@@ -10,6 +10,13 @@ private data class AssignAction(val key: String, val value: Any) : Action {
     }
 }
 
+// A test action designed to always throw an exception.
+private object CrashingAction : Action {
+    override fun execute(context: Context, event: Event): Context {
+        throw IllegalStateException("This action is designed to fail.")
+    }
+}
+
 class StateMachineEngineTest : BehaviorSpec({
     Given("a state machine with an initial and a next state") {
         val initialState = State(id = "Initial", on = mapOf("NEXT" to listOf(Transition(target = "Next"))))
@@ -116,6 +123,57 @@ class StateMachineEngineTest : BehaviorSpec({
             Then("all actions should be executed and the context updated") {
                 engine.context.value.get<String>("action1") shouldBe "ran"
                 engine.context.value.get<Int>("action2") shouldBe 123
+            }
+        }
+    }
+
+    Given("a state machine with entry and exit actions") {
+        val exitAction = AssignAction("exit", true)
+        val transitionAction = AssignAction("transition", true)
+        val entryAction = AssignAction("entry", true)
+
+        val initialState = State(id = "Initial", onExit = listOf(exitAction), on = mapOf("MOVE" to listOf(Transition(target = "Next", actions = listOf(transitionAction)))))
+        val nextState = State(id = "Next", onEntry = listOf(entryAction))
+        val definition = StateMachineDefinition(
+            initial = "Initial",
+            states = mapOf("Initial" to initialState, "Next" to nextState)
+        )
+
+        When("a transition occurs") {
+            val engine = StateMachineEngine(definition)
+            engine.send(Event("MOVE"))
+
+            Then("the exit, transition, and entry actions should all be executed") {
+                engine.context.value.get<Boolean>("exit") shouldBe true
+                engine.context.value.get<Boolean>("transition") shouldBe true
+                engine.context.value.get<Boolean>("entry") shouldBe true
+            }
+        }
+    }
+
+    Given("a transition with an action that throws an exception") {
+        val errorState = State(id = "ErrorState")
+        val crashingTransition = Transition(target = "Next", actions = listOf(CrashingAction))
+        val errorTransition = Transition(target = "ErrorState")
+        val initialState = State(
+            id = "Initial",
+            on = mapOf(
+                "CRASH_EVENT" to listOf(crashingTransition),
+                "error.execution" to listOf(errorTransition)
+            )
+        )
+        val nextState = State(id = "Next")
+        val definition = StateMachineDefinition(
+            initial = "Initial",
+            states = mapOf("Initial" to initialState, "Next" to nextState, "ErrorState" to errorState)
+        )
+
+        When("the event that causes the crash is sent") {
+            val engine = StateMachineEngine(definition)
+            engine.send(Event("CRASH_EVENT"))
+
+            Then("the state machine should transition to the error state") {
+                engine.currentState.value shouldBe errorState
             }
         }
     }

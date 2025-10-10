@@ -1,19 +1,39 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
 /**
- * Holds the extended state of the state machine in an immutable way.
+ * An immutable, type-safe store for holding the state machine's data.
  *
- * The context is a data repository that [Action]s can use to store and retrieve information.
- * In an immutable architecture, the context itself is never modified directly. Instead, an [Action]
- * creates a new context instance with the required changes.
+ * It behaves like a map but provides a more constrained API to ensure immutability.
+ * Every "put" operation returns a new Context instance with the data updated.
  */
-interface Context {
+class Context private constructor(private val values: Map<String, Any>) {
+
     /**
-     * Retrieves a value from the context in a type-safe way.
-     *
-     * @param T The expected type of the value.
-     * @param key The key or path identifying the value to retrieve.
-     * @return The value associated with the key, cast to type [T], or null if the key is not found or the type is wrong.
+     * Creates an empty context.
      */
-    fun <T> getData(key: String): T?
+    constructor() : this(emptyMap())
+
+    /**
+     * Retrieves a value from the context for a given [key].
+     *
+     * @param key The key of the value to retrieve.
+     * @return The value as type [T] if it exists and is of the correct type, otherwise null.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T> get(key: String): T? {
+        return values[key] as? T
+    }
+
+    /**
+     * Returns a new [Context] instance with the given [key] and [value] added.
+     *
+     * If the key already exists, its value will be overwritten.
+     *
+     * @param key The key for the data.
+     * @param value The data to store.
+     * @return A new, updated Context instance.
+     */
+    fun put(key: String, value: Any): Context {
+        return Context(values + (key to value))
+    }
 }

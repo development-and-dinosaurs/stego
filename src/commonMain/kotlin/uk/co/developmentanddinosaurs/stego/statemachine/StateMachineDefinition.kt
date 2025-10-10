@@ -5,23 +5,13 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  *
  * This is a pure data structure, typically deserialized from a configuration file (e.g., JSON).
  * It contains no runtime logic or state, only the blueprint for how the machine should be constructed.
+ *
+ * @property initial The ID of the top-level initial [State] that the machine will be in upon starting.
+ * @property states A map of all top-level states in the state machine, keyed by their unique IDs.
+ * @property initialContext The initial data for the machine's context.
  */
-interface StateMachineDefinition {
-    /**
-     * The ID of the top-level initial [State] that the machine will be in upon starting.
-     * This must correspond to a key in the [states] map.
-     */
-    val initial: String
-
-    /**
-     * A map of all top-level states in the state machine, keyed by their unique IDs.
-     * For hierarchical states, substates are defined within their parent [State] objects.
-     */
-    val states: Map<String, State>
-
-    /**
-     * The initial data for the machine's [Context].
-     * This map will be used to construct the initial [Context] when the machine is started.
-     */
-    val initialContext: Map<String, Any>
-}
+data class StateMachineDefinition(
+    val initial: String,
+    val states: Map<String, State>,
+    val initialContext: Context = Context()
+)

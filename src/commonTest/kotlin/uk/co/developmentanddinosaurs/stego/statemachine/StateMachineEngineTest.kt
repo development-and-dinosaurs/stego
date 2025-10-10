@@ -3,36 +3,13 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 
-private data class TestEvent(override val type: String, override val data: Map<String, Any> = emptyMap()) : Event
-
-private data class TestTransition(
-    override val target: String,
-    override val actions: List<Action> = emptyList(),
-    override val guard: Guard? = null
-) : Transition
-
-private data class TestState(
-    override val id: String,
-    override val on: Map<String, List<Transition>> = emptyMap(),
-    override val onEntry: List<Action> = emptyList(),
-    override val onExit: List<Action> = emptyList(),
-    override val invoke: Invokable? = null,
-    override val initial: String? = null,
-    override val states: Map<String, State>? = null
-) : State
-
-private data class TestStateMachineDefinition(
-    override val initial: String,
-    override val states: Map<String, State>,
-    override val initialContext: Map<String, Any> = emptyMap()
-) : StateMachineDefinition
-
 class StateMachineEngineTest : BehaviorSpec({
     Given("a state machine with an initial and a next state") {
-        val initialState = TestState("Initial", on = mapOf("NEXT" to listOf(TestTransition("Next"))))
-        val definition = TestStateMachineDefinition(
+        val initialState = State(id = "Initial", on = mapOf("NEXT" to listOf(Transition(target = "Next"))))
+        val nextState = State(id = "Next")
+        val definition = StateMachineDefinition(
             initial = "Initial",
-            states = mapOf("Initial" to initialState, "Next" to TestState("Next"))
+            states = mapOf("Initial" to initialState, "Next" to nextState)
         )
 
         When("the engine is created") {
@@ -45,16 +22,16 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("an event is sent that triggers a transition") {
             val engine = StateMachineEngine(definition)
-            engine.send(TestEvent("NEXT"))
+            engine.send(Event(type = "NEXT"))
 
             Then("the state machine should transition to the next state") {
-                engine.currentState.value shouldBe TestState("Next")
+                engine.currentState.value shouldBe nextState
             }
         }
 
         When("an event is sent that does not trigger a transition") {
             val engine = StateMachineEngine(definition)
-            engine.send(TestEvent("UNKNOWN"))
+            engine.send(Event(type = "UNKNOWN"))
 
             Then("the state machine should remain in the initial state") {
                 engine.currentState.value shouldBe initialState

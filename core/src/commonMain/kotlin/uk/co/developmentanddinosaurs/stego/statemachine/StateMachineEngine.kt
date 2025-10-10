@@ -36,6 +36,9 @@ class StateMachineEngine(
         }
 
         if (transition != null) {
+            val newContext = transition.actions.fold(_context.value) { acc, action -> action.execute(acc, event) }
+            _context.value = newContext
+
             val targetState = definition.states[transition.target]
             if (targetState != null) {
                 _currentState.value = targetState

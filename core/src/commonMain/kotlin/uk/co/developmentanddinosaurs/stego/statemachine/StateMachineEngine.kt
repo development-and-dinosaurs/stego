@@ -23,17 +23,17 @@ class StateMachineEngine(
         val initialState = definition.states[definition.initial]
             ?: throw IllegalArgumentException("Initial state '${definition.initial}' not found in definition.")
         _currentState = MutableStateFlow(initialState)
-
         _context = MutableStateFlow(definition.initialContext)
     }
 
     /**
-     * Processes an event to find the target state and transition to it.
-     * State changes are emitted to the [currentState] flow.
-     * This version does not yet handle actions, guards, or context changes.
+     * Processes an event to find and execute a valid transition.
+     * This version evaluates guards and resolves nested states, but does not yet handle actions or transition bubbling.
      */
     fun send(event: Event) {
-        val transition = _currentState.value.on[event.type]?.firstOrNull()
+        val transition = _currentState.value.on[event.type]?.firstOrNull { transition ->
+            transition.guard?.evaluate(_context.value, event) ?: true
+        }
 
         if (transition != null) {
             val targetState = definition.states[transition.target]

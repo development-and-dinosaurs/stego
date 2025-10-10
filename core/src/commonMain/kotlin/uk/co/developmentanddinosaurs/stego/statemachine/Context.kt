@@ -20,8 +20,8 @@ class Context private constructor(private val values: Map<String, Any>) {
      * @return The value as type [T] if it exists and is of the correct type, otherwise null.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T> get(key: String): T? {
-        return values[key] as? T
+    fun <T> get(key: String): T {
+        return values[key] as T
     }
 
     /**

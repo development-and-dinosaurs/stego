@@ -15,6 +15,14 @@ private data class AssignAction(val key: String, val value: Any) : Action {
     }
 }
 
+// A test action that appends a value to a list in the context.
+private data class AppendAction(val key: String, val value: String) : Action {
+    override fun execute(context: Context, event: Event): Context {
+        val list = context.get<List<String>?>(key) ?: emptyList()
+        return context.put(key, list + value)
+    }
+}
+
 // A test action designed to always throw an exception.
 private object CrashingAction : Action {
     override fun execute(context: Context, event: Event): Context {
@@ -243,6 +251,75 @@ class StateMachineEngineTest : BehaviorSpec({
 
             Then("the invokable should be cancelled and the state should be Idle") {
                 engine.output.value.state shouldBe idleState
+            }
+        }
+    }
+
+    Given("a hierarchical state machine") {
+        val childState = State(id = "Child")
+        val parentState = State(
+            id = "Parent",
+            initial = "Child",
+            states = mapOf("Child" to childState)
+        )
+        val definition = StateMachineDefinition(
+            initial = "Parent",
+            states = mapOf("Parent" to parentState)
+        )
+
+        When("the engine is created") {
+            val engine = StateMachineEngine(definition)
+
+            Then("it should automatically enter the nested initial state") {
+                engine.output.value.state shouldBe childState
+            }
+        }
+    }
+
+    Given("a hierarchical state machine with a transition on the parent") {
+        val endState = State(id = "End")
+        val childState = State(id = "Child")
+        val parentState = State(
+            id = "Parent",
+            initial = "Child",
+            states = mapOf("Child" to childState),
+            on = mapOf("GOTO_END" to listOf(Transition("End")))
+        )
+        val definition = StateMachineDefinition(
+            initial = "Parent",
+            states = mapOf("Parent" to parentState, "End" to endState)
+        )
+
+        When("the engine is in the child state and an event is sent") {
+            val engine = StateMachineEngine(definition)
+            engine.send(Event("GOTO_END"))
+
+            Then("the engine should find the transition on the parent and move to the correct state") {
+                engine.output.value.state shouldBe endState
+            }
+        }
+    }
+
+    Given("a deeply nested hierarchical state machine") {
+        val l5 = State("L5", onEntry = listOf(AppendAction("path", "L5")))
+        val l4 = State("L4", initial = "L5", states = mapOf("L5" to l5), onEntry = listOf(AppendAction("path", "L4")))
+        val l3 = State("L3", initial = "L4", states = mapOf("L4" to l4), onEntry = listOf(AppendAction("path", "L3")))
+        val l2 = State("L2", initial = "L3", states = mapOf("L3" to l3), onEntry = listOf(AppendAction("path", "L2")))
+        val l1 = State("L1", initial = "L2", states = mapOf("L2" to l2), onEntry = listOf(AppendAction("path", "L1")))
+        val definition = StateMachineDefinition(
+            initial = "L1",
+            states = mapOf("L1" to l1)
+        )
+
+        When("the engine is created") {
+            val engine = StateMachineEngine(definition)
+
+            Then("the final state should be the deepest child") {
+                engine.output.value.state shouldBe l5
+            }
+
+            Then("entry actions for all states in the hierarchy should be executed in order") {
+                engine.output.value.context.get<List<String>>("path") shouldBe listOf("L1", "L2", "L3", "L4", "L5")
             }
         }
     }

@@ -1,18 +1,24 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+
 /**
- * Represents a long-running service or another process that can be invoked by a [State].
+ * Represents a long-running service or another process that can be invoked by a [kotlin.collections.State].
  *
- * When a state machine enters a state with an `invoke` block, it will execute the specified service.
- * Upon completion, the invoked service is expected to send an event back to the state machine to trigger the next transition.
- * This promotes a clean, unified event-driven architecture.
- *
- * @property src The source or identifier of the invokable content.
- * @property onDone The [Event] to be sent when the invoked service completes successfully.
- * @property onError The [Event] to be sent when the invoked service reports an error.
+ * This is a regular interface to allow library consumers to provide their own custom implementations
+ * for tasks like API calls, database operations, etc.
  */
-data class Invokable(
-    val src: String,
-    val onDone: Event,
-    val onError: Event
-)
+interface Invokable {
+    /**
+     * Starts the invokable service within the given coroutine scope.
+     *
+     * The implementation should launch its work within the provided [scope] (e.g., using `scope.async`) and
+     * is contractually obligated to return a [Deferred] that will eventually resolve to a completion or error [Event].
+     *
+     * @param context The current, immutable context of the state machine.
+     * @param scope The [CoroutineScope] in which the asynchronous work should be launched.
+     * @return A [Deferred] instance that will complete with the resulting [Event].
+     */
+    fun invoke(context: Context, scope: CoroutineScope): Deferred<Event>
+}

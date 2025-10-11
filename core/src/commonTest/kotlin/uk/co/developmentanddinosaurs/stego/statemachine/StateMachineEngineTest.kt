@@ -1,7 +1,12 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 
 // A simple test action that assigns a value to the context.
 private data class AssignAction(val key: String, val value: Any) : Action {
@@ -17,7 +22,19 @@ private object CrashingAction : Action {
     }
 }
 
+// A test invokable that simulates a network call.
+private data class TestInvokable(val resultEvent: Event) : Invokable {
+    override fun invoke(context: Context, scope: CoroutineScope): Deferred<Event> {
+        return scope.async {
+            delay(100)
+            resultEvent
+        }
+    }
+}
+
 class StateMachineEngineTest : BehaviorSpec({
+    coroutineTestScope = true
+
     Given("a state machine with an initial and a next state") {
         val initialState = State(id = "Initial", on = mapOf("NEXT" to listOf(Transition(target = "Next"))))
         val nextState = State(id = "Next")
@@ -174,6 +191,27 @@ class StateMachineEngineTest : BehaviorSpec({
 
             Then("the state machine should transition to the error state") {
                 engine.currentState.value shouldBe errorState
+            }
+        }
+    }
+
+    Given("a state with an invokable service") {
+        val doneEvent = Event(type = "INVOKE_DONE")
+        val invokable = TestInvokable(resultEvent = doneEvent)
+        val successState = State(id = "Success")
+        val loadingState = State(id = "Loading", invoke = invokable, on = mapOf("INVOKE_DONE" to listOf(Transition("Success"))))
+        val definition = StateMachineDefinition(
+            initial = "Loading",
+            states = mapOf("Loading" to loadingState, "Success" to successState)
+        )
+
+        When("the engine is created") {
+            val engine = StateMachineEngine(definition, this)
+
+            testCoroutineScheduler.advanceUntilIdle()
+
+            Then("the invokable should be executed and the resulting event should cause a transition") {
+                engine.currentState.value shouldBe successState
             }
         }
     }

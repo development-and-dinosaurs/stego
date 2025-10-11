@@ -17,6 +17,27 @@ interface Guard {
     fun evaluate(context: Context, event: Event): Boolean
 }
 
+@Suppress("UNCHECKED_CAST")
+private fun compareValues(
+    left: Value<Any>,
+    right: Value<Any>,
+    context: Context,
+    event: Event,
+    comparison: (Int) -> Boolean
+): Boolean {
+    val leftValue = left.resolve(context, event)
+    val rightValue = right.resolve(context, event)
+    if (leftValue == null || rightValue == null) {
+        return false
+    }
+    val result = try {
+        (leftValue as? Comparable<Any>)?.compareTo(rightValue)
+    } catch (_: ClassCastException) {
+        null
+    }
+    return result != null && comparison(result)
+}
+
 /**
  * A guard that checks if two values are equal.
  */
@@ -39,19 +60,8 @@ data class NotEqualsGuard(val left: Value<Any>, val right: Value<Any>) : Guard {
  * A guard that checks if the left value is greater than the right value.
  */
 data class GreaterThanGuard(val left: Value<Any>, val right: Value<Any>) : Guard {
-    @Suppress("UNCHECKED_CAST")
     override fun evaluate(context: Context, event: Event): Boolean {
-        val leftValue = left.resolve(context, event)
-        val rightValue = right.resolve(context, event)
-        if (leftValue == null || rightValue == null) {
-            return false
-        }
-        val result = try {
-            (leftValue as? Comparable<Any>)?.compareTo(rightValue)
-        } catch (_: ClassCastException) {
-            null
-        }
-        return result != null && result > 0
+        return compareValues(left, right, context, event) { it > 0 }
     }
 }
 
@@ -59,19 +69,8 @@ data class GreaterThanGuard(val left: Value<Any>, val right: Value<Any>) : Guard
  * A guard that checks if the left value is less than the right value.
  */
 data class LessThanGuard(val left: Value<Any>, val right: Value<Any>) : Guard {
-    @Suppress("UNCHECKED_CAST")
     override fun evaluate(context: Context, event: Event): Boolean {
-        val leftValue = left.resolve(context, event)
-        val rightValue = right.resolve(context, event)
-        if (leftValue == null || rightValue == null) {
-            return false
-        }
-        val result = try {
-            (leftValue as? Comparable<Any>)?.compareTo(rightValue)
-        } catch (_: ClassCastException) {
-            null
-        }
-        return result != null && result < 0
+        return compareValues(left, right, context, event) { it < 0 }
     }
 }
 
@@ -79,19 +78,8 @@ data class LessThanGuard(val left: Value<Any>, val right: Value<Any>) : Guard {
  * A guard that checks if the left value is greater than or equal to the right value.
  */
 data class GreaterThanOrEqualsGuard(val left: Value<Any>, val right: Value<Any>) : Guard {
-    @Suppress("UNCHECKED_CAST")
     override fun evaluate(context: Context, event: Event): Boolean {
-        val leftValue = left.resolve(context, event)
-        val rightValue = right.resolve(context, event)
-        if (leftValue == null || rightValue == null) {
-            return false
-        }
-        val result = try {
-            (leftValue as? Comparable<Any>)?.compareTo(rightValue)
-        } catch (_: ClassCastException) {
-            null
-        }
-        return result != null && result >= 0
+        return compareValues(left, right, context, event) { it >= 0 }
     }
 }
 
@@ -99,19 +87,8 @@ data class GreaterThanOrEqualsGuard(val left: Value<Any>, val right: Value<Any>)
  * A guard that checks if the left value is less than or equal to the right value.
  */
 data class LessThanOrEqualsGuard(val left: Value<Any>, val right: Value<Any>) : Guard {
-    @Suppress("UNCHECKED_CAST")
     override fun evaluate(context: Context, event: Event): Boolean {
-        val leftValue = left.resolve(context, event)
-        val rightValue = right.resolve(context, event)
-        if (leftValue == null || rightValue == null) {
-            return false
-        }
-        val result = try {
-            (leftValue as? Comparable<Any>)?.compareTo(rightValue)
-        } catch (_: ClassCastException) {
-            null
-        }
-        return result != null && result <= 0
+        return compareValues(left, right, context, event) { it <= 0 }
     }
 }
 

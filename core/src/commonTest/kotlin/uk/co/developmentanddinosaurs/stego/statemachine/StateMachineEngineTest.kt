@@ -15,11 +15,11 @@ private data class AssignAction(val key: String, val value: Any) : Action {
     }
 }
 
-// A test action that appends a value to a list in the context.
-private data class AppendAction(val key: String, val value: String) : Action {
+// A test action that appends a string to a "trace" list in the context.
+private data class TraceAction(val name: String) : Action {
     override fun execute(context: Context, event: Event): Context {
-        val list = context.get<List<String>?>(key) ?: emptyList()
-        return context.put(key, list + value)
+        val currentTrace = context.get<List<String>>("trace") ?: emptyList()
+        return context.put("trace", currentTrace + name)
     }
 }
 
@@ -300,26 +300,99 @@ class StateMachineEngineTest : BehaviorSpec({
         }
     }
 
-    Given("a deeply nested hierarchical state machine") {
-        val l5 = State("L5", onEntry = listOf(AppendAction("path", "L5")))
-        val l4 = State("L4", initial = "L5", states = mapOf("L5" to l5), onEntry = listOf(AppendAction("path", "L4")))
-        val l3 = State("L3", initial = "L4", states = mapOf("L4" to l4), onEntry = listOf(AppendAction("path", "L3")))
-        val l2 = State("L2", initial = "L3", states = mapOf("L3" to l3), onEntry = listOf(AppendAction("path", "L2")))
-        val l1 = State("L1", initial = "L2", states = mapOf("L2" to l2), onEntry = listOf(AppendAction("path", "L1")))
+    Given("a hierarchical state machine with entry actions") {
+        val childEntryAction = TraceAction("child_entry")
+        val parentEntryAction = TraceAction("parent_entry")
+        val childState = State(id = "Child", onEntry = listOf(childEntryAction))
+        val parentState = State(
+            id = "Parent",
+            initial = "Child",
+            states = mapOf("Child" to childState),
+            onEntry = listOf(parentEntryAction)
+        )
         val definition = StateMachineDefinition(
-            initial = "L1",
-            states = mapOf("L1" to l1)
+            initial = "Parent",
+            initialContext = Context().put("trace", emptyList<String>()),
+            states = mapOf("Parent" to parentState)
         )
 
         When("the engine is created") {
             val engine = StateMachineEngine(definition)
 
-            Then("the final state should be the deepest child") {
+            Then("it should execute entry actions for both parent and child in order") {
+                engine.output.value.context.get<List<String>>("trace") shouldBe listOf("parent_entry", "child_entry")
+            }
+        }
+    }
+
+    Given("a hierarchical transition between sibling states") {
+        val parentEntryAction = TraceAction("parent_entry")
+        val parentExitAction = TraceAction("parent_exit")
+        val childOneEntryAction = TraceAction("childOne_entry")
+        val childOneExitAction = TraceAction("childOne_exit")
+        val childTwoEntryAction = TraceAction("childTwo_entry")
+
+        val childTwo = State(id = "ChildTwo", onEntry = listOf(childTwoEntryAction))
+        val childOne = State(
+            id = "ChildOne",
+            onEntry = listOf(childOneEntryAction),
+            onExit = listOf(childOneExitAction),
+            on = mapOf("MOVE" to listOf(Transition("ChildTwo")))
+        )
+        val parent = State(
+            id = "Parent",
+            initial = "ChildOne",
+            onEntry = listOf(parentEntryAction),
+            onExit = listOf(parentExitAction),
+            states = mapOf("ChildOne" to childOne, "ChildTwo" to childTwo)
+        )
+        val definition = StateMachineDefinition(
+            initial = "Parent",
+            initialContext = Context().put("trace", emptyList<String>()),
+            states = mapOf("Parent" to parent)
+        )
+
+        When("a transition occurs between the siblings") {
+            val engine = StateMachineEngine(definition)
+            engine.send(Event("MOVE"))
+
+            Then("only the relevant entry and exit actions should be executed") {
+                engine.output.value.context.get<List<String>>("trace") shouldBe listOf(
+                    "parent_entry",
+                    "childOne_entry",
+                    "childOne_exit",
+                    "childTwo_entry"
+                )
+            }
+        }
+    }
+
+    Given("a deeply nested hierarchical state machine") {
+        val l5 = State(id = "l5", onEntry = listOf(TraceAction("l5_entry")))
+        val l4 = State(id = "l4", initial = "l5", states = mapOf("l5" to l5), onEntry = listOf(TraceAction("l4_entry")))
+        val l3 = State(id = "l3", initial = "l4", states = mapOf("l4" to l4), onEntry = listOf(TraceAction("l3_entry")))
+        val l2 = State(id = "l2", initial = "l3", states = mapOf("l3" to l3), onEntry = listOf(TraceAction("l2_entry")))
+        val l1 = State(id = "l1", initial = "l2", states = mapOf("l2" to l2), onEntry = listOf(TraceAction("l1_entry")))
+        val definition = StateMachineDefinition(
+            initial = "l1",
+            initialContext = Context().put("trace", emptyList<String>()),
+            states = mapOf("l1" to l1)
+        )
+
+        When("the engine is created") {
+            val engine = StateMachineEngine(definition)
+
+            Then("it should enter the deepest initial state") {
                 engine.output.value.state shouldBe l5
             }
-
-            Then("entry actions for all states in the hierarchy should be executed in order") {
-                engine.output.value.context.get<List<String>>("path") shouldBe listOf("L1", "L2", "L3", "L4", "L5")
+            Then("it should execute all entry actions in order") {
+                engine.output.value.context.get<List<String>>("trace") shouldBe listOf(
+                    "l1_entry",
+                    "l2_entry",
+                    "l3_entry",
+                    "l4_entry",
+                    "l5_entry"
+                )
             }
         }
     }

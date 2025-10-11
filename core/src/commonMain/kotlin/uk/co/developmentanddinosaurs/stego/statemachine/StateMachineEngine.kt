@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 /**
  * A concrete state machine engine that executes a given [StateMachineDefinition].
@@ -30,17 +31,16 @@ class StateMachineEngine(
             ?: throw IllegalArgumentException("Initial state '${definition.initial}' not found in definition.")
 
         var tempContext = definition.initialContext
+        val initEvent = Event("stego.internal.init")
         initialPath.forEach { state ->
-            tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, Event("stego.internal.init")) }
+            tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, initEvent) }
         }
 
         _output = MutableStateFlow(StateMachineOutput(leafInitialState, tempContext))
 
-        // After setting the initial state, check if the final leaf state has an invokable to run.
-        leafInitialState.invoke?.let { invokable ->
-            val deferredEvent = invokable.invoke(output.value.context, scope)
+        leafInitialState.invoke?.let {
             activeInvokableJob = scope.launch {
-                val resultEvent = deferredEvent.await()
+                val resultEvent = it.invoke(output.value.context, scope).await()
                 send(resultEvent)
             }
         }
@@ -82,23 +82,43 @@ class StateMachineEngine(
         activeInvokableJob?.cancel()
         activeInvokableJob = null
 
+        val sourcePath = getPathToState(sourceState.id)!!
+        val targetPath = getPathToState(targetState.id)!!
+        val lcaIndex = sourcePath.zip(targetPath).indexOfFirst { (a, b) -> a.id != b.id }.let { if (it == -1) min(sourcePath.size, targetPath.size) - 1 else it - 1 }
+
+        val statesToExit = sourcePath.subList(lcaIndex + 1, sourcePath.size).reversed()
+        val statesToEnter = targetPath.subList(lcaIndex + 1, targetPath.size)
+
         var tempContext = output.value.context
-        tempContext = sourceState.onExit.fold(tempContext) { acc, action -> action.execute(acc, event) }
+
+        statesToExit.forEach { state ->
+            tempContext = state.onExit.fold(tempContext) { acc, action -> action.execute(acc, event) }
+        }
+
         tempContext = transition.actions.fold(tempContext) { acc, action -> action.execute(acc, event) }
-        _output.value = _output.value.copy(context = tempContext)
 
-        enterState(targetState, event)
-    }
+        statesToEnter.forEach { state ->
+            tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, event) }
+        }
 
-    private fun enterState(state: State, event: Event) {
-        var tempContext = output.value.context
-        tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, event) }
-        _output.value = StateMachineOutput(state, tempContext)
+        var finalTargetState = targetState
+        val descentPath = mutableListOf<State>()
+        while (finalTargetState.initial != null) {
+            val nextStateId = finalTargetState.initial
+            val nextState = finalTargetState.states[nextStateId] ?: throw IllegalStateException("Nested initial state '$nextStateId' not found in state '${finalTargetState.id}'.")
+            descentPath.add(nextState)
+            finalTargetState = nextState
+        }
 
-        state.invoke?.let { invokable ->
-            val deferredEvent = invokable.invoke(output.value.context, scope)
+        descentPath.forEach { state ->
+            tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, event) }
+        }
+
+        _output.value = StateMachineOutput(finalTargetState, tempContext)
+
+        finalTargetState.invoke?.let {
             activeInvokableJob = scope.launch {
-                val resultEvent = deferredEvent.await()
+                val resultEvent = it.invoke(output.value.context, scope).await()
                 send(resultEvent)
             }
         }
@@ -111,19 +131,15 @@ class StateMachineEngine(
     private fun findStateById(id: String, states: Map<String, State> = definition.states): State? {
         states[id]?.let { return it }
         for (state in states.values) {
-            state.states?.let { subStates ->
-                findStateById(id, subStates)?.let { return it }
-            }
+            findStateById(id, state.states)?.let { return it }
         }
         return null
     }
 
     private fun findParentState(childId: String, states: Map<String, State> = definition.states): State? {
         for (state in states.values) {
-            if (state.states?.containsKey(childId) == true) return state
-            state.states?.let { subStates ->
-                findParentState(childId, subStates)?.let { return it }
-            }
+            if (state.states.containsKey(childId)) return state
+            findParentState(childId, state.states)?.let { return it }
         }
         return null
     }
@@ -132,9 +148,20 @@ class StateMachineEngine(
         var current = findStateById(definition.initial) ?: return emptyList()
         val path = mutableListOf(current)
         while (current.initial != null) {
-            current = current.states?.get(current.initial!!) ?: return path
+            current = current.states[current.initial] ?: return path
             path.add(current)
         }
         return path
+    }
+
+    private fun getPathToState(stateId: String): List<State>? {
+        fun find(targetId: String, current: State, path: List<State>): List<State>? {
+            val newPath = path + current
+            if (current.id == targetId) return newPath
+            current.states.values.forEach { child -> find(targetId, child, newPath)?.let { return it } }
+            return null
+        }
+        definition.states.values.forEach { state -> find(stateId, state, emptyList())?.let { return it } }
+        return null
     }
 }

@@ -47,7 +47,7 @@ class StateMachineEngineTest : BehaviorSpec({
             val engine = StateMachineEngine(definition)
 
             Then("the initial state should be correct") {
-                engine.currentState.value shouldBe initialState
+                engine.output.value.state shouldBe initialState
             }
         }
 
@@ -56,7 +56,7 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event(type = "NEXT"))
 
             Then("the state machine should transition to the next state") {
-                engine.currentState.value shouldBe nextState
+                engine.output.value.state shouldBe nextState
             }
         }
 
@@ -65,7 +65,7 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event(type = "UNKNOWN"))
 
             Then("the state machine should remain in the initial state") {
-                engine.currentState.value shouldBe initialState
+                engine.output.value.state shouldBe initialState
             }
         }
     }
@@ -94,7 +94,7 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event(type = "EVENT"))
 
             Then("the state machine should transition to the correct state") {
-                engine.currentState.value shouldBe otherState
+                engine.output.value.state shouldBe otherState
             }
         }
     }
@@ -114,10 +114,10 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event(type = "ACTION_EVENT"))
 
             Then("the action should be executed and the context updated") {
-                engine.context.value.get<Boolean>("assigned") shouldBe true
+                engine.output.value.context.get<Boolean>("assigned") shouldBe true
             }
             Then("the state machine should transition to the next state") {
-                engine.currentState.value shouldBe nextState
+                engine.output.value.state shouldBe nextState
             }
         }
     }
@@ -138,8 +138,8 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event(type = "MULTI_ACTION_EVENT"))
 
             Then("all actions should be executed and the context updated") {
-                engine.context.value.get<String>("action1") shouldBe "ran"
-                engine.context.value.get<Int>("action2") shouldBe 123
+                engine.output.value.context.get<String>("action1") shouldBe "ran"
+                engine.output.value.context.get<Int>("action2") shouldBe 123
             }
         }
     }
@@ -161,9 +161,9 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event("MOVE"))
 
             Then("the exit, transition, and entry actions should all be executed") {
-                engine.context.value.get<Boolean>("exit") shouldBe true
-                engine.context.value.get<Boolean>("transition") shouldBe true
-                engine.context.value.get<Boolean>("entry") shouldBe true
+                engine.output.value.context.get<Boolean>("exit") shouldBe true
+                engine.output.value.context.get<Boolean>("transition") shouldBe true
+                engine.output.value.context.get<Boolean>("entry") shouldBe true
             }
         }
     }
@@ -190,7 +190,7 @@ class StateMachineEngineTest : BehaviorSpec({
             engine.send(Event("CRASH_EVENT"))
 
             Then("the state machine should transition to the error state") {
-                engine.currentState.value shouldBe errorState
+                engine.output.value.state shouldBe errorState
             }
         }
     }
@@ -210,7 +210,7 @@ class StateMachineEngineTest : BehaviorSpec({
             testCoroutineScheduler.advanceUntilIdle()
 
             Then("the invokable should be executed and the resulting event should cause a transition") {
-                engine.currentState.value shouldBe successState
+                engine.output.value.state shouldBe successState
             }
         }
     }
@@ -220,6 +220,8 @@ class StateMachineEngineTest : BehaviorSpec({
         val invokable = TestInvokable(resultEvent = doneEvent, duration = 5000) // A long-running task
         val successState = State(id = "Success")
         val failedTestState = State(id = "FailedTestState")
+        // This state now has a "poison pill" transition. If the invokable is not cancelled,
+        // it will transition here, failing the test.
         val idleState = State(id = "Idle", on = mapOf("INVOKE_DONE" to listOf(Transition("FailedTestState"))))
         val loadingState = State(
             id = "Loading",
@@ -240,7 +242,7 @@ class StateMachineEngineTest : BehaviorSpec({
             testCoroutineScheduler.advanceUntilIdle()
 
             Then("the invokable should be cancelled and the state should be Idle") {
-                engine.currentState.value shouldBe idleState
+                engine.output.value.state shouldBe idleState
             }
         }
     }

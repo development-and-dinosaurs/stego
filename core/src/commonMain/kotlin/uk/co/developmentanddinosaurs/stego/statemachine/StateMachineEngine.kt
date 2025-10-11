@@ -19,25 +19,22 @@ class StateMachineEngine(
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob())
 ) {
 
-    private val _currentState: MutableStateFlow<State>
-    private val _context: MutableStateFlow<Context>
-    private var activeInvokableJob: Job? = null
+    private val _output: MutableStateFlow<StateMachineOutput>
+    val output: StateFlow<StateMachineOutput> get() = _output.asStateFlow()
 
-    val currentState: StateFlow<State> get() = _currentState.asStateFlow()
-    val context: StateFlow<Context> get() = _context.asStateFlow()
+    private var activeInvokableJob: Job? = null
 
     init {
         val initialState = definition.states[definition.initial]
             ?: throw IllegalArgumentException("Initial state '${definition.initial}' not found in definition.")
-        _currentState = MutableStateFlow(initialState)
-        _context = MutableStateFlow(definition.initialContext)
+        _output = MutableStateFlow(StateMachineOutput(initialState, definition.initialContext))
 
         enterState(initialState, Event("stego.internal.init"))
     }
 
     fun send(event: Event) {
         try {
-            val sourceState = _currentState.value
+            val sourceState = output.value.state
             val transition = findTransition(event)
 
             if (transition != null) {
@@ -56,8 +53,8 @@ class StateMachineEngine(
     }
 
     private fun findTransition(event: Event): Transition? {
-        return _currentState.value.on[event.type]?.firstOrNull { transition ->
-            transition.guard?.evaluate(_context.value, event) ?: true
+        return output.value.state.on[event.type]?.firstOrNull { transition ->
+            transition.guard?.evaluate(output.value.context, event) ?: true
         }
     }
 
@@ -65,22 +62,21 @@ class StateMachineEngine(
         activeInvokableJob?.cancel()
         activeInvokableJob = null
 
-        var tempContext = _context.value
+        var tempContext = output.value.context
         tempContext = sourceState.onExit.fold(tempContext) { acc, action -> action.execute(acc, event) }
         tempContext = transition.actions.fold(tempContext) { acc, action -> action.execute(acc, event) }
-        _context.value = tempContext
+        _output.value = _output.value.copy(context = tempContext)
 
         enterState(targetState, event)
     }
 
     private fun enterState(state: State, event: Event) {
-        var tempContext = _context.value
+        var tempContext = output.value.context
         tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, event) }
-        _context.value = tempContext
-        _currentState.value = state
+        _output.value = StateMachineOutput(state, tempContext)
 
         state.invoke?.let { invokable ->
-            val deferredEvent = invokable.invoke(_context.value, scope)
+            val deferredEvent = invokable.invoke(output.value.context, scope)
             activeInvokableJob = scope.launch {
                 val resultEvent = deferredEvent.await()
                 send(resultEvent)

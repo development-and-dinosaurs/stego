@@ -1,6 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,7 @@ class StateMachineEngine(
 
     private val _currentState: MutableStateFlow<State>
     private val _context: MutableStateFlow<Context>
+    private var activeInvokableJob: Job? = null
 
     val currentState: StateFlow<State> get() = _currentState.asStateFlow()
     val context: StateFlow<Context> get() = _context.asStateFlow()
@@ -60,6 +62,9 @@ class StateMachineEngine(
     }
 
     private fun executeTransition(sourceState: State, targetState: State, transition: Transition, event: Event) {
+        activeInvokableJob?.cancel()
+        activeInvokableJob = null
+
         var tempContext = _context.value
         tempContext = sourceState.onExit.fold(tempContext) { acc, action -> action.execute(acc, event) }
         tempContext = transition.actions.fold(tempContext) { acc, action -> action.execute(acc, event) }
@@ -76,7 +81,7 @@ class StateMachineEngine(
 
         state.invoke?.let { invokable ->
             val deferredEvent = invokable.invoke(_context.value, scope)
-            scope.launch {
+            activeInvokableJob = scope.launch {
                 val resultEvent = deferredEvent.await()
                 send(resultEvent)
             }

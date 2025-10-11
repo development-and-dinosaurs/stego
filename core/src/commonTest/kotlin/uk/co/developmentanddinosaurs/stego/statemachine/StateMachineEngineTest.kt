@@ -23,10 +23,10 @@ private object CrashingAction : Action {
 }
 
 // A test invokable that simulates a network call.
-private data class TestInvokable(val resultEvent: Event) : Invokable {
+private data class TestInvokable(val resultEvent: Event, val duration: Long = 100) : Invokable {
     override fun invoke(context: Context, scope: CoroutineScope): Deferred<Event> {
         return scope.async {
-            delay(100)
+            delay(duration)
             resultEvent
         }
     }
@@ -207,11 +207,40 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is created") {
             val engine = StateMachineEngine(definition, this)
-
             testCoroutineScheduler.advanceUntilIdle()
 
             Then("the invokable should be executed and the resulting event should cause a transition") {
                 engine.currentState.value shouldBe successState
+            }
+        }
+    }
+
+    Given("a state with a cancellable invokable service") {
+        val doneEvent = Event(type = "INVOKE_DONE")
+        val invokable = TestInvokable(resultEvent = doneEvent, duration = 5000) // A long-running task
+        val successState = State(id = "Success")
+        val failedTestState = State(id = "FailedTestState")
+        val idleState = State(id = "Idle", on = mapOf("INVOKE_DONE" to listOf(Transition("FailedTestState"))))
+        val loadingState = State(
+            id = "Loading",
+            invoke = invokable,
+            on = mapOf(
+                "INVOKE_DONE" to listOf(Transition("Success")),
+                "CANCEL" to listOf(Transition("Idle"))
+            )
+        )
+        val definition = StateMachineDefinition(
+            initial = "Loading",
+            states = mapOf("Loading" to loadingState, "Success" to successState, "Idle" to idleState, "FailedTestState" to failedTestState)
+        )
+
+        When("the engine is created and a cancel event is sent before the invokable completes") {
+            val engine = StateMachineEngine(definition, this)
+            engine.send(Event("CANCEL"))
+            testCoroutineScheduler.advanceUntilIdle()
+
+            Then("the invokable should be cancelled and the state should be Idle") {
+                engine.currentState.value shouldBe idleState
             }
         }
     }

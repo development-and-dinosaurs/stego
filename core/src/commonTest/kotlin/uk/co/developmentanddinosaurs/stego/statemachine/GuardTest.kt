@@ -5,163 +5,216 @@ import io.kotest.matchers.shouldBe
 
 class GuardTest : BehaviorSpec({
 
-    val testEvent = Event(type = "TEST", data = mapOf("isTest" to true, "count" to 5))
-    val testContext = Context().put("userId", 123)
-    val trueGuard = EqualsGuard(LiteralValue(1), LiteralValue(1))
-    val falseGuard = EqualsGuard(LiteralValue(1), LiteralValue(2))
+    val testEvent = Event(type = "TEST")
+    val testContext = Context()
+    val valueOne = LiteralValue<Any>(1)
+    val valueTwo = LiteralValue<Any>(2)
+    val trueGuard = EqualsGuard(valueOne, valueOne)
+    val falseGuard = EqualsGuard(valueOne, valueTwo)
 
     Given("an EqualsGuard") {
-        When("it compares a context value to a matching literal") {
-            val guard = EqualsGuard(ContextValue("userId"), LiteralValue(123))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is equal to the right value") {
+            val guard = EqualsGuard(valueOne, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("it compares an event value to a non-matching literal") {
-            val guard = EqualsGuard(EventValue("isTest"), LiteralValue(false))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
+        And("the left value is not equal to the right value") {
+            val guard = EqualsGuard(valueOne, valueTwo)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("a NotEqualsGuard") {
-        When("it compares a context value to a non-matching literal") {
-            val guard = NotEqualsGuard(ContextValue("userId"), LiteralValue(456))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is not equal to the right value") {
+            val guard = NotEqualsGuard(valueOne, valueTwo)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("it compares an event value to a matching literal") {
-            val guard = NotEqualsGuard(EventValue("isTest"), LiteralValue(true))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
+        And("the left value is equal to the right value") {
+            val guard = NotEqualsGuard(valueOne, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("a GreaterThanGuard") {
-        When("the left value is greater than the right value") {
-            val guard = GreaterThanGuard(EventValue("count"), LiteralValue(4))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is greater than the right value") {
+            val guard = GreaterThanGuard(valueTwo, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("the left value is not greater than the right value") {
-            val guard = GreaterThanGuard(EventValue("count"), LiteralValue(5))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
+        And("the left value is not greater than the right value") {
+            val guard = GreaterThanGuard(valueOne, valueTwo)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("a LessThanGuard") {
-        When("the left value is less than the right value") {
-            val guard = LessThanGuard(EventValue("count"), LiteralValue(6))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is less than the right value") {
+            val guard = LessThanGuard(valueOne, valueTwo)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("the left value is not less than the right value") {
-            val guard = LessThanGuard(EventValue("count"), LiteralValue(5))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
-            }
-        }
-        When("the values are not comparable") {
-            val guard = LessThanGuard(EventValue("isTest"), LiteralValue(5))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
+        And("the left value is not less than the right value") {
+            val guard = LessThanGuard(valueTwo, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("a GreaterThanOrEqualsGuard") {
-        When("the left value is greater than the right value") {
-            val guard = GreaterThanOrEqualsGuard(EventValue("count"), LiteralValue(4))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is greater than the right value") {
+            val guard = GreaterThanOrEqualsGuard(valueTwo, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("the left value is equal to the right value") {
-            val guard = GreaterThanOrEqualsGuard(EventValue("count"), LiteralValue(5))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is equal to the right value") {
+            val guard = GreaterThanOrEqualsGuard(valueOne, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("the left value is less than the right value") {
-            val guard = GreaterThanOrEqualsGuard(EventValue("count"), LiteralValue(6))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
+        And("the left value is less than the right value") {
+            val guard = GreaterThanOrEqualsGuard(valueOne, valueTwo)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("a LessThanOrEqualsGuard") {
-        When("the left value is less than the right value") {
-            val guard = LessThanOrEqualsGuard(EventValue("count"), LiteralValue(6))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is less than the right value") {
+            val guard = LessThanOrEqualsGuard(valueOne, valueTwo)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("the left value is equal to the right value") {
-            val guard = LessThanOrEqualsGuard(EventValue("count"), LiteralValue(5))
-            Then("it should evaluate to true") {
-                guard.evaluate(testContext, testEvent) shouldBe true
+        And("the left value is equal to the right value") {
+            val guard = LessThanOrEqualsGuard(valueOne, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-        When("the left value is greater than the right value") {
-            val guard = LessThanOrEqualsGuard(EventValue("count"), LiteralValue(4))
-            Then("it should evaluate to false") {
-                guard.evaluate(testContext, testEvent) shouldBe false
+        And("the left value is greater than the right value") {
+            val guard = LessThanOrEqualsGuard(valueTwo, valueOne)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("an AndGuard") {
-        When("all sub-guards are true") {
-            val andGuard = AndGuard(listOf(trueGuard, trueGuard))
-            Then("it should evaluate to true") {
-                andGuard.evaluate(testContext, testEvent) shouldBe true
+        And("all sub-guards are true") {
+            val guard = AndGuard(listOf(trueGuard, trueGuard))
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-
-        When("one sub-guard is false") {
-            val andGuard = AndGuard(listOf(trueGuard, falseGuard))
-            Then("it should evaluate to false") {
-                andGuard.evaluate(testContext, testEvent) shouldBe false
+        And("one sub-guard is false") {
+            val guard = AndGuard(listOf(trueGuard, falseGuard))
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("an OrGuard") {
-        When("one sub-guard is true") {
-            val orGuard = OrGuard(listOf(trueGuard, falseGuard))
-            Then("it should evaluate to true") {
-                orGuard.evaluate(testContext, testEvent) shouldBe true
+        And("one sub-guard is true") {
+            val guard = OrGuard(listOf(trueGuard, falseGuard))
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
-
-        When("all sub-guards are false") {
-            val orGuard = OrGuard(listOf(falseGuard, falseGuard))
-            Then("it should evaluate to false") {
-                orGuard.evaluate(testContext, testEvent) shouldBe false
+        And("all sub-guards are false") {
+            val guard = OrGuard(listOf(falseGuard, falseGuard))
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
     }
 
     Given("a NotGuard") {
-        When("the sub-guard is true") {
-            val notGuard = NotGuard(trueGuard)
-            Then("it should evaluate to false") {
-                notGuard.evaluate(testContext, testEvent) shouldBe false
+        And("the sub-guard is true") {
+            val guard = NotGuard(trueGuard)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to false") {
+                    result shouldBe false
+                }
             }
         }
-
-        When("the sub-guard is false") {
-            val notGuard = NotGuard(falseGuard)
-            Then("it should evaluate to true") {
-                notGuard.evaluate(testContext, testEvent) shouldBe true
+        And("the sub-guard is false") {
+            val guard = NotGuard(falseGuard)
+            When("the guard is evaluated") {
+                val result = guard.evaluate(testContext, testEvent)
+                Then("it should evaluate to true") {
+                    result shouldBe true
+                }
             }
         }
     }

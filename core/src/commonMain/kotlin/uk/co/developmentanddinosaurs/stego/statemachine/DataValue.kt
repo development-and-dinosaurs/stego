@@ -2,7 +2,6 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 
 /**
  * A sealed interface representing any valid data value within the state machine.
- * This can be a primitive, an object, or a list.
  */
 sealed interface DataValue
 

@@ -26,24 +26,12 @@ class StateMachineEngine(
     private var activeInvokableJob: Job? = null
 
     init {
-        val initialPath = getInitialStatePath()
-        val leafInitialState = initialPath.lastOrNull()
+        val initialState = findStateById(definition.initial)
             ?: throw IllegalArgumentException("Initial state '${definition.initial}' not found in definition.")
+        _output = MutableStateFlow(StateMachineOutput(initialState, definition.initialContext))
 
-        var tempContext = definition.initialContext
-        val initEvent = Event("stego.internal.init")
-        initialPath.forEach { state ->
-            tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, initEvent) }
-        }
-
-        _output = MutableStateFlow(StateMachineOutput(leafInitialState, tempContext))
-
-        leafInitialState.invoke?.let {
-            activeInvokableJob = scope.launch {
-                val resultEvent = it.invoke(output.value.context, scope).await()
-                send(resultEvent)
-            }
-        }
+        // Enter the initial state, which will handle descending to the leaf and running entry actions.
+        enterState(initialState, Event("stego.internal.init"))
     }
 
     fun send(event: Event) {
@@ -87,7 +75,6 @@ class StateMachineEngine(
         val lcaIndex = sourcePath.zip(targetPath).indexOfFirst { (a, b) -> a.id != b.id }.let { if (it == -1) min(sourcePath.size, targetPath.size) - 1 else it - 1 }
 
         val statesToExit = sourcePath.subList(lcaIndex + 1, sourcePath.size).reversed()
-        val statesToEnter = targetPath.subList(lcaIndex + 1, targetPath.size)
 
         var tempContext = output.value.context
 
@@ -96,6 +83,14 @@ class StateMachineEngine(
         }
 
         tempContext = transition.actions.fold(tempContext) { acc, action -> action.execute(acc, event) }
+        _output.value = _output.value.copy(context = tempContext)
+
+        val statesToEnter = targetPath.subList(lcaIndex + 1, targetPath.size)
+        enterState(targetState, event, statesToEnter)
+    }
+
+    private fun enterState(targetState: State, event: Event, statesToEnter: List<State> = getPathToState(targetState.id)!!) {
+        var tempContext = output.value.context
 
         statesToEnter.forEach { state ->
             tempContext = state.onEntry.fold(tempContext) { acc, action -> action.execute(acc, event) }

@@ -50,7 +50,7 @@ kotlin {
         }
 
         commonTest.dependencies {
-            implementation(project(":serialisation:kotlinx"))
+//            implementation(project(":serialisation:kotlinx"))
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.kotest.framework.engine)

@@ -10,5 +10,5 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  */
 data class Event(
     val type: String,
-    val data: Map<String, Any> = emptyMap(),
+    val data: Map<String, DataValue> = emptyMap()
 )

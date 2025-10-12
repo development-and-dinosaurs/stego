@@ -8,10 +8,10 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  *
  * @property initial The ID of the top-level initial [State] that the machine will be in upon starting.
  * @property states A map of all top-level states in the state machine, keyed by their unique IDs.
- * @property initialContext The initial data for the machine's context.
+ * @property initialContext The initial [Context] of the state machine.
  */
 data class StateMachineDefinition(
     val initial: String,
     val states: Map<String, State>,
-    val initialContext: Context = Context(),
+    val initialContext: Context = Context()
 )

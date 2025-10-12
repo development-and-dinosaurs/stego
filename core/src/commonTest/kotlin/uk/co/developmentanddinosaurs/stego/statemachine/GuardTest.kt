@@ -8,8 +8,8 @@ class GuardTest :
 
         val testEvent = Event(type = "TEST")
         val testContext = Context()
-        val valueOne = LiteralValue<Any>(1)
-        val valueTwo = LiteralValue<Any>(2)
+        val valueOne = LiteralReference(LongPrimitive(1))
+        val valueTwo = LiteralReference(LongPrimitive(2))
         val trueGuard = EqualsGuard(valueOne, valueOne)
         val falseGuard = EqualsGuard(valueOne, valueTwo)
 

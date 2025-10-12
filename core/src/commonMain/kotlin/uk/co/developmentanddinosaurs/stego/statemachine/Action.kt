@@ -17,5 +17,8 @@ interface Action {
      * @param event The event that triggered the transition and this action.
      * @return A new, updated [Context] instance.
      */
-    fun execute(context: Context, event: Event): Context
+    fun execute(
+        context: Context,
+        event: Event,
+    ): Context
 }

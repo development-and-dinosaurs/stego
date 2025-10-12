@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.diffplug.spotless)
 }
 
 group = "uk.co.developmentanddinosaurs"
@@ -15,8 +16,14 @@ kotlin {
     jvm()
     androidLibrary {
         namespace = "uk.co.developmentanddinosaurs"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         withJava()
         withDeviceTestBuilder {
@@ -86,6 +93,17 @@ mavenPublishing {
             connection = "YYY"
             developerConnection = "ZZZ"
         }
+    }
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint()
+    }
+    kotlinGradle {
+        target("**/*.gradle.kts")
+        ktlint()
     }
 }
 

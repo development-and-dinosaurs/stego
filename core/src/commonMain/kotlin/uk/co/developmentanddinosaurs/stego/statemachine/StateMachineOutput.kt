@@ -8,5 +8,5 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  */
 data class StateMachineOutput(
     val state: State,
-    val context: Context
+    val context: Context,
 )

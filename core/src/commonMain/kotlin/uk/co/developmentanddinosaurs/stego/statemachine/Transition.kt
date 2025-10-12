@@ -13,5 +13,5 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 data class Transition(
     val target: String,
     val actions: List<Action> = emptyList(),
-    val guard: Guard? = null
+    val guard: Guard? = null,
 )

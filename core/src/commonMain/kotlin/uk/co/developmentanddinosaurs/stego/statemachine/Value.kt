@@ -11,33 +11,45 @@ sealed interface Value<T> {
      * @param event The current event being processed.
      * @return The resolved value, or null if not found or of the wrong type.
      */
-    fun resolve(context: Context, event: Event): T?
+    fun resolve(
+        context: Context,
+        event: Event,
+    ): T?
 }
 
 /**
  * Represents a value that is retrieved from the state machine's context.
  */
-data class ContextValue<T>(val path: String) : Value<T> {
-    override fun resolve(context: Context, event: Event): T {
-        return context.get(path)
-    }
+data class ContextValue<T>(
+    val path: String,
+) : Value<T> {
+    override fun resolve(
+        context: Context,
+        event: Event,
+    ): T = context.get(path)
 }
 
 /**
  * Represents a value that is retrieved from the data payload of the triggering [Event].
  */
-data class EventValue<T>(val path: String) : Value<T> {
+data class EventValue<T>(
+    val path: String,
+) : Value<T> {
     @Suppress("UNCHECKED_CAST")
-    override fun resolve(context: Context, event: Event): T {
-        return event.data[path] as T
-    }
+    override fun resolve(
+        context: Context,
+        event: Event,
+    ): T = event.data[path] as T
 }
 
 /**
  * Represents a fixed, literal (or constant) value.
  */
-data class LiteralValue<T>(val value: T) : Value<T> {
-    override fun resolve(context: Context, event: Event): T {
-        return value
-    }
+data class LiteralValue<T>(
+    val value: T,
+) : Value<T> {
+    override fun resolve(
+        context: Context,
+        event: Event,
+    ): T = value
 }

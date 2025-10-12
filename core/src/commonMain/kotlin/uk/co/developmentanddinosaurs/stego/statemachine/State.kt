@@ -21,5 +21,5 @@ data class State(
     val on: Map<String, List<Transition>> = emptyMap(),
     val invoke: Invokable? = null,
     val initial: String? = null,
-    val states: Map<String, State> = emptyMap()
+    val states: Map<String, State> = emptyMap(),
 )

@@ -20,5 +20,8 @@ interface Invokable {
      * @param scope The [CoroutineScope] in which the asynchronous work should be launched.
      * @return A [Deferred] instance that will complete with the resulting [Event].
      */
-    fun invoke(context: Context, scope: CoroutineScope): Deferred<Event>
+    fun invoke(
+        context: Context,
+        scope: CoroutineScope,
+    ): Deferred<Event>
 }

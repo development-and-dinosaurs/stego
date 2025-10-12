@@ -27,7 +27,7 @@ private data class TraceAction(
         context: Context,
         event: Event,
     ): Context {
-        val currentTrace = context.get<List<String>>("trace") ?: emptyList()
+        val currentTrace = context.get<List<String>?>("trace") ?: emptyList()
         return context.put("trace", currentTrace + name)
     }
 }

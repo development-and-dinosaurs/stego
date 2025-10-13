@@ -27,23 +27,20 @@ class StateMachineEngine(
 
     init {
         val initialState = findStateById(definition.initial)
-            ?: throw IllegalArgumentException("Initial state '${definition.initial}' not found in definition.")
+            ?: throw StateMachineException("Initial state '${definition.initial}' not found in definition.")
         _output = MutableStateFlow(StateMachineOutput(initialState, definition.initialContext))
 
-        // Enter the initial state, which will handle descending to the leaf and running entry actions.
         enterState(initialState, Event("stego.internal.init"))
     }
 
     fun send(event: Event) {
         try {
             val sourceState = output.value.state
-            val transition = findTransition(event)
+            val transition = findTransition(event) ?: return
 
-            if (transition != null) {
-                val targetState = resolveTargetState(transition)
-                if (targetState != null) {
-                    executeTransition(sourceState, targetState, transition, event)
-                }
+            val targetState = resolveTargetState(transition)
+            if (targetState != null) {
+                executeTransition(sourceState, targetState, transition, event)
             }
         } catch (e: Exception) {
             val errorEvent = Event(

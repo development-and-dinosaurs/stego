@@ -1,5 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.matchers.shouldBe
@@ -42,6 +43,20 @@ private data class TestInvokable(val resultEvent: Event, val duration: Long = 10
 
 class StateMachineEngineTest : BehaviorSpec({
     coroutineTestScope = true
+
+    Given("a state machine with an initial state not in the state map") {
+        val definition = StateMachineDefinition(
+            initial = "StateA",
+            states = mapOf("StateB" to State(id = "StateB"))
+        )
+        When("the engine is created") {
+            val engine = shouldThrow<StateMachineException> {  StateMachineEngine(definition) }
+
+            Then("a state machine exception should be throw") {
+                engine.message shouldBe "Initial state 'StateA' not found in definition."
+            }
+        }
+    }
 
     Given("a state machine with an initial and a next state") {
         val initialState = State(id = "Initial", on = mapOf("NEXT" to listOf(Transition(target = "Next"))))

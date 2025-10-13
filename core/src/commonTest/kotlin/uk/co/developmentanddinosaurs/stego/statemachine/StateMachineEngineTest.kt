@@ -41,6 +41,16 @@ private data class TestInvokable(val resultEvent: Event, val duration: Long = 10
     }
 }
 
+// A test action that sends an event back to the state machine engine.
+private class SendAction(val event: Event) : Action {
+    lateinit var engine: StateMachineEngine
+
+    override fun execute(context: Context, event: Event): Context {
+        engine.send(this.event)
+        return context
+    }
+}
+
 class StateMachineEngineTest : BehaviorSpec({
     coroutineTestScope = true
 
@@ -260,7 +270,6 @@ class StateMachineEngineTest : BehaviorSpec({
         When("the engine is created and a cancel event is sent before the invokable completes") {
             val engine = StateMachineEngine(definition, this)
             engine.send(Event("CANCEL"))
-            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the invokable should be cancelled and the state should be Idle") {
                 engine.output.value.state shouldBe idleState
@@ -305,7 +314,7 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is in the child state and an event is sent") {
             val engine = StateMachineEngine(definition)
-            engine.send(Event("GOTO_END"))
+                        engine.send(Event("GOTO_END"))
 
             Then("the engine should find the transition on the parent and move to the correct state") {
                 engine.output.value.state shouldBe endState
@@ -367,7 +376,7 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("a transition occurs between the siblings") {
             val engine = StateMachineEngine(definition)
-            engine.send(Event("MOVE"))
+                        engine.send(Event("MOVE"))
 
             Then("only the relevant entry and exit actions should be executed") {
                 (engine.output.value.context.get("trace") as? ListValue)?.value shouldBe listOf(
@@ -406,6 +415,37 @@ class StateMachineEngineTest : BehaviorSpec({
                     StringPrimitive("l4_entry"),
                     StringPrimitive("l5_entry")
                 )
+            }
+        }
+    }
+
+    Given("a state machine that sends an event from a transition action") {
+        val sendAction = SendAction(Event("EVENT_B"))
+        val stateC = State(id = "StateC")
+        val stateB = State(
+            id = "StateB",
+            on = mapOf(
+                "EVENT_B" to listOf(Transition(target = "StateC"))
+            )
+        )
+        val stateA = State(
+            id = "StateA",
+            on = mapOf(
+                "EVENT_A" to listOf(Transition(target = "StateB", actions = listOf(sendAction)))
+            )
+        )
+        val definition = StateMachineDefinition(
+            initial = "StateA",
+            states = mapOf("StateA" to stateA, "StateB" to stateB, "StateC" to stateC)
+        )
+
+        When("an event triggers the action that sends another event") {
+            val engine = StateMachineEngine(definition, this)
+            sendAction.engine = engine
+            engine.send(Event("EVENT_A"))
+
+            Then("the machine should run to completion and end in the final state") {
+                engine.output.value.state shouldBe stateC
             }
         }
     }

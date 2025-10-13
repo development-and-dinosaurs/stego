@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.math.min
 
 /**
@@ -24,6 +26,7 @@ class StateMachineEngine(
     val output: StateFlow<StateMachineOutput> get() = _output.asStateFlow()
 
     private var activeInvokableJob: Job? = null
+    private val processingMutex = Mutex()
 
     init {
         val initialState = findStateById(definition.initial)
@@ -34,6 +37,14 @@ class StateMachineEngine(
     }
 
     fun send(event: Event) {
+        scope.launch {
+            processingMutex.withLock {
+                processEvent(event)
+            }
+        }
+    }
+
+    private fun processEvent(event: Event) {
         try {
             val sourceState = output.value.state
             val transition = findTransition(event) ?: return

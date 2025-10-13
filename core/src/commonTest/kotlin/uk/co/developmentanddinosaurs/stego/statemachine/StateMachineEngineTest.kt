@@ -60,10 +60,42 @@ class StateMachineEngineTest : BehaviorSpec({
             states = mapOf("StateB" to State(id = "StateB"))
         )
         When("the engine is created") {
-            val engine = shouldThrow<StateMachineException> {  StateMachineEngine(definition) }
+            val engine = shouldThrow<StateMachineException> { StateMachineEngine(definition) }
 
             Then("a state machine exception should be throw") {
                 engine.message shouldBe "Initial state 'StateA' not found in definition."
+            }
+        }
+    }
+
+    Given("a state machine with a transition to a non-existent state") {
+        val stateA = State(id = "StateA", on = mapOf("EVENT" to listOf(Transition(target = "StateC"))))
+        val definition = StateMachineDefinition(
+            initial = "StateA",
+            states = mapOf("StateA" to stateA)
+        )
+
+        When("the engine is created") {
+            val exception = shouldThrow<StateMachineException> { StateMachineEngine(definition) }
+
+            Then("a state machine exception should be thrown") {
+                exception.message shouldBe "State 'StateA' has a transition to non-existent target state 'StateC'."
+            }
+        }
+    }
+
+    Given("a state machine with a nested non-existent initial state") {
+        val parentState = State(id = "Parent", initial = "Child", states = mapOf("NotChild" to State(id = "NotChild")))
+        val definition = StateMachineDefinition(
+            initial = "Parent",
+            states = mapOf("Parent" to parentState)
+        )
+
+        When("the engine is created") {
+            val exception = shouldThrow<StateMachineException> { StateMachineEngine(definition) }
+
+            Then("a state machine exception should be thrown") {
+                exception.message shouldBe "State 'Parent' has a non-existent initial state 'Child'."
             }
         }
     }
@@ -78,6 +110,7 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is created") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the initial state should be correct") {
                 engine.output.value.state shouldBe initialState
@@ -86,7 +119,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("an event is sent that triggers a transition") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event(type = "NEXT"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the state machine should transition to the next state") {
                 engine.output.value.state shouldBe nextState
@@ -95,7 +130,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("an event is sent that does not trigger a transition") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event(type = "UNKNOWN"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the state machine should remain in the initial state") {
                 engine.output.value.state shouldBe initialState
@@ -124,7 +161,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("an event is sent that matches a passing guard") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event(type = "EVENT"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the state machine should transition to the correct state") {
                 engine.output.value.state shouldBe otherState
@@ -144,7 +183,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("an event is sent that triggers the transition") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event(type = "ACTION_EVENT"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the action should be executed and the context updated") {
                 (engine.output.value.context.get("assigned") as? BooleanPrimitive)?.value shouldBe true
@@ -168,7 +209,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("an event is sent that triggers the transition") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event(type = "MULTI_ACTION_EVENT"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("all actions should be executed and the context updated") {
                 (engine.output.value.context.get("action1") as? StringPrimitive)?.value shouldBe "ran"
@@ -191,7 +234,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("a transition occurs") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event("MOVE"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the exit, transition, and entry actions should all be executed") {
                 (engine.output.value.context.get("exit") as? BooleanPrimitive)?.value shouldBe true
@@ -220,7 +265,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the event that causes the crash is sent") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
             engine.send(Event("CRASH_EVENT"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the state machine should transition to the error state") {
                 engine.output.value.state shouldBe errorState
@@ -270,6 +317,7 @@ class StateMachineEngineTest : BehaviorSpec({
         When("the engine is created and a cancel event is sent before the invokable completes") {
             val engine = StateMachineEngine(definition, this)
             engine.send(Event("CANCEL"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the invokable should be cancelled and the state should be Idle") {
                 engine.output.value.state shouldBe idleState
@@ -291,6 +339,7 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is created") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("it should automatically enter the nested initial state") {
                 engine.output.value.state shouldBe childState
@@ -314,7 +363,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is in the child state and an event is sent") {
             val engine = StateMachineEngine(definition)
-                        engine.send(Event("GOTO_END"))
+            testCoroutineScheduler.advanceUntilIdle()
+            engine.send(Event("GOTO_END"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the engine should find the transition on the parent and move to the correct state") {
                 engine.output.value.state shouldBe endState
@@ -340,6 +391,7 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is created") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("it should execute entry actions for both parent and child in order") {
                 (engine.output.value.context.get("trace") as? ListValue)?.value shouldBe listOf(StringPrimitive("parent_entry"), StringPrimitive("child_entry"))
@@ -376,7 +428,9 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("a transition occurs between the siblings") {
             val engine = StateMachineEngine(definition)
-                        engine.send(Event("MOVE"))
+            testCoroutineScheduler.advanceUntilIdle()
+            engine.send(Event("MOVE"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("only the relevant entry and exit actions should be executed") {
                 (engine.output.value.context.get("trace") as? ListValue)?.value shouldBe listOf(
@@ -403,6 +457,7 @@ class StateMachineEngineTest : BehaviorSpec({
 
         When("the engine is created") {
             val engine = StateMachineEngine(definition)
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("it should enter the deepest initial state") {
                 engine.output.value.state shouldBe l5
@@ -443,6 +498,7 @@ class StateMachineEngineTest : BehaviorSpec({
             val engine = StateMachineEngine(definition, this)
             sendAction.engine = engine
             engine.send(Event("EVENT_A"))
+            testCoroutineScheduler.advanceUntilIdle()
 
             Then("the machine should run to completion and end in the final state") {
                 engine.output.value.state shouldBe stateC

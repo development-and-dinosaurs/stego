@@ -18,7 +18,7 @@ class MappingTest : StringSpec({
                 "userId" to LongPrimitiveDto(123)
             ),
             states = mapOf(
-                "Idle" to StateDto(
+                "Idle" to LogicStateDto(
                     id = "Idle",
                     on = mapOf(
                         "START" to listOf(
@@ -32,7 +32,7 @@ class MappingTest : StringSpec({
                         )
                     )
                 ),
-                "Active" to StateDto(id = "Active")
+                "Active" to LogicStateDto(id = "Active")
             )
         )
 

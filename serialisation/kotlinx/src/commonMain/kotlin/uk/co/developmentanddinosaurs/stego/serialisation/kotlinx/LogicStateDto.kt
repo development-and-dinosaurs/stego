@@ -1,19 +1,20 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.Serializable
+import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 
 @Serializable
-data class StateDto(
+data class LogicStateDto(
     val id: String,
     val onEntry: List<ActionDto> = emptyList(),
     val onExit: List<ActionDto> = emptyList(),
     val on: Map<String, List<TransitionDto>> = emptyMap(),
     val invoke: InvokableDto? = null,
     val initial: String? = null,
-    val states: Map<String, StateDto> = emptyMap()
+    val states: Map<String, LogicStateDto> = emptyMap()
 ) {
-    fun toDomain(): State = State(
+    fun toDomain(): State = LogicState(
         id = id,
         onEntry = onEntry.map { it.toDomain() },
         onExit = onExit.map { it.toDomain() },

@@ -1,25 +1,15 @@
-package uk.co.developmentanddinosaurs.stego.statemachine
+package uk.co.developmentanddinosaurs.stego.ui
+
+import uk.co.developmentanddinosaurs.stego.statemachine.Action
+import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
+import uk.co.developmentanddinosaurs.stego.statemachine.State
+import uk.co.developmentanddinosaurs.stego.statemachine.Transition
 
 /**
- * Represents a state within the state machine.
- *
- * A state can be simple (a leaf state) or hierarchical (a parent state that contains substates).
- * It defines actions to be performed on entry and exit, and a set of transitions that can be triggered by events.
- */
-interface State {
-    val id: String
-    val onEntry: List<Action>
-    val onExit: List<Action>
-    val on: Map<String, List<Transition>>
-    val invoke: Invokable?
-    val initial: String?
-    val states: Map<String, State>
-}
-
-/**
- * A state that contains only logic and no UI information.
+ * A state that contains UI information.
  *
  * @property id A unique identifier for the state within its parent's scope.
+ * @property view The UI view to be rendered for this state.
  * @property onEntry A list of [Action]s to be executed when the state machine enters this state.
  * @property onExit A list of [Action]s to be executed when the state machine exits this state.
  * @property on A map where keys are event types and values are a list of possible [Transition]s.
@@ -27,8 +17,9 @@ interface State {
  * @property initial The ID of the initial substate. Required if this is a hierarchical parent state.
  * @property states An optional map of substates, keyed by their IDs.
  */
-data class LogicState(
+data class UiState(
     override val id: String,
+    val view: View,
     override val onEntry: List<Action> = emptyList(),
     override val onExit: List<Action> = emptyList(),
     override val on: Map<String, List<Transition>> = emptyMap(),

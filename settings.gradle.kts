@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "stego"
-include("core", "serialisation:kotlinx")
+include("core", "serialisation:kotlinx", "ui")

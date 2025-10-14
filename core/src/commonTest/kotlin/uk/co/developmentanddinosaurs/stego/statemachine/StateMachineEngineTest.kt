@@ -72,7 +72,7 @@ class StateMachineEngineTest : BehaviorSpec({
     Given("a state machine with an initial state not in the state map") {
         val definition = StateMachineDefinition(
             initial = "StateA",
-            states = mapOf("StateB" to State(id = "StateB"))
+            states = mapOf("StateB" to LogicState(id = "StateB"))
         )
         When("the engine is created") {
             val engine = shouldThrow<StateMachineException> { StateMachineEngine(definition) }
@@ -84,7 +84,7 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a state machine with a transition to a non-existent state") {
-        val stateA = State(id = "StateA", on = mapOf("EVENT" to listOf(Transition(target = "StateC"))))
+        val stateA = LogicState(id = "StateA", on = mapOf("EVENT" to listOf(Transition(target = "StateC"))))
         val definition = StateMachineDefinition(
             initial = "StateA",
             states = mapOf("StateA" to stateA)
@@ -100,7 +100,7 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a state machine with a nested non-existent initial state") {
-        val parentState = State(id = "Parent", initial = "Child", states = mapOf("NotChild" to State(id = "NotChild")))
+        val parentState = LogicState(id = "Parent", initial = "Child", states = mapOf("NotChild" to LogicState(id = "NotChild")))
         val definition = StateMachineDefinition(
             initial = "Parent",
             states = mapOf("Parent" to parentState)
@@ -116,8 +116,8 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a state machine with an initial and a next state") {
-        val initialState = State(id = "Initial", on = mapOf("NEXT" to listOf(Transition(target = "Next"))))
-        val nextState = State(id = "Next")
+        val initialState = LogicState(id = "Initial", on = mapOf("NEXT" to listOf(Transition(target = "Next"))))
+        val nextState = LogicState(id = "Next")
         val definition = StateMachineDefinition(
             initial = "Initial",
             states = mapOf("Initial" to initialState, "Next" to nextState)
@@ -154,7 +154,7 @@ class StateMachineEngineTest : BehaviorSpec({
         val trueGuard = EqualsGuard(LiteralReference(BooleanPrimitive(true)), LiteralReference(BooleanPrimitive(true)))
         val falseGuard =
             EqualsGuard(LiteralReference(BooleanPrimitive(true)), LiteralReference(BooleanPrimitive(false)))
-        val guardedState = State(
+        val guardedState = LogicState(
             id = "Guarded",
             on = mapOf(
                 "EVENT" to listOf(
@@ -163,8 +163,8 @@ class StateMachineEngineTest : BehaviorSpec({
                 )
             )
         )
-        val nextState = State(id = "Next")
-        val otherState = State(id = "Other")
+        val nextState = LogicState(id = "Next")
+        val otherState = LogicState(id = "Other")
         val definition = StateMachineDefinition(
             initial = "Guarded",
             states = mapOf("Guarded" to guardedState, "Next" to nextState, "Other" to otherState)
@@ -183,8 +183,8 @@ class StateMachineEngineTest : BehaviorSpec({
     Given("a state machine with a transition that has an action") {
         val assignAction = AssignAction(key = "assigned", value = BooleanPrimitive(true))
         val transition = Transition(target = "Next", actions = listOf(assignAction))
-        val initialState = State(id = "Initial", on = mapOf("ACTION_EVENT" to listOf(transition)))
-        val nextState = State(id = "Next")
+        val initialState = LogicState(id = "Initial", on = mapOf("ACTION_EVENT" to listOf(transition)))
+        val nextState = LogicState(id = "Next")
         val definition = StateMachineDefinition(
             initial = "Initial",
             states = mapOf("Initial" to initialState, "Next" to nextState)
@@ -207,8 +207,8 @@ class StateMachineEngineTest : BehaviorSpec({
         val action1 = AssignAction(key = "action1", value = StringPrimitive("ran"))
         val action2 = AssignAction(key = "action2", value = LongPrimitive(123))
         val transition = Transition(target = "Next", actions = listOf(action1, action2))
-        val initialState = State(id = "Initial", on = mapOf("MULTI_ACTION_EVENT" to listOf(transition)))
-        val nextState = State(id = "Next")
+        val initialState = LogicState(id = "Initial", on = mapOf("MULTI_ACTION_EVENT" to listOf(transition)))
+        val nextState = LogicState(id = "Next")
         val definition = StateMachineDefinition(
             initial = "Initial",
             states = mapOf("Initial" to initialState, "Next" to nextState)
@@ -230,12 +230,12 @@ class StateMachineEngineTest : BehaviorSpec({
         val transitionAction = AssignAction("transition", BooleanPrimitive(true))
         val entryAction = AssignAction("entry", BooleanPrimitive(true))
 
-        val initialState = State(
+        val initialState = LogicState(
             id = "Initial",
             onExit = listOf(exitAction),
             on = mapOf("MOVE" to listOf(Transition(target = "Next", actions = listOf(transitionAction))))
         )
-        val nextState = State(id = "Next", onEntry = listOf(entryAction))
+        val nextState = LogicState(id = "Next", onEntry = listOf(entryAction))
         val definition = StateMachineDefinition(
             initial = "Initial",
             states = mapOf("Initial" to initialState, "Next" to nextState)
@@ -254,17 +254,17 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a transition with an action that throws an exception") {
-        val errorState = State(id = "ErrorState")
+        val errorState = LogicState(id = "ErrorState")
         val crashingTransition = Transition(target = "Next", actions = listOf(CrashingAction))
         val errorTransition = Transition(target = "ErrorState")
-        val initialState = State(
+        val initialState = LogicState(
             id = "Initial",
             on = mapOf(
                 "CRASH_EVENT" to listOf(crashingTransition),
                 "error.execution" to listOf(errorTransition)
             )
         )
-        val nextState = State(id = "Next")
+        val nextState = LogicState(id = "Next")
         val definition = StateMachineDefinition(
             initial = "Initial",
             states = mapOf("Initial" to initialState, "Next" to nextState, "ErrorState" to errorState)
@@ -283,9 +283,9 @@ class StateMachineEngineTest : BehaviorSpec({
     Given("a state with an invokable service") {
         val doneEvent = Event(type = "INVOKE_DONE")
         val invokable = TestInvokable(resultEvent = doneEvent)
-        val successState = State(id = "Success")
+        val successState = LogicState(id = "Success")
         val loadingState =
-            State(id = "Loading", invoke = invokable, on = mapOf("INVOKE_DONE" to listOf(Transition("Success"))))
+            LogicState(id = "Loading", invoke = invokable, on = mapOf("INVOKE_DONE" to listOf(Transition("Success"))))
         val definition = StateMachineDefinition(
             initial = "Loading",
             states = mapOf("Loading" to loadingState, "Success" to successState)
@@ -304,10 +304,10 @@ class StateMachineEngineTest : BehaviorSpec({
     Given("a state with a cancellable invokable service") {
         val doneEvent = Event(type = "INVOKE_DONE")
         val invokable = TestInvokable(resultEvent = doneEvent, duration = 5000) // A long-running task
-        val successState = State(id = "Success")
-        val failedTestState = State(id = "FailedTestState")
-        val idleState = State(id = "Idle", on = mapOf("INVOKE_DONE" to listOf(Transition("FailedTestState"))))
-        val loadingState = State(
+        val successState = LogicState(id = "Success")
+        val failedTestState = LogicState(id = "FailedTestState")
+        val idleState = LogicState(id = "Idle", on = mapOf("INVOKE_DONE" to listOf(Transition("FailedTestState"))))
+        val loadingState = LogicState(
             id = "Loading",
             invoke = invokable,
             on = mapOf(
@@ -336,8 +336,8 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a hierarchical state machine") {
-        val childState = State(id = "Child")
-        val parentState = State(
+        val childState = LogicState(id = "Child")
+        val parentState = LogicState(
             id = "Parent",
             initial = "Child",
             states = mapOf("Child" to childState)
@@ -357,9 +357,9 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a hierarchical state machine with a transition on the parent") {
-        val endState = State(id = "End")
-        val childState = State(id = "Child")
-        val parentState = State(
+        val endState = LogicState(id = "End")
+        val childState = LogicState(id = "Child")
+        val parentState = LogicState(
             id = "Parent",
             initial = "Child",
             states = mapOf("Child" to childState),
@@ -383,8 +383,8 @@ class StateMachineEngineTest : BehaviorSpec({
     Given("a hierarchical state machine with entry actions") {
         val childEntryAction = TraceAction("child_entry")
         val parentEntryAction = TraceAction("parent_entry")
-        val childState = State(id = "Child", onEntry = listOf(childEntryAction))
-        val parentState = State(
+        val childState = LogicState(id = "Child", onEntry = listOf(childEntryAction))
+        val parentState = LogicState(
             id = "Parent",
             initial = "Child",
             states = mapOf("Child" to childState),
@@ -415,14 +415,14 @@ class StateMachineEngineTest : BehaviorSpec({
         val childOneExitAction = TraceAction("childOne_exit")
         val childTwoEntryAction = TraceAction("childTwo_entry")
 
-        val childTwo = State(id = "ChildTwo", onEntry = listOf(childTwoEntryAction))
-        val childOne = State(
+        val childTwo = LogicState(id = "ChildTwo", onEntry = listOf(childTwoEntryAction))
+        val childOne = LogicState(
             id = "ChildOne",
             onEntry = listOf(childOneEntryAction),
             onExit = listOf(childOneExitAction),
             on = mapOf("MOVE" to listOf(Transition("ChildTwo")))
         )
-        val parent = State(
+        val parent = LogicState(
             id = "Parent",
             initial = "ChildOne",
             onEntry = listOf(parentEntryAction),
@@ -451,11 +451,11 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a deeply nested hierarchical state machine") {
-        val l5 = State(id = "l5", onEntry = listOf(TraceAction("l5_entry")))
-        val l4 = State(id = "l4", initial = "l5", states = mapOf("l5" to l5), onEntry = listOf(TraceAction("l4_entry")))
-        val l3 = State(id = "l3", initial = "l4", states = mapOf("l4" to l4), onEntry = listOf(TraceAction("l3_entry")))
-        val l2 = State(id = "l2", initial = "l3", states = mapOf("l3" to l3), onEntry = listOf(TraceAction("l2_entry")))
-        val l1 = State(id = "l1", initial = "l2", states = mapOf("l2" to l2), onEntry = listOf(TraceAction("l1_entry")))
+        val l5 = LogicState(id = "l5", onEntry = listOf(TraceAction("l5_entry")))
+        val l4 = LogicState(id = "l4", initial = "l5", states = mapOf("l5" to l5), onEntry = listOf(TraceAction("l4_entry")))
+        val l3 = LogicState(id = "l3", initial = "l4", states = mapOf("l4" to l4), onEntry = listOf(TraceAction("l3_entry")))
+        val l2 = LogicState(id = "l2", initial = "l3", states = mapOf("l3" to l3), onEntry = listOf(TraceAction("l2_entry")))
+        val l1 = LogicState(id = "l1", initial = "l2", states = mapOf("l2" to l2), onEntry = listOf(TraceAction("l1_entry")))
         val definition = StateMachineDefinition(
             initial = "l1",
             initialContext = Context().put("trace", ListValue(emptyList())),
@@ -482,14 +482,14 @@ class StateMachineEngineTest : BehaviorSpec({
 
     Given("a state machine that sends an event from a transition action") {
         val sendAction = SendAction(Event("EVENT_B"))
-        val stateC = State(id = "StateC")
-        val stateB = State(
+        val stateC = LogicState(id = "StateC")
+        val stateB = LogicState(
             id = "StateB",
             on = mapOf(
                 "EVENT_B" to listOf(Transition(target = "StateC"))
             )
         )
-        val stateA = State(
+        val stateA = LogicState(
             id = "StateA",
             on = mapOf(
                 "EVENT_A" to listOf(Transition(target = "StateB", actions = listOf(sendAction)))
@@ -512,12 +512,12 @@ class StateMachineEngineTest : BehaviorSpec({
     }
 
     Given("a state machine that queues events") {
-        val stateC = State(id = "StateC")
-        val stateB = State(
+        val stateC = LogicState(id = "StateC")
+        val stateB = LogicState(
             id = "StateB",
             on = mapOf("EVENT_B" to listOf(Transition("StateC")))
         )
-        val stateA = State(
+        val stateA = LogicState(
             id = "StateA",
             on = mapOf(
                 "EVENT_A" to listOf(

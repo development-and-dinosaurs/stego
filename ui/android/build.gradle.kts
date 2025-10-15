@@ -9,10 +9,6 @@ kotlin {
     jvm()
 
     sourceSets {
-        jvmMain.dependencies {
-            implementation(libs.compose.desktop.currentOs)
-        }
-
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
@@ -23,9 +19,10 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":core"))
             implementation(project(":ui:core"))
+            implementation(project.dependencies.platform(libs.compose.bom))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
-            implementation(libs.compose.material)
+            implementation(libs.compose.material3)
             implementation(libs.compose.ui)
         }
         commonTest.dependencies {

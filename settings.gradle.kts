@@ -19,5 +19,6 @@ include(
     "serialisation:kotlinx:core",
     "serialisation:kotlinx:ui",
     "ui:core",
-    "ui:android"
+    "ui:android",
+    "app"
 )

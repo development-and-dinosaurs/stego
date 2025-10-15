@@ -16,3 +16,11 @@ data class ButtonView(
     val text: String,
     val onClick: Event
 ) : View
+
+data class TextFieldView(
+    val text: String,
+    val label: String,
+    val onTextChanged: Event
+) : View
+
+object ProgressIndicatorView : View

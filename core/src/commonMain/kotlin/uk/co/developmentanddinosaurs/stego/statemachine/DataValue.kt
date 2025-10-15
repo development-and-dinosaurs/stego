@@ -8,7 +8,9 @@ sealed interface DataValue
 /**
  * A sealed sub-interface for primitive data values that can be compared.
  */
-sealed interface Primitive : DataValue, Comparable<Primitive> {
+sealed interface Primitive :
+    DataValue,
+    Comparable<Primitive> {
     override fun compareTo(other: Primitive): Int
 }
 
@@ -17,6 +19,7 @@ sealed interface Primitive : DataValue, Comparable<Primitive> {
  */
 sealed interface NumericPrimitive : Primitive {
     fun toDouble(): Double
+
     override fun compareTo(other: Primitive): Int {
         if (other is NumericPrimitive) {
             return this.toDouble().compareTo(other.toDouble())
@@ -26,7 +29,9 @@ sealed interface NumericPrimitive : Primitive {
     }
 }
 
-data class StringPrimitive(val value: String) : Primitive {
+data class StringPrimitive(
+    val value: String,
+) : Primitive {
     override fun compareTo(other: Primitive): Int {
         if (other is StringPrimitive) {
             return this.value.compareTo(other.value)
@@ -36,23 +41,33 @@ data class StringPrimitive(val value: String) : Primitive {
     }
 }
 
-data class IntPrimitive(val value: Int) : NumericPrimitive {
+data class IntPrimitive(
+    val value: Int,
+) : NumericPrimitive {
     override fun toDouble(): Double = value.toDouble()
 }
 
-data class LongPrimitive(val value: Long) : NumericPrimitive {
+data class LongPrimitive(
+    val value: Long,
+) : NumericPrimitive {
     override fun toDouble(): Double = value.toDouble()
 }
 
-data class FloatPrimitive(val value: Float) : NumericPrimitive {
+data class FloatPrimitive(
+    val value: Float,
+) : NumericPrimitive {
     override fun toDouble(): Double = value.toDouble()
 }
 
-data class DoublePrimitive(val value: Double) : NumericPrimitive {
+data class DoublePrimitive(
+    val value: Double,
+) : NumericPrimitive {
     override fun toDouble(): Double = value
 }
 
-data class BooleanPrimitive(val value: Boolean) : Primitive {
+data class BooleanPrimitive(
+    val value: Boolean,
+) : Primitive {
     override fun compareTo(other: Primitive): Int {
         if (other is BooleanPrimitive) {
             return this.value.compareTo(other.value)
@@ -65,9 +80,13 @@ data class BooleanPrimitive(val value: Boolean) : Primitive {
 /**
  * Represents a JSON-style object: a map of string keys to other [DataValue] instances.
  */
-data class ObjectValue(val value: Map<String, DataValue>) : DataValue
+data class ObjectValue(
+    val value: Map<String, DataValue>,
+) : DataValue
 
 /**
  * Represents a JSON-style array: a list of other [DataValue] instances.
  */
-data class ListValue(val value: List<DataValue>) : DataValue
+data class ListValue(
+    val value: List<DataValue>,
+) : DataValue

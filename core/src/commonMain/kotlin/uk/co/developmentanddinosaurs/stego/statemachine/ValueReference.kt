@@ -11,38 +11,44 @@ sealed interface ValueReference {
      * @param event The current event being processed.
      * @return The resolved [DataValue], or null if the reference cannot be found.
      */
-    fun resolve(context: Context, event: Event): DataValue?
+    fun resolve(
+        context: Context,
+        event: Event,
+    ): DataValue?
 }
 
 /**
  * A reference to a value stored in the state machine's context.
  */
 data class ContextReference(
-    val path: String
+    val path: String,
 ) : ValueReference {
-    override fun resolve(context: Context, event: Event): DataValue? {
-        return context.get(path)
-    }
+    override fun resolve(
+        context: Context,
+        event: Event,
+    ): DataValue? = context.get(path)
 }
 
 /**
  * A reference to a value stored in the triggering event's data payload.
  */
 data class EventReference(
-    val path: String
+    val path: String,
 ) : ValueReference {
-    override fun resolve(context: Context, event: Event): DataValue? {
-        return event.data[path]
-    }
+    override fun resolve(
+        context: Context,
+        event: Event,
+    ): DataValue? = event.data[path]
 }
 
 /**
  * A reference to a fixed, literal (or constant) value.
  */
 data class LiteralReference(
-    val value: DataValue
+    val value: DataValue,
 ) : ValueReference {
-    override fun resolve(context: Context, event: Event): DataValue {
-        return value
-    }
+    override fun resolve(
+        context: Context,
+        event: Event,
+    ): DataValue = value
 }

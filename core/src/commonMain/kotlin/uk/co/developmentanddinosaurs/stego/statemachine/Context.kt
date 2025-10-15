@@ -6,8 +6,9 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  * It behaves like a map but provides a more constrained API to ensure immutability.
  * Every "put" operation returns a new Context instance with the data updated.
  */
-class Context private constructor(private val values: Map<String, DataValue>) {
-
+class Context private constructor(
+    private val values: Map<String, DataValue>,
+) {
     /**
      * Creates an empty context.
      */
@@ -19,9 +20,7 @@ class Context private constructor(private val values: Map<String, DataValue>) {
      * @param key The key of the value to retrieve.
      * @return The [DataValue] if it exists, otherwise null.
      */
-    fun get(key: String): DataValue? {
-        return values[key]
-    }
+    fun get(key: String): DataValue? = values[key]
 
     /**
      * Returns a new [Context] instance with the given [key] and [value] added.
@@ -30,7 +29,8 @@ class Context private constructor(private val values: Map<String, DataValue>) {
      * @param value The data to store.
      * @return A new, updated Context instance.
      */
-    fun put(key: String, value: DataValue): Context {
-        return Context(values + (key to value))
-    }
+    fun put(
+        key: String,
+        value: DataValue,
+    ): Context = Context(values + (key to value))
 }

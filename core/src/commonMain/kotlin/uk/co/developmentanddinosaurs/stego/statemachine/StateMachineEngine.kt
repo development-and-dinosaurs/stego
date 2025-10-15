@@ -21,9 +21,8 @@ import kotlin.math.min
  */
 class StateMachineEngine(
     private val definition: StateMachineDefinition,
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob())
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob()),
 ) {
-
     private val _output: MutableStateFlow<StateMachineOutput>
     val output: StateFlow<StateMachineOutput> get() = _output.asStateFlow()
     private val processingMutex = Mutex()
@@ -72,10 +71,11 @@ class StateMachineEngine(
             if (event.type == "error.execution") {
                 return
             }
-            val errorEvent = Event(
-                type = "error.execution",
-                data = mapOf("cause" to StringPrimitive(e.message ?: "An unknown execution error occurred"))
-            )
+            val errorEvent =
+                Event(
+                    type = "error.execution",
+                    data = mapOf("cause" to StringPrimitive(e.message ?: "An unknown execution error occurred")),
+                )
             send(errorEvent)
         }
     }
@@ -92,7 +92,7 @@ class StateMachineEngine(
             }
             state.initial?.let { initialId ->
                 if (!state.states.containsKey(initialId)) {
-                    throw StateMachineException("State '${state.id}' has a non-existent initial state '${initialId}'.")
+                    throw StateMachineException("State '${state.id}' has a non-existent initial state '$initialId'.")
                 }
             }
         }
@@ -101,28 +101,37 @@ class StateMachineEngine(
     private fun findTransition(event: Event): Transition? {
         var currentState: State? = output.value.state
         while (currentState != null) {
-            val transition = currentState.on[event.type]?.firstOrNull { transition ->
-                transition.guard?.evaluate(output.value.context, event) ?: true
-            }
+            val transition =
+                currentState.on[event.type]?.firstOrNull { transition ->
+                    transition.guard?.evaluate(output.value.context, event) ?: true
+                }
             if (transition != null) return transition
             currentState = findParentState(currentState.id)
         }
         return null
     }
 
-    private fun executeTransition(sourceState: State, targetState: State, transition: Transition, event: Event) {
+    private fun executeTransition(
+        sourceState: State,
+        targetState: State,
+        transition: Transition,
+        event: Event,
+    ) {
         activeInvokableJob?.cancel()
         activeInvokableJob = null
 
-        val sourcePath = getPathToState(sourceState.id)
-            ?: throw StateMachineException("Failed to find path to source state '${sourceState.id}'. Definition may be inconsistent.")
-        val targetPath = getPathToState(targetState.id)
-            ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'. Definition may be inconsistent.")
+        val sourcePath =
+            getPathToState(sourceState.id)
+                ?: throw StateMachineException("Failed to find path to source state '${sourceState.id}'. Definition may be inconsistent.")
+        val targetPath =
+            getPathToState(targetState.id)
+                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'. Definition may be inconsistent.")
 
-        val lcaIndex = (0 until min(sourcePath.size, targetPath.size))
-            .firstOrNull { i -> sourcePath[i].id != targetPath[i].id }
-            ?.let { it - 1 }
-            ?: (min(sourcePath.size, targetPath.size) - 1)
+        val lcaIndex =
+            (0 until min(sourcePath.size, targetPath.size))
+                .firstOrNull { i -> sourcePath[i].id != targetPath[i].id }
+                ?.let { it - 1 }
+                ?: (min(sourcePath.size, targetPath.size) - 1)
 
         val statesToExit = sourcePath.subList(lcaIndex + 1, sourcePath.size).reversed()
 
@@ -139,9 +148,14 @@ class StateMachineEngine(
         enterState(targetState, event, statesToEnter)
     }
 
-    private fun enterState(targetState: State, event: Event, statesToEnter: List<State>? = null) {
-        val path = statesToEnter ?: getPathToState(targetState.id)
-        ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
+    private fun enterState(
+        targetState: State,
+        event: Event,
+        statesToEnter: List<State>? = null,
+    ) {
+        val path =
+            statesToEnter ?: getPathToState(targetState.id)
+                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
 
         var tempContext = output.value.context
 
@@ -153,8 +167,9 @@ class StateMachineEngine(
         val descentPath = mutableListOf<State>()
         while (finalTargetState.initial != null) {
             val nextStateId = finalTargetState.initial
-            val nextState = finalTargetState.states[nextStateId]
-                ?: throw StateMachineException("Nested initial state '$nextStateId' not found in parent '${finalTargetState.id}'.")
+            val nextState =
+                finalTargetState.states[nextStateId]
+                    ?: throw StateMachineException("Nested initial state '$nextStateId' not found in parent '${finalTargetState.id}'.")
             descentPath.add(nextState)
             finalTargetState = nextState
         }
@@ -166,10 +181,11 @@ class StateMachineEngine(
         _output.value = StateMachineOutput(finalTargetState, tempContext)
 
         finalTargetState.invoke?.let {
-            activeInvokableJob = scope.launch {
-                val resultEvent = it.invoke(output.value.context, scope).await()
-                send(resultEvent)
-            }
+            activeInvokableJob =
+                scope.launch {
+                    val resultEvent = it.invoke(output.value.context, scope).await()
+                    send(resultEvent)
+                }
         }
     }
 
@@ -191,6 +207,7 @@ class StateMachineEngine(
 
     private fun buildStateMap(states: Map<String, State>): Map<String, State> {
         val map = mutableMapOf<String, State>()
+
         fun recurse(subStates: Map<String, State>) {
             for (state in subStates.values) {
                 map[state.id] = state
@@ -203,6 +220,7 @@ class StateMachineEngine(
 
     private fun buildParentMap(states: Map<String, State>): Map<String, State> {
         val map = mutableMapOf<String, State>()
+
         fun recurse(parent: State?) {
             val children = parent?.states ?: states
             for (child in children.values) {

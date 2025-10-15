@@ -13,7 +13,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":core"))
-            implementation(project(":ui"))
+            implementation(project(":ui:core"))
             implementation(project(":serialisation:kotlinx:core"))
             api(libs.kotlinx.serialization.json)
         }

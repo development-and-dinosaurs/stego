@@ -1,7 +1,12 @@
 [versions]
-agp = "8.13.0"
+agp = "8.12.3"
 android-compileSdk = "36"
 android-minSdk = "24"
+androidx-activity-compose = "1.11.0"
+androidx-appcompat = "1.7.1"
+androidx-core-ktx = "1.17.0"
+google-material = "1.13.0"
+jetbrains-compose = "1.9.1"
 kotest = "6.0.3"
 kotlin = "2.2.20"
 kotlinxCoroutinesCore = "1.10.2"
@@ -10,6 +15,15 @@ spotless = "8.0.0"
 vanniktechMavenPublish = "0.34.0"
 
 [libraries]
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "jetbrains-compose" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "jetbrains-compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "jetbrains-compose" }
+compose-desktop-currentOs = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "jetbrains-compose" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
@@ -19,7 +33,9 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 [plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechMavenPublish" }

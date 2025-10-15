@@ -11,6 +11,7 @@ import kotlinx.serialization.modules.subclass
 class DeserializationTest : BehaviorSpec({
     val json = Json {
         prettyPrint = true
+        encodeDefaults = true
         serializersModule = SerializersModule {
             polymorphic(ViewDto::class) {
                 subclass(LabelViewDto::class)
@@ -54,7 +55,8 @@ class DeserializationTest : BehaviorSpec({
                 "type": "uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ButtonViewDto",
                 "text": "Click me",
                 "onClick": {
-                    "type": "BUTTON_EVENT"
+                    "type": "BUTTON_EVENT",
+                    "data": {}
                 }
             }
         """.trimIndent()
@@ -94,7 +96,8 @@ class DeserializationTest : BehaviorSpec({
                         "type": "uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ButtonViewDto",
                         "text": "Click me",
                         "onClick": {
-                            "type": "BUTTON_EVENT"
+                            "type": "BUTTON_EVENT",
+                            "data": {}
                         }
                     }
                 ]

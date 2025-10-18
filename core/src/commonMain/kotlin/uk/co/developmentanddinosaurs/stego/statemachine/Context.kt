@@ -33,4 +33,6 @@ class Context private constructor(
         key: String,
         value: DataValue,
     ): Context = Context(values + (key to value))
+
+    fun asMap(): Map<String, DataValue> = values
 }

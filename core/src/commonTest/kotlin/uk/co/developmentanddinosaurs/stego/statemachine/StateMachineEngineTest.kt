@@ -43,21 +43,6 @@ private object CrashingAction : Action {
     ): Context = throw IllegalStateException("This action is designed to fail.")
 }
 
-// A test invokable that simulates a network call.
-private data class TestInvokable(
-    val resultEvent: Event,
-    val duration: Long = 100,
-) : Invokable {
-    override fun invoke(
-        context: Context,
-        scope: CoroutineScope,
-    ): Deferred<Event> =
-        scope.async {
-            delay(duration)
-            resultEvent
-        }
-}
-
 // A test action that sends an event back to the state machine engine.
 private class SendAction(
     val event: Event,
@@ -88,6 +73,13 @@ private data class DelayAction(
     ): Context {
         runBlocking { delay(duration) }
         return context
+    }
+}
+
+class TestInvokable(private val duration: Long = 1000) : Invokable {
+    override suspend fun invoke(input: Map<String, DataValue>): InvokableResult {
+        delay(duration)
+        return InvokableResult.Success(mapOf("waitedFor" to LongPrimitive(duration)))
     }
 }
 
@@ -340,11 +332,14 @@ class StateMachineEngineTest :
         }
 
         Given("a state with an invokable service") {
-            val doneEvent = Event(type = "INVOKE_DONE")
-            val invokable = TestInvokable(resultEvent = doneEvent)
+            val invokable = TestInvokable()
             val successState = LogicState(id = "Success")
             val loadingState =
-                LogicState(id = "Loading", invoke = invokable, on = mapOf("INVOKE_DONE" to listOf(Transition("Success"))))
+                LogicState(
+                    id = "Loading",
+                    invoke = InvokableDefinition(id = "testInvoke", src = invokable),
+                    on = mapOf("done.invoke.testInvoke" to listOf(Transition("Success"))),
+                )
             val definition =
                 StateMachineDefinition(
                     initial = "Loading",
@@ -362,18 +357,17 @@ class StateMachineEngineTest :
         }
 
         Given("a state with a cancellable invokable service") {
-            val doneEvent = Event(type = "INVOKE_DONE")
-            val invokable = TestInvokable(resultEvent = doneEvent, duration = 5000) // A long-running task
+            val invokable = TestInvokable(duration = 5000) // A long-running task
             val successState = LogicState(id = "Success")
             val failedTestState = LogicState(id = "FailedTestState")
-            val idleState = LogicState(id = "Idle", on = mapOf("INVOKE_DONE" to listOf(Transition("FailedTestState"))))
+            val idleState = LogicState(id = "Idle", on = mapOf("done.invoke.testInvoke" to listOf(Transition("FailedTestState"))))
             val loadingState =
                 LogicState(
                     id = "Loading",
-                    invoke = invokable,
+                    invoke = InvokableDefinition(id = "testInvoke", src = invokable),
                     on =
                         mapOf(
-                            "INVOKE_DONE" to listOf(Transition("Success")),
+                            "done.invoke.testInvoke" to listOf(Transition("Success")),
                             "CANCEL" to listOf(Transition("Idle")),
                         ),
                 )

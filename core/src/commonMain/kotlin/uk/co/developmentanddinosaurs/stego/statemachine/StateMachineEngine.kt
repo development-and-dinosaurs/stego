@@ -183,8 +183,26 @@ class StateMachineEngine(
         finalTargetState.invoke?.let {
             activeInvokableJob =
                 scope.launch {
-                    val resultEvent = it.invoke(output.value.context, scope).await()
-                    send(resultEvent)
+                    val resolvedInput = it.input.mapValues { (_, value) ->
+                        (value as? ValueReference)?.resolve(output.value.context, Event("")) ?: value
+                    }
+                    try {
+                        when (val result = it.src.invoke(resolvedInput)) {
+                            is InvokableResult.Success -> {
+                                val doneEvent = Event("done.invoke.${it.id}", result.data)
+                                send(doneEvent)
+                            }
+                            is InvokableResult.Failure -> {
+                                val errorEvent = Event("error.invoke.${it.id}", result.data)
+                                send(errorEvent)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // This catches unexpected exceptions from the invokable itself
+                        val errorData = mapOf("cause" to StringPrimitive(e.message ?: "An unexpected error occurred during invoke"))
+                        val errorEvent = Event("error.invoke.${it.id}", errorData)
+                        send(errorEvent)
+                    }
                 }
         }
     }

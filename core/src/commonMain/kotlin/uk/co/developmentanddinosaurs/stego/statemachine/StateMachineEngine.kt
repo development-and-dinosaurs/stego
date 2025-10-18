@@ -155,7 +155,7 @@ class StateMachineEngine(
     ) {
         val path =
             statesToEnter ?: getPathToState(targetState.id)
-                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
+            ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
 
         var tempContext = output.value.context
 
@@ -183,23 +183,29 @@ class StateMachineEngine(
         finalTargetState.invoke?.let {
             activeInvokableJob =
                 scope.launch {
-                    val resolvedInput = it.input.mapValues { (_, value) ->
-                        (value as? ValueReference)?.resolve(output.value.context, Event("")) ?: value
+                    val resolvedParams = it.input.mapValues { (_, value) ->
+                        ValueResolver.resolve(
+                            value,
+                            output.value.context,
+                            Event("")
+                        )
                     }
                     try {
-                        when (val result = it.src.invoke(resolvedInput)) {
+                        when (val result =
+                            it.src.invoke(resolvedParams)) {
                             is InvokableResult.Success -> {
                                 val doneEvent = Event("done.invoke.${it.id}", result.data)
                                 send(doneEvent)
                             }
+
                             is InvokableResult.Failure -> {
                                 val errorEvent = Event("error.invoke.${it.id}", result.data)
                                 send(errorEvent)
                             }
                         }
                     } catch (e: Exception) {
-                        // This catches unexpected exceptions from the invokable itself
-                        val errorData = mapOf("cause" to StringPrimitive(e.message ?: "An unexpected error occurred during invoke"))
+                        val errorData =
+                            mapOf("cause" to StringPrimitive(e.message ?: "An unexpected error occurred during invoke"))
                         val errorEvent = Event("error.invoke.${it.id}", errorData)
                         send(errorEvent)
                     }

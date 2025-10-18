@@ -26,7 +26,20 @@ data class ContextReference(
     override fun resolve(
         context: Context,
         event: Event,
-    ): DataValue? = context.get(path)
+    ): DataValue? {
+        val segments = path.split('.')
+        var current: DataValue? = context.get(segments.first())
+
+        for (i in 1 until segments.size) {
+            current =
+                if (current is ObjectValue) {
+                    current.value[segments[i]]
+                } else {
+                    return null
+                }
+        }
+        return current
+    }
 }
 
 /**
@@ -38,7 +51,20 @@ data class EventReference(
     override fun resolve(
         context: Context,
         event: Event,
-    ): DataValue? = event.data[path]
+    ): DataValue? {
+        val segments = path.split('.')
+        var current: DataValue? = event.data[segments.first()]
+
+        for (i in 1 until segments.size) {
+            current =
+                if (current is ObjectValue) {
+                    current.value[segments[i]]
+                } else {
+                    return null
+                }
+        }
+        return current
+    }
 }
 
 /**

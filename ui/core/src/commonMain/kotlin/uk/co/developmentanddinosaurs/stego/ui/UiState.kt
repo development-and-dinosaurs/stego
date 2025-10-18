@@ -3,6 +3,7 @@ package uk.co.developmentanddinosaurs.stego.ui
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
+import uk.co.developmentanddinosaurs.stego.statemachine.InvokableDefinition
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 import uk.co.developmentanddinosaurs.stego.statemachine.Transition
 
@@ -24,7 +25,7 @@ data class UiState(
     override val onEntry: List<Action> = emptyList(),
     override val onExit: List<Action> = emptyList(),
     override val on: Map<String, List<Transition>> = emptyMap(),
-    override val invoke: Invokable? = null,
+    override val invoke: InvokableDefinition? = null,
     override val initial: String? = null,
     override val states: Map<String, State> = emptyMap(),
 ) : State

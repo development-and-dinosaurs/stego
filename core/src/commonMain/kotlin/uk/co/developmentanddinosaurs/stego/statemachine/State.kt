@@ -11,7 +11,7 @@ interface State {
     val onEntry: List<Action>
     val onExit: List<Action>
     val on: Map<String, List<Transition>>
-    val invoke: Invokable?
+    val invoke: InvokableDefinition?
     val initial: String?
     val states: Map<String, State>
 }
@@ -23,7 +23,7 @@ interface State {
  * @property onEntry A list of [Action]s to be executed when the state machine enters this state.
  * @property onExit A list of [Action]s to be executed when the state machine exits this state.
  * @property on A map where keys are event types and values are a list of possible [Transition]s.
- * @property invoke An optional [Invokable] service to be executed upon entering this state.
+ * @property invoke An optional [InvokableDefinition] to be executed upon entering this state.
  * @property initial The ID of the initial substate. Required if this is a hierarchical parent state.
  * @property states An optional map of substates, keyed by their IDs.
  */
@@ -32,7 +32,7 @@ data class LogicState(
     override val onEntry: List<Action> = emptyList(),
     override val onExit: List<Action> = emptyList(),
     override val on: Map<String, List<Transition>> = emptyMap(),
-    override val invoke: Invokable? = null,
+    override val invoke: InvokableDefinition? = null,
     override val initial: String? = null,
     override val states: Map<String, State> = emptyMap(),
 ) : State

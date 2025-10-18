@@ -1,6 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.Serializable
+import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 
@@ -16,8 +17,8 @@ data class LogicStateDto(
 ) {
     fun toDomain(): State = LogicState(
         id = id,
-        onEntry = onEntry.map { it.toDomain() },
-        onExit = onExit.map { it.toDomain() },
+        onEntry = listOf(),
+        onExit = listOf(),
         on = on.mapValues { (_, transitions) -> transitions.map { it.toDomain() } },
         invoke = null,
         initial = initial,

@@ -17,8 +17,8 @@ data class UiStateDto(
 ) {
     fun toDomain(): State = UiState(
         id = id,
-        onEntry = onEntry.map { it.toDomain() },
-        onExit = onExit.map { it.toDomain() },
+        onEntry = emptyList(),
+        onExit = emptyList(),
         on = on.mapValues { (_, transitions) -> transitions.map { it.toDomain() } },
         invoke = null,
         initial = initial,

@@ -11,7 +11,7 @@ data class TransitionDto(
 ) {
     fun toDomain(): Transition = Transition(
         target = target,
-        actions = actions.map { it.toDomain() },
+        actions = listOf(),
         guard = guard?.toDomain()
     )
 }

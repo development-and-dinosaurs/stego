@@ -3,7 +3,7 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 /**
  * Represents a reference to a value, which can be resolved from different locations.
  */
-sealed interface ValueReference {
+sealed interface ValueReference : DataValue {
     /**
      * Resolves the reference to a concrete [DataValue].
      *

@@ -6,8 +6,15 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.longOrNull
+import uk.co.developmentanddinosaurs.stego.statemachine.BooleanPrimitive
+import uk.co.developmentanddinosaurs.stego.statemachine.ContextReference
+import uk.co.developmentanddinosaurs.stego.statemachine.DataValue
+import uk.co.developmentanddinosaurs.stego.statemachine.DoublePrimitive
+import uk.co.developmentanddinosaurs.stego.statemachine.EventReference
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.InvokableDefinition
+import uk.co.developmentanddinosaurs.stego.statemachine.LongPrimitive
+import uk.co.developmentanddinosaurs.stego.statemachine.StringPrimitive
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 
 /**
@@ -23,8 +30,8 @@ class InvokableDefinitionMapper(private val invokableRegistry: Map<String, Invok
         val invokable = invokableRegistry[dto.src]
             ?: throw StateMachineException("Invokable source '${dto.src}' not found in registry.")
 
-        val inputMap = dto.input?.mapValues { (_, value) ->
-            jsonElementToAny(value)
+        val inputMap: Map<String, DataValue> = dto.input?.mapValues { (_, value) ->
+            jsonElementToDataValue(value)
         } ?: emptyMap()
 
         return InvokableDefinition(
@@ -34,16 +41,22 @@ class InvokableDefinitionMapper(private val invokableRegistry: Map<String, Invok
         )
     }
 
-    private fun jsonElementToAny(element: JsonElement): Any {
+    private fun jsonElementToDataValue(element: JsonElement): DataValue {
         if (element is JsonNull) throw StateMachineException("Null values are not supported in invokable input.")
         if (element !is JsonPrimitive) throw StateMachineException("Complex objects in invokable input are not supported. Use expressions to reference context data.")
 
         return when {
-            element.isString -> element.content
-            element.longOrNull != null -> element.longOrNull!!
-            element.doubleOrNull != null -> element.doubleOrNull!!
-            element.booleanOrNull != null -> element.booleanOrNull!!
-            else -> element.content // Fallback for other primitive types
+            element.isString -> {
+                when {
+                    element.content.startsWith("context.") -> ContextReference(element.content.substringAfter("context."))
+                    element.content.startsWith("event.") -> EventReference(element.content.substringAfter("event."))
+                    else -> StringPrimitive(element.content)
+                }
+            }
+            element.longOrNull != null -> LongPrimitive(element.longOrNull!!)
+            element.doubleOrNull != null -> DoublePrimitive(element.doubleOrNull!!)
+            element.booleanOrNull != null -> BooleanPrimitive(element.booleanOrNull!!)
+            else -> StringPrimitive(element.content) // Fallback for other primitive types
         }
     }
 }

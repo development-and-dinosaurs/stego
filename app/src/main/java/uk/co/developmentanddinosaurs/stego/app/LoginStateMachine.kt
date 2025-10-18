@@ -1,36 +1,20 @@
 package uk.co.developmentanddinosaurs.stego.app
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import uk.co.developmentanddinosaurs.stego.statemachine.Action
-import uk.co.developmentanddinosaurs.stego.statemachine.Context
-import uk.co.developmentanddinosaurs.stego.statemachine.Event
-import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
-import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
-import uk.co.developmentanddinosaurs.stego.statemachine.StringPrimitive
-import uk.co.developmentanddinosaurs.stego.statemachine.Transition
-import uk.co.developmentanddinosaurs.stego.ui.ButtonView
-import uk.co.developmentanddinosaurs.stego.ui.ColumnView
-import uk.co.developmentanddinosaurs.stego.ui.LabelView
-import uk.co.developmentanddinosaurs.stego.ui.ProgressIndicatorView
-import uk.co.developmentanddinosaurs.stego.ui.TextFieldView
-import uk.co.developmentanddinosaurs.stego.ui.UiState
+import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.ui.*
 
 /**
  * A mock invokable that simulates a login network request.
  */
 object LoginInvokable : Invokable {
-    override fun invoke(context: Context, scope: CoroutineScope): Deferred<Event> {
-        return scope.async {
-            delay(2000)
-            val username = (context.get("username") as? StringPrimitive)?.value
-            if (username == "stego") {
-                Event("LOGIN_SUCCESS")
-            } else {
-                Event("LOGIN_FAIL", mapOf("error" to StringPrimitive("Invalid username")))
-            }
+    override suspend fun invoke(input: Map<String, DataValue>): InvokableResult {
+        delay(2000)
+        val username = (input["username"] as? StringPrimitive)?.value
+        return if (username == "stego") {
+            InvokableResult.Success(mapOf("loggedIn" to BooleanPrimitive(true)))
+        } else {
+            InvokableResult.Failure(mapOf("error" to StringPrimitive("Invalid username")))
         }
     }
 }
@@ -63,7 +47,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
             view = ColumnView(
                 children = listOf(
                     TextFieldView(
-                        text = "\${username}",
+                        text = $$"${username}",
                         label = "Username",
                         onTextChanged = Event("TEXT_CHANGED")
                     ),
@@ -90,17 +74,21 @@ val loginStateMachineDefinition = StateMachineDefinition(
                     LabelView("Logging in...")
                 )
             ),
-            invoke = LoginInvokable,
+            invoke = InvokableDefinition(
+                "login",
+                LoginInvokable,
+                mapOf("username" to ContextReference("username"))
+            ),
             on = mapOf(
-                "LOGIN_SUCCESS" to listOf(Transition("Success")),
-                "LOGIN_FAIL" to listOf(Transition("Error", actions = listOf(SaveErrorAction)))
+                "done.invoke.login" to listOf(Transition("Success")),
+                "error.invoke.login" to listOf(Transition("Error", actions = listOf(SaveErrorAction)))
             )
         ),
         "Success" to UiState(
             id = "Success",
             view = ColumnView(
                 children = listOf(
-                    LabelView("Welcome, \${username}!")
+                    LabelView($$"Welcome, ${username}!")
                 )
             )
         ),
@@ -108,7 +96,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
             id = "Error",
             view = ColumnView(
                 children = listOf(
-                    LabelView("Error for \${username}: \${error}"),
+                    LabelView($$"Error for ${username}: ${error}"),
                     ButtonView(
                         text = "Retry",
                         onClick = Event("RETRY")

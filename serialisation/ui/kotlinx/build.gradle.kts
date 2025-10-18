@@ -14,7 +14,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":core"))
             implementation(project(":ui:core"))
-            implementation(project(":serialisation:kotlinx:core"))
+            implementation(project(":serialisation:core:kotlinx"))
             api(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {

@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
                 val viewModel: LoginViewModel = viewModel()
                 val uiState by viewModel.uiState.collectAsState()
                 (uiState.state as? UiState)?.let { state ->
-                    Render(state.view, uiState.context, viewModel::onEvent)
+                    Render(state.uiNode, uiState.context, viewModel::onEvent)
                 }
             }
         }

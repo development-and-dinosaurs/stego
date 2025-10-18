@@ -44,7 +44,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
     states = mapOf(
         "Idle" to UiState(
             id = "Idle",
-            view = ColumnView(
+            uiNode = ColumnView(
                 children = listOf(
                     TextFieldView(
                         text = $$"${username}",
@@ -68,7 +68,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
         ),
         "Loading" to UiState(
             id = "Loading",
-            view = ColumnView(
+            uiNode = ColumnView(
                 children = listOf(
                     ProgressIndicatorView,
                     LabelView("Logging in...")
@@ -86,7 +86,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
         ),
         "Success" to UiState(
             id = "Success",
-            view = ColumnView(
+            uiNode = ColumnView(
                 children = listOf(
                     LabelView($$"Welcome, ${username}!")
                 )
@@ -94,7 +94,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
         ),
         "Error" to UiState(
             id = "Error",
-            view = ColumnView(
+            uiNode = ColumnView(
                 children = listOf(
                     LabelView($$"Error for ${username}: ${error}"),
                     ButtonView(

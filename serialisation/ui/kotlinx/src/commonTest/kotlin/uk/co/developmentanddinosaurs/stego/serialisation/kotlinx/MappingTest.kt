@@ -3,81 +3,101 @@ package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import uk.co.developmentanddinosaurs.stego.ui.ButtonView
-import uk.co.developmentanddinosaurs.stego.ui.ColumnView
-import uk.co.developmentanddinosaurs.stego.ui.LabelView
-import uk.co.developmentanddinosaurs.stego.ui.UiState
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
+import uk.co.developmentanddinosaurs.stego.ui.node.*
 
 class MappingTest : BehaviorSpec({
-    Given("a LabelViewDto") {
-        val labelViewDto = LabelViewDto("Hello, World!")
-        When("toDomain is invoked") {
-            val view = labelViewDto.toDomain()
-            Then("it should be a LabelView") {
-                view.shouldBeInstanceOf<LabelView>()
+    val uiNodeMapper = CompositeUiNodeMapper(
+        simpleMappers = mapOf(
+            LabelUiNodeDto::class to LabelUiNodeMapper(),
+            ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper()
+        ),
+        compositeAwareFactories = mapOf(
+            ColumnUiNodeDto::class to { mapper: UiNodeMapper -> ColumnUiNodeMapper(mapper) },
+            ButtonUiNodeDto::class to { _: UiNodeMapper -> ButtonUiNodeMapper() },
+            TextFieldUiNodeDto::class to { _: UiNodeMapper -> TextFieldUiNodeMapper() }
+        )
+    )
+
+    Given("a LabelUiNodeDto") {
+        val labelUiNodeDto = LabelUiNodeDto("Hello, World!")
+        When("it is mapped to a domain object") {
+            val uiNode = uiNodeMapper.map(labelUiNodeDto)
+            Then("it should be a LabelUiNode") {
+                uiNode.shouldBeInstanceOf<LabelUiNode>()
             }
             Then("it should have the correct text") {
-                (view as LabelView).text shouldBe "Hello, World!"
+                (uiNode as LabelUiNode).text shouldBe "Hello, World!"
             }
         }
     }
 
-    Given("a ButtonViewDto") {
-        val buttonViewDto = ButtonViewDto("Click me", EventDto("EVENT_TYPE"))
-        When("toDomain is invoked") {
-            val view = buttonViewDto.toDomain()
-            Then("it should be a ButtonView") {
-                view.shouldBeInstanceOf<ButtonView>()
+    Given("a ButtonUiNodeDto") {
+        val buttonUiNodeDto = ButtonUiNodeDto("Click me", EventDto("EVENT_TYPE"))
+        When("it is mapped to a domain object") {
+            val uiNode = uiNodeMapper.map(buttonUiNodeDto)
+            Then("it should be a ButtonUiNode") {
+                uiNode.shouldBeInstanceOf<ButtonUiNode>()
             }
             Then("it should have the correct text") {
-                (view as ButtonView).text shouldBe "Click me"
+                (uiNode as ButtonUiNode).text shouldBe "Click me"
             }
             Then("it should have the correct onClick event") {
-                (view as ButtonView).onClick.type shouldBe "EVENT_TYPE"
+                (uiNode as ButtonUiNode).onClick.type shouldBe "EVENT_TYPE"
             }
         }
     }
 
-    Given("a ColumnViewDto") {
-        val columnViewDto = ColumnViewDto(
+    Given("a ColumnUiNodeDto") {
+        val columnUiNodeDto = ColumnUiNodeDto(
             children = listOf(
-                LabelViewDto("I am a label"),
-                ButtonViewDto("I am a button", EventDto("BUTTON_EVENT"))
+                LabelUiNodeDto("I am a label"),
+                ButtonUiNodeDto("I am a button", EventDto("BUTTON_EVENT"))
             )
         )
-        When("toDomain is invoked") {
-            val view = columnViewDto.toDomain()
-            Then("it should be a ColumnView") {
-                view.shouldBeInstanceOf<ColumnView>()
+        When("it is mapped to a domain object") {
+            val uiNode = uiNodeMapper.map(columnUiNodeDto)
+            Then("it should be a ColumnUiNode") {
+                uiNode.shouldBeInstanceOf<ColumnUiNode>()
             }
             Then("it should have the correct number of children") {
-                (view as ColumnView).children.size shouldBe 2
+                (uiNode as ColumnUiNode).children.size shouldBe 2
             }
-            Then("the first child should be a LabelView") {
-                (view as ColumnView).children[0].shouldBeInstanceOf<LabelView>()
+            Then("the first child should be a LabelUiNode") {
+                (uiNode as ColumnUiNode).children[0].shouldBeInstanceOf<LabelUiNode>()
             }
-            Then("the second child should be a ButtonView") {
-                (view as ColumnView).children[1].shouldBeInstanceOf<ButtonView>()
+            Then("the second child should be a ButtonUiNode") {
+                (uiNode as ColumnUiNode).children[1].shouldBeInstanceOf<ButtonUiNode>()
             }
         }
     }
 
-    Given("a UiStateDto") {
-        val uiStateDto = UiStateDto(
-            id = "testState",
-            view = LabelViewDto("Test View")
-        )
-        When("toDomain is invoked") {
-            val state = uiStateDto.toDomain()
-            Then("it should be a UiState") {
-                state.shouldBeInstanceOf<UiState>()
+    Given("a TextFieldUiNodeDto") {
+        val textFieldUiNodeDto = TextFieldUiNodeDto("initial text", "label", EventDto("TEXT_CHANGED"))
+        When("it is mapped to a domain object") {
+            val uiNode = uiNodeMapper.map(textFieldUiNodeDto)
+            Then("it should be a TextFieldUiNode") {
+                uiNode.shouldBeInstanceOf<TextFieldUiNode>()
             }
-            Then("it should have the correct id") {
-                state.id shouldBe "testState"
+            Then("it should have the correct text") {
+                (uiNode as TextFieldUiNode).text shouldBe "initial text"
             }
-            Then("it should have the correct view") {
-                (state as UiState).view.shouldBeInstanceOf<LabelView>()
-                (state.view as LabelView).text shouldBe "Test View"
+            Then("it should have the correct label") {
+                (uiNode as TextFieldUiNode).label shouldBe "label"
+            }
+            Then("it should have the correct onTextChanged event") {
+                (uiNode as TextFieldUiNode).onTextChanged.type shouldBe "TEXT_CHANGED"
+            }
+        }
+    }
+
+    Given("a ProgressIndicatorUiNodeDto") {
+        val progressIndicatorUiNodeDto = ProgressIndicatorUiNodeDto
+        When("it is mapped to a domain object") {
+            val uiNode = uiNodeMapper.map(progressIndicatorUiNodeDto)
+            Then("it should be a ProgressIndicatorUiNode") {
+                uiNode.shouldBeInstanceOf<ProgressIndicatorUiNode>()
             }
         }
     }

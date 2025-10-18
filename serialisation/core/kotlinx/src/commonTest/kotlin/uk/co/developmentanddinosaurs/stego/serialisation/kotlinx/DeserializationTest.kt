@@ -3,7 +3,6 @@ package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class DeserializationTest : StringSpec({

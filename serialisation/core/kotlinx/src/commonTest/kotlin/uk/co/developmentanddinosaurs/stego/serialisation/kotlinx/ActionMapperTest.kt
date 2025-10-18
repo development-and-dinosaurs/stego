@@ -1,11 +1,11 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.types.shouldBeInstanceOf
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.LogAction

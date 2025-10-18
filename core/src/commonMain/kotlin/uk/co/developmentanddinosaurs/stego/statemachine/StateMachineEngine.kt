@@ -155,7 +155,7 @@ class StateMachineEngine(
     ) {
         val path =
             statesToEnter ?: getPathToState(targetState.id)
-            ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
+                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
 
         var tempContext = output.value.context
 
@@ -183,16 +183,19 @@ class StateMachineEngine(
         finalTargetState.invoke?.let {
             activeInvokableJob =
                 scope.launch {
-                    val resolvedParams = it.input.mapValues { (_, value) ->
-                        ValueResolver.resolve(
-                            value,
-                            output.value.context,
-                            Event("")
-                        )
-                    }
+                    val resolvedParams =
+                        it.input.mapValues { (_, value) ->
+                            ValueResolver.resolve(
+                                value,
+                                output.value.context,
+                                Event(""),
+                            )
+                        }
                     try {
-                        when (val result =
-                            it.src.invoke(resolvedParams)) {
+                        when (
+                            val result =
+                                it.src.invoke(resolvedParams)
+                        ) {
                             is InvokableResult.Success -> {
                                 val doneEvent = Event("done.invoke.${it.id}", result.data)
                                 send(doneEvent)

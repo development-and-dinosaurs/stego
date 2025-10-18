@@ -4,9 +4,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -76,7 +73,9 @@ private data class DelayAction(
     }
 }
 
-class TestInvokable(private val duration: Long = 1000) : Invokable {
+class TestInvokable(
+    private val duration: Long = 1000,
+) : Invokable {
     override suspend fun invoke(input: Map<String, DataValue>): InvokableResult {
         delay(duration)
         return InvokableResult.Success(mapOf("waitedFor" to LongPrimitive(duration)))

@@ -2,7 +2,8 @@ package uk.co.developmentanddinosaurs.stego.app
 
 import kotlinx.coroutines.delay
 import uk.co.developmentanddinosaurs.stego.statemachine.*
-import uk.co.developmentanddinosaurs.stego.ui.*
+import uk.co.developmentanddinosaurs.stego.ui.UiState
+import uk.co.developmentanddinosaurs.stego.ui.node.*
 
 /**
  * A mock invokable that simulates a login network request.
@@ -44,14 +45,14 @@ val loginStateMachineDefinition = StateMachineDefinition(
     states = mapOf(
         "Idle" to UiState(
             id = "Idle",
-            uiNode = ColumnView(
+            uiNode = ColumnUiNode(
                 children = listOf(
-                    TextFieldView(
+                    TextFieldUiNode(
                         text = $$"${username}",
                         label = "Username",
                         onTextChanged = Event("TEXT_CHANGED")
                     ),
-                    ButtonView(
+                    ButtonUiNode(
                         text = "Log In",
                         onClick = Event("SUBMIT")
                     )
@@ -68,10 +69,10 @@ val loginStateMachineDefinition = StateMachineDefinition(
         ),
         "Loading" to UiState(
             id = "Loading",
-            uiNode = ColumnView(
+            uiNode = ColumnUiNode(
                 children = listOf(
-                    ProgressIndicatorView,
-                    LabelView("Logging in...")
+                    ProgressIndicatorUiNode,
+                    LabelUiNode("Logging in...")
                 )
             ),
             invoke = InvokableDefinition(
@@ -86,18 +87,18 @@ val loginStateMachineDefinition = StateMachineDefinition(
         ),
         "Success" to UiState(
             id = "Success",
-            uiNode = ColumnView(
+            uiNode = ColumnUiNode(
                 children = listOf(
-                    LabelView($$"Welcome, ${username}!")
+                    LabelUiNode($$"Welcome, ${username}!")
                 )
             )
         ),
         "Error" to UiState(
             id = "Error",
-            uiNode = ColumnView(
+            uiNode = ColumnUiNode(
                 children = listOf(
-                    LabelView($$"Error for ${username}: ${error}"),
-                    ButtonView(
+                    LabelUiNode($$"Error for ${username}: ${error}"),
+                    ButtonUiNode(
                         text = "Retry",
                         onClick = Event("RETRY")
                     )

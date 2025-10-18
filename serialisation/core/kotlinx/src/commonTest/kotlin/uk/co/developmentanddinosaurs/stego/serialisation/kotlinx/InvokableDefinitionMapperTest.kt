@@ -7,15 +7,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import uk.co.developmentanddinosaurs.stego.statemachine.BooleanPrimitive
-import uk.co.developmentanddinosaurs.stego.statemachine.ContextReference
-import uk.co.developmentanddinosaurs.stego.statemachine.DoublePrimitive
-import uk.co.developmentanddinosaurs.stego.statemachine.EventReference
-import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
-import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult
-import uk.co.developmentanddinosaurs.stego.statemachine.LongPrimitive
-import uk.co.developmentanddinosaurs.stego.statemachine.StringPrimitive
-import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
+import uk.co.developmentanddinosaurs.stego.statemachine.*
 
 class InvokableDefinitionMapperTest : BehaviorSpec({
 

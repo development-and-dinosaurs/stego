@@ -26,9 +26,7 @@ object ValueResolver {
         value: DataValue,
         context: Context,
         event: Event,
-    ): DataValue {
-        return (value as? ValueReference)?.resolve(context, event) ?: value
-    }
+    ): DataValue = (value as? ValueReference)?.resolve(context, event) ?: value
 
     /**
      * Parses a string into the most appropriate [DataValue].
@@ -39,11 +37,10 @@ object ValueResolver {
      * @param value The string to parse.
      * @return The corresponding [DataValue] (e.g., [ContextReference], [EventReference], or [StringPrimitive]).
      */
-    fun parse(value: String): DataValue {
-        return when {
+    fun parse(value: String): DataValue =
+        when {
             value.startsWith("context.") -> ContextReference(value.substringAfter("context."))
             value.startsWith("event.") -> EventReference(value.substringAfter("event."))
             else -> StringPrimitive(value)
         }
-    }
 }

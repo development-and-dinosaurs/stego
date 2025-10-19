@@ -2,7 +2,7 @@ package uk.co.developmentanddinosaurs.stego.app
 
 import kotlinx.coroutines.delay
 import uk.co.developmentanddinosaurs.stego.statemachine.*
-import uk.co.developmentanddinosaurs.stego.statemachine.guards.EqualsGuard
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 import uk.co.developmentanddinosaurs.stego.ui.UiState
 import uk.co.developmentanddinosaurs.stego.ui.node.*
 
@@ -120,7 +120,7 @@ val loginStateMachineDefinition = StateMachineDefinition(
             ),
             on = mapOf(
                 "done.invoke.login" to listOf(
-                    Transition("Success", guard = EqualsGuard("{event.loggedIn}", true))
+                    Transition("Success", guard = Guard.create("({event.loggedIn} == true)"))
                 ),
                 "error.invoke.login" to listOf(Transition("Error", actions = listOf(SaveErrorAction)))
             )

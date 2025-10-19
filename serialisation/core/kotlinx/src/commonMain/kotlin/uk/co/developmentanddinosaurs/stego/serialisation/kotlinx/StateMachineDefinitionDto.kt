@@ -12,8 +12,9 @@ data class StateMachineDefinitionDto(
 ) {
     fun toDomain(): StateMachineDefinition {
         var context = Context()
-        initialContext.forEach { (key, value) ->
-            context = context.put(key, value.toDomain())
+        initialContext.forEach { (key, valueDto) ->
+            val value = valueDto.toDomain() ?: return@forEach
+            context = context.put(key, value)
         }
         return StateMachineDefinition(
             initial = initial,

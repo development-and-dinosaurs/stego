@@ -6,6 +6,7 @@ import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.LogAction
@@ -26,7 +27,11 @@ class ActionMapperTest : BehaviorSpec({
         }
 
         When("checking if it can map a different ActionDto type") {
-            val dummyDto = object : ActionDto {}
+            val dummyDto = object : ActionDto {
+                override fun toDomain(): Action {
+                    TODO("Not yet implemented")
+                }
+            }
             Then("it should return false") {
                 mapper.canMap(dummyDto).shouldBeFalse()
             }
@@ -75,7 +80,11 @@ class ActionMapperTest : BehaviorSpec({
         }
 
         When("mapping an unknown ActionDto type") {
-            val dummyDto = object : ActionDto {}
+            val dummyDto = object : ActionDto {
+                override fun toDomain(): Action {
+                    TODO("Not yet implemented")
+                }
+            }
             Then("it should return false for canMap") {
                 compositeMapper.canMap(dummyDto).shouldBeFalse()
             }

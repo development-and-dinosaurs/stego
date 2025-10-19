@@ -16,7 +16,7 @@ class LoginViewModel(application: Application,
 ) : AndroidViewModel(application) {
 
     private val engine = StateMachineEngine(
-        definition = stateDef(getApplication()),
+        definition = loginStateMachineDefinition,
         scope = CoroutineScope(viewModelScope.coroutineContext + dispatcher)
     )
 

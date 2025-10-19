@@ -125,7 +125,8 @@ val loginStateMachineDefinition = StateMachineDefinition(
                 mapOf("username" to ContextReference("username"))
             ),
             on = mapOf(
-                "done.invoke.login" to listOf(Transition("Success")),
+                "done.invoke.login" to listOf(Transition("Success", guard = EqualsGuard(ContextReference("loggedIn"),
+                    LiteralReference(BooleanPrimitive(true))))),
                 "error.invoke.login" to listOf(Transition("Error", actions = listOf(SaveErrorAction)))
             )
         ),

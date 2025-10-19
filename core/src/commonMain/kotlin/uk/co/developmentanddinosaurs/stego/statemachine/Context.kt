@@ -7,7 +7,7 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  * Every "put" operation returns a new Context instance with the data updated.
  */
 class Context private constructor(
-    private val values: Map<String, Any>,
+    private val values: Map<String, Any?>,
 ) {
     /**
      * Creates an empty context.
@@ -31,8 +31,8 @@ class Context private constructor(
      */
     fun put(
         key: String,
-        value: Any,
+        value: Any?,
     ): Context = Context(values + (key to value))
 
-    fun asMap(): Map<String, Any> = values
+    fun asMap(): Map<String, Any?> = values
 }

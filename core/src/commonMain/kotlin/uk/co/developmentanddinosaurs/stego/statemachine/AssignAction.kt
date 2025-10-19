@@ -1,6 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
-class AssignAction(private val key: String, private val value: Any) : Action {
+class AssignAction(private val key: String, private val value: Any?) : Action {
     override fun execute(
         context: Context,
         event: Event,

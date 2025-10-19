@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import uk.co.developmentanddinosaurs.stego.statemachine.guards.EqualsGuard
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
 // A simple test action that assigns a primitive value to the context.
 private data class AssignAction(
@@ -77,7 +77,7 @@ private data class DelayAction(
 class TestInvokable(
     private val duration: Long = 1000,
 ) : Invokable {
-    override suspend fun invoke(input: Map<String, Any>): InvokableResult {
+    override suspend fun invoke(input: Map<String, Any?>): InvokableResult {
         delay(duration)
         return InvokableResult.Success(mapOf("waitedFor" to duration))
     }
@@ -174,9 +174,8 @@ class StateMachineEngineTest :
         }
 
         Given("a state machine with a guarded transition") {
-            val trueGuard = EqualsGuard(left = true, right = true)
-            val falseGuard =
-                EqualsGuard(true, false)
+            val trueGuard = Guard.create("(true == true)")
+            val falseGuard = Guard.create("(true == false)")
             val guardedState =
                 LogicState(
                     id = "Guarded",

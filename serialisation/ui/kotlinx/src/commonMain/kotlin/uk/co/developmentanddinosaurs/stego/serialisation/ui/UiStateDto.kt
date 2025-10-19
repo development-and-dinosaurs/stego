@@ -1,19 +1,34 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.ui
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
+import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
+import uk.co.developmentanddinosaurs.stego.statemachine.State
 
 @Serializable
+@SerialName("ui")
 data class UiStateDto(
-    val id: String,
-    val initial: String? = null,
-    val invoke: InvokableDefinitionDto? = null,
-    val on: Map<String, List<TransitionDto>> = emptyMap(),
-    val onEntry: List<ActionDto> = emptyList(),
-    val onExit: List<ActionDto> = emptyList(),
-    val states: Map<String, UiStateDto> = emptyMap(),
+    override val id: String,
+    override val initial: String? = null,
+    override val invoke: InvokableDefinitionDto? = null,
+    override val on: Map<String, List<TransitionDto>> = emptyMap(),
+    override val onEntry: List<ActionDto> = emptyList(),
+    override val onExit: List<ActionDto> = emptyList(),
+    override val states: Map<String, UiStateDto> = emptyMap(),
     val uiNode: UiNodeDto
-)
+) : StateDto {
+    override fun toDomain(): State = LogicState(
+        id = id,
+        onEntry = listOf(),
+        onExit = listOf(),
+        on = on.mapValues { (_, transitions) -> transitions.map { it.toDomain() } },
+        invoke = null,
+        initial = initial,
+        states = states.mapValues { (_, stateDto) -> stateDto.toDomain() }
+    )
+}

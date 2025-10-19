@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -56,6 +57,8 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":ui:core"))
     implementation(project(":ui:android"))
+    implementation(project(":serialisation:core:kotlinx"))
+    implementation(project(":serialisation:ui:kotlinx"))
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
@@ -65,6 +68,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.cash.turbine)
     testImplementation(libs.kotest.assertions.core)

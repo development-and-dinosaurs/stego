@@ -8,4 +8,6 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Action
  * Library consumers can provide their own implementations and register them with the `SerializersModule`
  * to allow for custom actions defined in JSON.
  */
-interface ActionDto
+interface ActionDto {
+    fun toDomain(): Action
+}

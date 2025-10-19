@@ -1,6 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.app
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -10,12 +11,12 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineEngine
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineOutput
 
-class LoginViewModel(
-    dispatcher: CoroutineDispatcher = Dispatchers.Main
-) : ViewModel() {
+class LoginViewModel(application: Application,
+                     dispatcher: CoroutineDispatcher = Dispatchers.Main
+) : AndroidViewModel(application) {
 
     private val engine = StateMachineEngine(
-        definition = loginStateMachineDefinition,
+        definition = stateDef(getApplication()),
         scope = CoroutineScope(viewModelScope.coroutineContext + dispatcher)
     )
 

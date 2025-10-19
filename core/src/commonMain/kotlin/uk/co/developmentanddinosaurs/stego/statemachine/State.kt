@@ -8,11 +8,11 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  */
 interface State {
     val id: String
+    val initial: String?
+    val invoke: InvokableDefinition?
+    val on: Map<String, List<Transition>>
     val onEntry: List<Action>
     val onExit: List<Action>
-    val on: Map<String, List<Transition>>
-    val invoke: InvokableDefinition?
-    val initial: String?
     val states: Map<String, State>
 }
 
@@ -29,10 +29,10 @@ interface State {
  */
 data class LogicState(
     override val id: String,
+    override val initial: String? = null,
+    override val invoke: InvokableDefinition? = null,
+    override val on: Map<String, List<Transition>> = emptyMap(),
     override val onEntry: List<Action> = emptyList(),
     override val onExit: List<Action> = emptyList(),
-    override val on: Map<String, List<Transition>> = emptyMap(),
-    override val invoke: InvokableDefinition? = null,
-    override val initial: String? = null,
     override val states: Map<String, State> = emptyMap(),
 ) : State

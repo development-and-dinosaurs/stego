@@ -2,7 +2,6 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -443,7 +442,7 @@ class StateMachineEngineTest :
             val definition =
                 StateMachineDefinition(
                     initial = "Parent",
-                    initialContext = Context().put("trace", listOf<String>()),
+                    initialContext = mapOf("trace" to listOf<String>()),
                     states = mapOf("Parent" to parentState),
                 )
 
@@ -482,7 +481,7 @@ class StateMachineEngineTest :
             val definition =
                 StateMachineDefinition(
                     initial = "Parent",
-                    initialContext = Context().put("trace", listOf<String>()),
+                    initialContext = mapOf("trace" to listOf<String>()),
                     states = mapOf("Parent" to parent),
                 )
 
@@ -530,7 +529,7 @@ class StateMachineEngineTest :
             val definition =
                 StateMachineDefinition(
                     initial = "l1",
-                    initialContext = Context().put("trace", listOf<String>()),
+                    initialContext = mapOf("trace" to listOf<String>()),
                     states = mapOf("l1" to l1),
                 )
 

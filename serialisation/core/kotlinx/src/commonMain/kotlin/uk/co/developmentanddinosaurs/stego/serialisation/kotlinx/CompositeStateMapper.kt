@@ -10,20 +10,24 @@ import kotlin.reflect.KClass
  * It looks up the correct mapper based on the DTO's class and delegates the mapping task.
  */
 class CompositeStateMapper(
-    private val mapperMap: Map<KClass<out StateDto>, StateDtoMapper>
+    mapperFactories: Map<KClass<out StateDto>, (StateDtoMapper) -> StateDtoMapper>
 ) : StateDtoMapper {
+    private val mapperMap: Map<KClass<out StateDto>, StateDtoMapper> =
+        mapperFactories.mapValues { (_, factory) -> factory(this) }
 
     fun map(dto: StateMachineDefinitionDto): StateMachineDefinition {
-        println("Mapping state machine")
+        val initialContext = dto.initialContext.mapValues { (_, valueDto) ->
+            valueDto.toDomain()
+                ?: throw StateMachineException("Failed to map initial context value: $valueDto")
+        }
         return StateMachineDefinition(
             initial = dto.initial,
             states = dto.states.mapValues { (_, stateDto) -> map(stateDto) },
-            initialContext = dto.initialContext
+            initialContext = initialContext
         )
     }
 
     override fun map(dto: StateDto): State {
-        println("Mapping state $dto")
         val mapper = mapperMap[dto::class]
             ?: throw StateMachineException("Unsupported StateDto type: ${dto::class.simpleName}")
         return mapper.map(dto)

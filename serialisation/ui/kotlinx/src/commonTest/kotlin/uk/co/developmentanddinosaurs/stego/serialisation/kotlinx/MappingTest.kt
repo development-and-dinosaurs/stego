@@ -93,7 +93,7 @@ class MappingTest : BehaviorSpec({
     }
 
     Given("a ProgressIndicatorUiNodeDto") {
-        val progressIndicatorUiNodeDto = ProgressIndicatorUiNodeDto
+        val progressIndicatorUiNodeDto = ProgressIndicatorUiNodeDto()
         When("it is mapped to a domain object") {
             val uiNode = uiNodeMapper.map(progressIndicatorUiNodeDto)
             Then("it should be a ProgressIndicatorUiNode") {

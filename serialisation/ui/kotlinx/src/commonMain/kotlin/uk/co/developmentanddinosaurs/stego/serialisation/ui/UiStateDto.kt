@@ -12,11 +12,11 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 @SerialName("ui")
 data class UiStateDto(
     override val id: String,
-    val uiNode: UiNodeDto,
     override val initial: String? = null,
     override val invoke: InvokableDefinitionDto? = null,
     override val on: Map<String, List<TransitionDto>> = emptyMap(),
     override val onEntry: List<ActionDto> = emptyList(),
     override val onExit: List<ActionDto> = emptyList(),
-    override val states: Map<String, UiStateDto> = emptyMap()
+    override val states: Map<String, UiStateDto> = emptyMap(),
+    val uiNode: UiNodeDto,
 ) : StateDto

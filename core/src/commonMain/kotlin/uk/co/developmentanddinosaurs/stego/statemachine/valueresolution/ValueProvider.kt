@@ -16,6 +16,7 @@ interface ValueProvider {
          * Resolves the input into a specific [ValueProvider].
          * If the value is a String in the format `{context.key}` or `{event.key}`,
          * a corresponding dynamic value provider is created.
+         * For other strings, it attempts to convert them to numbers or booleans.
          * Otherwise, a [LiteralValue] is created.
          */
         fun resolve(value: Any?): ValueProvider {
@@ -29,6 +30,15 @@ interface ValueProvider {
                         "event" -> EventValue(key)
                         else -> error("Unknown value source: $source") // Should not happen
                     }
+                }
+
+                return when {
+                    value.toIntOrNull() != null -> LiteralValue(value.toInt())
+                    value.toDoubleOrNull() != null -> LiteralValue(value.toDouble())
+                    value.equals("true", ignoreCase = true) -> LiteralValue(true)
+                    value.equals("false", ignoreCase = true) -> LiteralValue(false)
+                    value.startsWith("\"") && value.endsWith("\"") -> LiteralValue(value.substring(1, value.length - 1))
+                    else -> LiteralValue(value)
                 }
             }
             return LiteralValue(value)

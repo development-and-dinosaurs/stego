@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 
 class InvokableTest :
     BehaviorSpec({
-        val resultData = mapOf("result" to StringPrimitive("success"))
+        val resultData = mapOf("result" to "success")
 
         Given("an Invokable constructed as a lambda") {
             val invokable = Invokable { _ -> InvokableResult.Success(resultData) }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
 import kotlin.math.min
 
 /**
@@ -39,7 +40,7 @@ class StateMachineEngine(
         validateDefinition()
 
         val initialState = stateMap[definition.initial]!! // We've just validated this is here
-        _output = MutableStateFlow(StateMachineOutput(initialState, definition.initialContext))
+        _output = MutableStateFlow(StateMachineOutput(initialState, Context(definition.initialContext)))
 
         enterState(initialState, Event("stego.internal.init"))
     }
@@ -48,6 +49,10 @@ class StateMachineEngine(
      * Sends an event to the state machine for processing. This method is non-blocking and thread-safe.
      */
     fun send(event: Event) {
+        println("current context")
+        println(output.value.context.asMap())
+        println("current event")
+        println(event.data)
         scope.launch {
             processingMutex.withLock {
                 processEvent(event)
@@ -74,7 +79,7 @@ class StateMachineEngine(
             val errorEvent =
                 Event(
                     type = "error.execution",
-                    data = mapOf("cause" to StringPrimitive(e.message ?: "An unknown execution error occurred")),
+                    data = mapOf("cause" to (e.message ?: "An unknown execution error occurred")),
                 )
             send(errorEvent)
         }
@@ -155,7 +160,7 @@ class StateMachineEngine(
     ) {
         val path =
             statesToEnter ?: getPathToState(targetState.id)
-                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
+            ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
 
         var tempContext = output.value.context
 
@@ -184,17 +189,10 @@ class StateMachineEngine(
             activeInvokableJob =
                 scope.launch {
                     val resolvedParams =
-                        it.input.mapValues { (_, value) ->
-                            ValueResolver.resolve(
-                                value,
-                                output.value.context,
-                                Event(""),
-                            )
-                        }
+                        it.input.map { input -> input.key to ValueProvider.resolve(input.value).get(_output.value.context, null) }.toMap()
                     try {
                         when (
-                            val result =
-                                it.src.invoke(resolvedParams)
+                            val result = it.src.invoke(resolvedParams)
                         ) {
                             is InvokableResult.Success -> {
                                 val doneEvent = Event("done.invoke.${it.id}", result.data)
@@ -208,7 +206,7 @@ class StateMachineEngine(
                         }
                     } catch (e: Exception) {
                         val errorData =
-                            mapOf("cause" to StringPrimitive(e.message ?: "An unexpected error occurred during invoke"))
+                            mapOf("cause" to (e.message ?: "An unexpected error occurred during invoke"))
                         val errorEvent = Event("error.invoke.${it.id}", errorData)
                         send(errorEvent)
                     }

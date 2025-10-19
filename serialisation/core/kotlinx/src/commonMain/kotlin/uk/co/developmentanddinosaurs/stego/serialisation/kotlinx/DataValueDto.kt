@@ -1,54 +1,58 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import uk.co.developmentanddinosaurs.stego.statemachine.*
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.*
 
-@Serializable
+@Serializable(with = DataValueDtoSerializer::class)
 sealed interface DataValueDto {
-    fun toDomain(): DataValue
+    fun toDomain(): Any?
 }
 
-@Serializable
-sealed interface PrimitiveDto : DataValueDto {
-    override fun toDomain(): Primitive
+data class StringDataValueDto(val value: String) : DataValueDto {
+    override fun toDomain(): Any = value
 }
 
-@Serializable
-data class StringPrimitiveDto(val value: String) : PrimitiveDto {
-    override fun toDomain(): Primitive = StringPrimitive(value)
+data class NumberDataValueDto(val value: Number) : DataValueDto {
+    override fun toDomain(): Any = value
 }
 
-@Serializable
-data class IntPrimitiveDto(val value: Int) : PrimitiveDto {
-    override fun toDomain(): Primitive = IntPrimitive(value)
+data class BooleanDataValueDto(val value: Boolean) : DataValueDto {
+    override fun toDomain(): Any = value
 }
 
-@Serializable
-data class LongPrimitiveDto(val value: Long) : PrimitiveDto {
-    override fun toDomain(): Primitive = LongPrimitive(value)
+data object NullDataValueDto : DataValueDto {
+    override fun toDomain(): Any? = null
 }
 
-@Serializable
-data class FloatPrimitiveDto(val value: Float) : PrimitiveDto {
-    override fun toDomain(): Primitive = FloatPrimitive(value)
-}
+object DataValueDtoSerializer : KSerializer<DataValueDto> {
+    override val descriptor: SerialDescriptor = JsonPrimitive.serializer().descriptor
 
-@Serializable
-data class DoublePrimitiveDto(val value: Double) : PrimitiveDto {
-    override fun toDomain(): Primitive = DoublePrimitive(value)
-}
+    override fun serialize(encoder: Encoder, value: DataValueDto) {
+        val jsonEncoder = encoder as? JsonEncoder ?: error("This serializer can only be used with JSON")
+        val jsonElement = when (value) {
+            is StringDataValueDto -> JsonPrimitive(value.value)
+            is NumberDataValueDto -> JsonPrimitive(value.value)
+            is BooleanDataValueDto -> JsonPrimitive(value.value)
+            is NullDataValueDto -> JsonNull
+        }
+        jsonEncoder.encodeJsonElement(jsonElement)
+    }
 
-@Serializable
-data class BooleanPrimitiveDto(val value: Boolean) : PrimitiveDto {
-    override fun toDomain(): Primitive = BooleanPrimitive(value)
-}
+    override fun deserialize(decoder: Decoder): DataValueDto {
+        val jsonDecoder = decoder as? JsonDecoder ?: error("This serializer can only be used with JSON")
+        val jsonElement = jsonDecoder.decodeJsonElement() as JsonPrimitive
 
-@Serializable
-data class ObjectValueDto(val value: Map<String, DataValueDto>) : DataValueDto {
-    override fun toDomain(): DataValue = ObjectValue(value.mapValues { it.value.toDomain() })
-}
-
-@Serializable
-data class ListValueDto(val value: List<DataValueDto>) : DataValueDto {
-    override fun toDomain(): DataValue = ListValue(value.map { it.toDomain() })
+        return when {
+            jsonElement is JsonNull -> NullDataValueDto
+            jsonElement.isString -> StringDataValueDto(jsonElement.content)
+            jsonElement.longOrNull != null -> NumberDataValueDto(jsonElement.longOrNull!!)
+            jsonElement.doubleOrNull != null -> NumberDataValueDto(jsonElement.doubleOrNull!!)
+            jsonElement.booleanOrNull != null -> BooleanDataValueDto(jsonElement.booleanOrNull!!)
+            else -> error("Unsupported JSON primitive type for DataValueDto")
+        }
+    }
 }

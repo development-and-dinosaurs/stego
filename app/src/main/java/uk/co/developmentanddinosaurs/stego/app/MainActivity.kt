@@ -19,8 +19,9 @@ class MainActivity : ComponentActivity() {
                 val factory = object : ViewModelProvider.Factory {
                     override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                         if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
+                            val definition = stateDef(application)
                             @Suppress("UNCHECKED_CAST")
-                            return LoginViewModel(application = application) as T
+                            return LoginViewModel(definition) as T
                         }
                         throw IllegalArgumentException("Unknown ViewModel class")
                     }

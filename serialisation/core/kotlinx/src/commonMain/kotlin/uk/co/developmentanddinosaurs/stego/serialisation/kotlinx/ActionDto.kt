@@ -9,5 +9,4 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Action
  * to allow for custom actions defined in JSON.
  */
 interface ActionDto {
-    fun toDomain(): Action
 }

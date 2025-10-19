@@ -8,7 +8,7 @@ import uk.co.developmentanddinosaurs.stego.statemachine.LogAction
 @Serializable
 @SerialName("log")
 data class LogActionDto(val message: String) : ActionDto {
-    override fun toDomain(): Action {
+    fun toDomain(): Action {
         return LogAction(message, ::println)
     }
 }

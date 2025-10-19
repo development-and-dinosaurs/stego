@@ -1,7 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 
 /**
  * A serializable representation of an `InvokableDefinition` from a JSON definition.
@@ -10,5 +9,5 @@ import kotlinx.serialization.json.JsonObject
 data class InvokableDefinitionDto(
     val id: String,
     val src: String,
-    val input: JsonObject? = null,
+    val input: Map<String, DataValueDto> = emptyMap(),
 )

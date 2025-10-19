@@ -2,14 +2,12 @@ package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.LogAction
+import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 
 class ActionMapperTest : BehaviorSpec({
 
@@ -18,24 +16,6 @@ class ActionMapperTest : BehaviorSpec({
 
     Given("a LogActionMapper") {
         val mapper = LogActionMapper(testLogger)
-
-        When("checking if it can map a LogActionDto") {
-            val dto = LogActionDto("Test Message")
-            Then("it should return true") {
-                mapper.canMap(dto).shouldBeTrue()
-            }
-        }
-
-        When("checking if it can map a different ActionDto type") {
-            val dummyDto = object : ActionDto {
-                override fun toDomain(): Action {
-                    TODO("Not yet implemented")
-                }
-            }
-            Then("it should return false") {
-                mapper.canMap(dummyDto).shouldBeFalse()
-            }
-        }
 
         When("mapping a LogActionDto") {
             val dto = LogActionDto("Hello from test!")
@@ -54,15 +34,12 @@ class ActionMapperTest : BehaviorSpec({
     }
 
     Given("a CompositeActionMapper with a LogActionMapper") {
-        val logMapper = LogActionMapper(testLogger)
-        val compositeMapper = CompositeActionMapper(listOf(logMapper))
-
-        When("checking if it can map a LogActionDto") {
-            val dto = LogActionDto("Composite Test")
-            Then("it should return true") {
-                compositeMapper.canMap(dto).shouldBeTrue()
-            }
-        }
+        val compositeMapper = CompositeActionMapper(
+            mapOf(
+                LogActionDto::class to LogActionMapper(testLogger),
+                AssignActionDto::class to AssignActionMapper()
+            )
+        )
 
         When("mapping a LogActionDto") {
             val dto = LogActionDto("Composite Map Test")
@@ -80,16 +57,10 @@ class ActionMapperTest : BehaviorSpec({
         }
 
         When("mapping an unknown ActionDto type") {
-            val dummyDto = object : ActionDto {
-                override fun toDomain(): Action {
-                    TODO("Not yet implemented")
-                }
-            }
-            Then("it should return false for canMap") {
-                compositeMapper.canMap(dummyDto).shouldBeFalse()
-            }
-            Then("it should throw an IllegalArgumentException") {
-                shouldThrow<IllegalArgumentException> {
+            val dummyDto = object : ActionDto {}
+
+            Then("it should throw a StateMachineException") {
+                shouldThrow<StateMachineException> {
                     compositeMapper.map(dummyDto)
                 }
             }

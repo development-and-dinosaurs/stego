@@ -9,7 +9,7 @@ sealed interface InvokableResult {
      * @property data The data payload produced by the successful execution.
      */
     data class Success(
-        val data: Map<String, DataValue> = emptyMap(),
+        val data: Map<String, Any> = emptyMap(),
     ) : InvokableResult
 
     /**
@@ -18,7 +18,7 @@ sealed interface InvokableResult {
      * @property cause An optional [Throwable] that represents the reason for failure.
      */
     data class Failure(
-        val data: Map<String, DataValue> = emptyMap(),
+        val data: Map<String, Any> = emptyMap(),
         val cause: Throwable? = null,
     ) : InvokableResult
 }

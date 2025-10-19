@@ -69,5 +69,5 @@ fun interface Invokable {
      * @param input A map of resolved parameters for this specific invocation.
      * @return An [InvokableResult] representing the outcome of the work.
      */
-    suspend fun invoke(input: Map<String, DataValue>): InvokableResult
+    suspend fun invoke(input: Map<String, Any?>): InvokableResult
 }

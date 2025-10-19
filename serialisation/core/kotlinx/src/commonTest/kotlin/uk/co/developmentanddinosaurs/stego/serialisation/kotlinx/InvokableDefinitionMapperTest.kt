@@ -4,10 +4,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
+import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult
+import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 
 class InvokableDefinitionMapperTest : BehaviorSpec({
 
@@ -20,15 +19,12 @@ class InvokableDefinitionMapperTest : BehaviorSpec({
             InvokableDefinitionDto(
                 id = "testId",
                 src = "my-invoke",
-                input =
-                buildJsonObject {
-                    put("literalString", "hello")
-                    put("literalLong", 123L)
-                    put("literalDouble", 45.6)
-                    put("literalBoolean", true)
-                    put("contextRef", "context.user.id")
-                    put("eventRef", "event.data.payload")
-                },
+                input = mapOf(
+                    "literalString" to StringDataValueDto("hello"),
+                    "literalLong" to NumberDataValueDto(123L),
+                    "literalDouble" to NumberDataValueDto(45.6),
+                    "literalBoolean" to BooleanDataValueDto(true)
+                ),
             )
 
         When("the mapper maps the DTO") {
@@ -38,20 +34,18 @@ class InvokableDefinitionMapperTest : BehaviorSpec({
                 definition.id shouldBe "testId"
                 definition.src shouldBe dummyInvokable
                 definition.input shouldContainExactly
-                    mapOf(
-                        "literalString" to StringPrimitive("hello"),
-                        "literalLong" to LongPrimitive(123L),
-                        "literalDouble" to DoublePrimitive(45.6),
-                        "literalBoolean" to BooleanPrimitive(true),
-                        "contextRef" to ContextReference("user.id"),
-                        "eventRef" to EventReference("data.payload"),
+                    mapOf<String, Any?>(
+                        "literalString" to "hello",
+                        "literalLong" to 123L,
+                        "literalDouble" to 45.6,
+                        "literalBoolean" to true
                     )
             }
         }
     }
 
     Given("an InvokableDefinitionDto with no input") {
-        val dto = InvokableDefinitionDto(id = "testId", src = "my-invoke", input = null)
+        val dto = InvokableDefinitionDto(id = "testId", src = "my-invoke", input = emptyMap())
 
         When("the mapper maps the DTO") {
             val definition = mapper.map(dto)
@@ -69,44 +63,6 @@ class InvokableDefinitionMapperTest : BehaviorSpec({
             Then("it should throw a StateMachineException") {
                 val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
                 exception.message shouldBe "Invokable source 'unknown-invoke' not found in registry."
-            }
-        }
-    }
-
-    Given("an InvokableDefinitionDto with a null value in input") {
-        val dto =
-            InvokableDefinitionDto(
-                id = "testId",
-                src = "my-invoke",
-                input = buildJsonObject { put("badValue", JsonNull) },
-            )
-
-        When("the mapper maps the DTO") {
-            Then("it should throw a StateMachineException") {
-                val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
-                exception.message shouldBe "Null values are not supported in invokable input."
-            }
-        }
-    }
-
-    Given("an InvokableDefinitionDto with a complex object in input") {
-        val dto =
-            InvokableDefinitionDto(
-                id = "testId",
-                src = "my-invoke",
-                input =
-                buildJsonObject {
-                    put(
-                        "complex",
-                        buildJsonObject { put("a", "b") },
-                    )
-                },
-            )
-
-        When("the mapper maps the DTO") {
-            Then("it should throw a StateMachineException") {
-                val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
-                exception.message shouldBe "Complex objects in invokable input are not supported. Use expressions to reference context data."
             }
         }
     }

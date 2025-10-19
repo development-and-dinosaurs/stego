@@ -13,5 +13,5 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 data class StateMachineDefinition(
     val initial: String,
     val states: Map<String, State>,
-    val initialContext: Context = Context(),
+    val initialContext: Map<String, Any?> = emptyMap(),
 )

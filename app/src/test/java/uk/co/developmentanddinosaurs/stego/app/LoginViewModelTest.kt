@@ -5,19 +5,37 @@ import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import uk.co.developmentanddinosaurs.stego.statemachine.Event
-import uk.co.developmentanddinosaurs.stego.statemachine.StringPrimitive
+import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
 @ExperimentalCoroutinesApi
 class LoginViewModelTest : BehaviorSpec({
     coroutineTestScope = true
 
+    // Define a minimal, self-contained state machine for this test
+    val testLoginStateMachineDefinition = StateMachineDefinition(
+        initial = "Start",
+        states = mapOf(
+            "Start" to LogicState(
+                id = "Start",
+                on = mapOf(
+                    "SUBMIT" to listOf(
+                        Transition("Success", guard = Guard.create("event.username == 'stego'")),
+                        Transition("Error", actions = listOf(AssignAction("error", "Invalid username")))
+                    )
+                )
+            ),
+            "Success" to LogicState(id = "Success"),
+            "Error" to LogicState(id = "Error")
+        )
+    )
+
     Given("a LoginViewModel") {
         val testDispatcher = StandardTestDispatcher(testCoroutineScheduler)
 
         When("a successful login event is sent") {
-            val viewModel = LoginViewModel(testDispatcher)
-            val event = Event("SUBMIT", mapOf("username" to StringPrimitive("stego")))
+            val viewModel = LoginViewModel(testLoginStateMachineDefinition, testDispatcher)
+            val event = Event("SUBMIT", mapOf("username" to "stego"))
             viewModel.onEvent(event)
             testCoroutineScheduler.advanceUntilIdle()
 
@@ -27,8 +45,8 @@ class LoginViewModelTest : BehaviorSpec({
         }
 
         When("a failed login event is sent") {
-            val viewModel = LoginViewModel(testDispatcher)
-            val event = Event("SUBMIT", mapOf("username" to StringPrimitive("wrong")))
+            val viewModel = LoginViewModel(testLoginStateMachineDefinition, testDispatcher)
+            val event = Event("SUBMIT", mapOf("username" to "wrong"))
             viewModel.onEvent(event)
             testCoroutineScheduler.advanceUntilIdle()
 
@@ -37,7 +55,7 @@ class LoginViewModelTest : BehaviorSpec({
             }
 
             And("the context should contain an error message") {
-                (viewModel.uiState.value.context.get("error") as? StringPrimitive)?.value shouldBe "Invalid username"
+                viewModel.uiState.value.context.get("error") shouldBe "Invalid username"
             }
         }
     }

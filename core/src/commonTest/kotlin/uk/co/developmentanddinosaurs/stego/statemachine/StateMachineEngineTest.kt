@@ -201,6 +201,7 @@ class StateMachineEngineTest :
                 engine.send(Event(type = "EVENT"))
 
                 Then("the state machine should transition to the correct state") {
+                    engine.output.first { it.state == otherState }
                     engine.output.value.state shouldBe otherState
                 }
             }
@@ -222,10 +223,9 @@ class StateMachineEngineTest :
                 engine.send(Event(type = "ACTION_EVENT"))
 
                 Then("the action should be executed and the context updated") {
-                    engine.output.value.context.get("assigned") shouldBe true
-                }
-                Then("the state machine should transition to the next state") {
-                    engine.output.value.state shouldBe nextState
+                    val finalOutput = engine.output.first { it.state == nextState }
+                    finalOutput.context.get("assigned") shouldBe true
+                    finalOutput.state shouldBe nextState
                 }
             }
         }
@@ -247,8 +247,9 @@ class StateMachineEngineTest :
                 engine.send(Event(type = "MULTI_ACTION_EVENT"))
 
                 Then("all actions should be executed and the context updated") {
-                    engine.output.value.context.get("action1") shouldBe "ran"
-                    engine.output.value.context.get("action2") shouldBe 123L
+                    val finalOutput = engine.output.first { it.state == nextState }
+                    finalOutput.context.get("action1") shouldBe "ran"
+                    finalOutput.context.get("action2") shouldBe 123L
                 }
             }
         }
@@ -276,9 +277,10 @@ class StateMachineEngineTest :
                 engine.send(Event("MOVE"))
 
                 Then("the exit, transition, and entry actions should all be executed") {
-                    engine.output.value.context.get("exit") shouldBe true
-                    engine.output.value.context.get("transition") shouldBe true
-                    engine.output.value.context.get("entry") shouldBe true
+                    val finalOutput = engine.output.first { it.state == nextState }
+                    finalOutput.context.get("exit") shouldBe true
+                    finalOutput.context.get("transition") shouldBe true
+                    finalOutput.context.get("entry") shouldBe true
                 }
             }
         }
@@ -308,6 +310,7 @@ class StateMachineEngineTest :
                 engine.send(Event("CRASH_EVENT"))
 
                 Then("the state machine should transition to the error state") {
+                    engine.output.first { it.state == errorState }
                     engine.output.value.state shouldBe errorState
                 }
             }
@@ -330,10 +333,9 @@ class StateMachineEngineTest :
 
             When("the engine is created") {
                 val engine = StateMachineEngine(definition, this)
-                testCoroutineScheduler.advanceUntilIdle()
 
                 Then("the invokable should be executed and the resulting event should cause a transition") {
-                    engine.output.value.state shouldBe successState
+                    engine.output.first { it.state == successState }
                 }
             }
         }
@@ -371,6 +373,7 @@ class StateMachineEngineTest :
                 engine.send(Event("CANCEL"))
 
                 Then("the invokable should be cancelled and the state should be Idle") {
+                    engine.output.first { it.state == idleState }
                     engine.output.value.state shouldBe idleState
                 }
             }
@@ -420,6 +423,7 @@ class StateMachineEngineTest :
                 engine.send(Event("GOTO_END"))
 
                 Then("the engine should find the transition on the parent and move to the correct state") {
+                    engine.output.first { it.state == endState }
                     engine.output.value.state shouldBe endState
                 }
             }
@@ -487,7 +491,7 @@ class StateMachineEngineTest :
                 engine.send(Event("MOVE"))
 
                 Then("only the relevant entry and exit actions should be executed") {
-                    engine.output.value.context.get("trace") shouldBe listOf(
+                    engine.output.first { it.state == childTwo }.context.get("trace") shouldBe listOf(
                         "parent_entry",
                         "childOne_entry",
                         "childOne_exit",
@@ -580,6 +584,7 @@ class StateMachineEngineTest :
                 engine.send(Event("EVENT_A"))
 
                 Then("the machine should run to completion and end in the final state") {
+                    engine.output.first { it.state == stateC }
                     engine.output.value.state shouldBe stateC
                 }
             }
@@ -618,6 +623,7 @@ class StateMachineEngineTest :
                 engine.send(Event("EVENT_B"))
 
                 Then("the machine should process both events sequentially and end in the final state") {
+                    engine.output.first { it.state == stateC }
                     engine.output.value.state shouldBe stateC
                 }
             }

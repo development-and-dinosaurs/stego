@@ -5,7 +5,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
-import uk.co.developmentanddinosaurs.stego.statemachine.StringPrimitive
 import uk.co.developmentanddinosaurs.stego.ui.node.TextFieldUiNode
 import uk.co.developmentanddinosaurs.stego.ui.resolve
 
@@ -25,7 +24,7 @@ fun RenderTextFieldUiNode(textFieldUiNode: TextFieldUiNode, context: Context, on
         onValueChange = { newText ->
             text = newText
             val eventData = textFieldUiNode.onTextChanged.data.toMutableMap()
-            eventData["text"] = StringPrimitive(newText)
+            eventData["text"] = newText
             onEvent(textFieldUiNode.onTextChanged.copy(data = eventData))
         },
         label = { Text(resolve(textFieldUiNode.label, context)) }

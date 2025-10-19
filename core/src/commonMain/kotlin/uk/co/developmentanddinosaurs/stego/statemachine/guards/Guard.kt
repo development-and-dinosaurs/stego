@@ -1,0 +1,8 @@
+package uk.co.developmentanddinosaurs.stego.statemachine.guards
+
+import uk.co.developmentanddinosaurs.stego.statemachine.Context
+import uk.co.developmentanddinosaurs.stego.statemachine.Event
+
+interface Guard {
+    fun evaluate(context: Context, event: Event): Boolean
+}

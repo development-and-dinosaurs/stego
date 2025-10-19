@@ -7,11 +7,12 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.EqualsGuard
 
 // A simple test action that assigns a primitive value to the context.
 private data class AssignAction(
     val key: String,
-    val value: DataValue,
+    val value: Any,
 ) : Action {
     override fun execute(
         context: Context,
@@ -27,8 +28,8 @@ private data class TraceAction(
         context: Context,
         event: Event,
     ): Context {
-        val currentTrace = (context.get("trace") as? ListValue)?.value ?: emptyList()
-        return context.put("trace", ListValue(currentTrace + StringPrimitive(name)))
+        val currentTrace = context.get("trace") as List<String>
+        return context.put("trace", currentTrace + name)
     }
 }
 
@@ -76,9 +77,9 @@ private data class DelayAction(
 class TestInvokable(
     private val duration: Long = 1000,
 ) : Invokable {
-    override suspend fun invoke(input: Map<String, DataValue>): InvokableResult {
+    override suspend fun invoke(input: Map<String, Any>): InvokableResult {
         delay(duration)
-        return InvokableResult.Success(mapOf("waitedFor" to LongPrimitive(duration)))
+        return InvokableResult.Success(mapOf("waitedFor" to duration))
     }
 }
 
@@ -119,7 +120,8 @@ class StateMachineEngineTest :
         }
 
         Given("a state machine with a nested non-existent initial state") {
-            val parentState = LogicState(id = "Parent", initial = "Child", states = mapOf("NotChild" to LogicState(id = "NotChild")))
+            val parentState =
+                LogicState(id = "Parent", initial = "Child", states = mapOf("NotChild" to LogicState(id = "NotChild")))
             val definition =
                 StateMachineDefinition(
                     initial = "Parent",
@@ -172,19 +174,19 @@ class StateMachineEngineTest :
         }
 
         Given("a state machine with a guarded transition") {
-            val trueGuard = EqualsGuard(LiteralReference(BooleanPrimitive(true)), LiteralReference(BooleanPrimitive(true)))
+            val trueGuard = EqualsGuard(left = true, right = true)
             val falseGuard =
-                EqualsGuard(LiteralReference(BooleanPrimitive(true)), LiteralReference(BooleanPrimitive(false)))
+                EqualsGuard(true, false)
             val guardedState =
                 LogicState(
                     id = "Guarded",
                     on =
                         mapOf(
                             "EVENT" to
-                                listOf(
-                                    Transition(target = "Next", guard = falseGuard),
-                                    Transition(target = "Other", guard = trueGuard),
-                                ),
+                                    listOf(
+                                        Transition(target = "Next", guard = falseGuard),
+                                        Transition(target = "Other", guard = trueGuard),
+                                    ),
                         ),
                 )
             val nextState = LogicState(id = "Next")
@@ -206,7 +208,7 @@ class StateMachineEngineTest :
         }
 
         Given("a state machine with a transition that has an action") {
-            val assignAction = AssignAction(key = "assigned", value = BooleanPrimitive(true))
+            val assignAction = AssignAction(key = "assigned", value = true)
             val transition = Transition(target = "Next", actions = listOf(assignAction))
             val initialState = LogicState(id = "Initial", on = mapOf("ACTION_EVENT" to listOf(transition)))
             val nextState = LogicState(id = "Next")
@@ -221,10 +223,7 @@ class StateMachineEngineTest :
                 engine.send(Event(type = "ACTION_EVENT"))
 
                 Then("the action should be executed and the context updated") {
-                    (
-                        engine.output.value.context
-                            .get("assigned") as? BooleanPrimitive
-                    )?.value shouldBe true
+                    engine.output.value.context.get("assigned") shouldBe true
                 }
                 Then("the state machine should transition to the next state") {
                     engine.output.value.state shouldBe nextState
@@ -233,8 +232,8 @@ class StateMachineEngineTest :
         }
 
         Given("a state machine with a transition that has multiple actions") {
-            val action1 = AssignAction(key = "action1", value = StringPrimitive("ran"))
-            val action2 = AssignAction(key = "action2", value = LongPrimitive(123))
+            val action1 = AssignAction(key = "action1", value = "ran")
+            val action2 = AssignAction(key = "action2", value = 123)
             val transition = Transition(target = "Next", actions = listOf(action1, action2))
             val initialState = LogicState(id = "Initial", on = mapOf("MULTI_ACTION_EVENT" to listOf(transition)))
             val nextState = LogicState(id = "Next")
@@ -249,22 +248,16 @@ class StateMachineEngineTest :
                 engine.send(Event(type = "MULTI_ACTION_EVENT"))
 
                 Then("all actions should be executed and the context updated") {
-                    (
-                        engine.output.value.context
-                            .get("action1") as? StringPrimitive
-                    )?.value shouldBe "ran"
-                    (
-                        engine.output.value.context
-                            .get("action2") as? LongPrimitive
-                    )?.value shouldBe 123L
+                    engine.output.value.context.get("action1") shouldBe "ran"
+                    engine.output.value.context.get("action2") shouldBe 123L
                 }
             }
         }
 
         Given("a state machine with entry and exit actions") {
-            val exitAction = AssignAction("exit", BooleanPrimitive(true))
-            val transitionAction = AssignAction("transition", BooleanPrimitive(true))
-            val entryAction = AssignAction("entry", BooleanPrimitive(true))
+            val exitAction = AssignAction("exit", true)
+            val transitionAction = AssignAction("transition", true)
+            val entryAction = AssignAction("entry", true)
 
             val initialState =
                 LogicState(
@@ -284,18 +277,9 @@ class StateMachineEngineTest :
                 engine.send(Event("MOVE"))
 
                 Then("the exit, transition, and entry actions should all be executed") {
-                    (
-                        engine.output.value.context
-                            .get("exit") as? BooleanPrimitive
-                    )?.value shouldBe true
-                    (
-                        engine.output.value.context
-                            .get("transition") as? BooleanPrimitive
-                    )?.value shouldBe true
-                    (
-                        engine.output.value.context
-                            .get("entry") as? BooleanPrimitive
-                    )?.value shouldBe true
+                    engine.output.value.context.get("exit") shouldBe true
+                    engine.output.value.context.get("transition") shouldBe true
+                    engine.output.value.context.get("entry") shouldBe true
                 }
             }
         }
@@ -359,7 +343,8 @@ class StateMachineEngineTest :
             val invokable = TestInvokable(duration = 5000) // A long-running task
             val successState = LogicState(id = "Success")
             val failedTestState = LogicState(id = "FailedTestState")
-            val idleState = LogicState(id = "Idle", on = mapOf("done.invoke.testInvoke" to listOf(Transition("FailedTestState"))))
+            val idleState =
+                LogicState(id = "Idle", on = mapOf("done.invoke.testInvoke" to listOf(Transition("FailedTestState"))))
             val loadingState =
                 LogicState(
                     id = "Loading",
@@ -455,7 +440,7 @@ class StateMachineEngineTest :
             val definition =
                 StateMachineDefinition(
                     initial = "Parent",
-                    initialContext = Context().put("trace", ListValue(emptyList())),
+                    initialContext = Context().put("trace", listOf<String>()),
                     states = mapOf("Parent" to parentState),
                 )
 
@@ -463,14 +448,7 @@ class StateMachineEngineTest :
                 val engine = StateMachineEngine(definition)
 
                 Then("it should execute entry actions for both parent and child in order") {
-                    (
-                        engine.output.value.context
-                            .get("trace") as? ListValue
-                    )?.value shouldBe
-                        listOf(
-                            StringPrimitive("parent_entry"),
-                            StringPrimitive("child_entry"),
-                        )
+                    engine.output.value.context.get("trace") shouldBe listOf("parent_entry", "child_entry")
                 }
             }
         }
@@ -501,7 +479,7 @@ class StateMachineEngineTest :
             val definition =
                 StateMachineDefinition(
                     initial = "Parent",
-                    initialContext = Context().put("trace", ListValue(emptyList())),
+                    initialContext = Context().put("trace", listOf<String>()),
                     states = mapOf("Parent" to parent),
                 )
 
@@ -510,30 +488,46 @@ class StateMachineEngineTest :
                 engine.send(Event("MOVE"))
 
                 Then("only the relevant entry and exit actions should be executed") {
-                    (
-                        engine.output.value.context
-                            .get("trace") as? ListValue
-                    )?.value shouldBe
-                        listOf(
-                            StringPrimitive("parent_entry"),
-                            StringPrimitive("childOne_entry"),
-                            StringPrimitive("childOne_exit"),
-                            StringPrimitive("childTwo_entry"),
-                        )
+                    engine.output.value.context.get("trace") shouldBe listOf(
+                        "parent_entry",
+                        "childOne_entry",
+                        "childOne_exit",
+                        "childTwo_entry",
+                    )
                 }
             }
         }
 
         Given("a deeply nested hierarchical state machine") {
             val l5 = LogicState(id = "l5", onEntry = listOf(TraceAction("l5_entry")))
-            val l4 = LogicState(id = "l4", initial = "l5", states = mapOf("l5" to l5), onEntry = listOf(TraceAction("l4_entry")))
-            val l3 = LogicState(id = "l3", initial = "l4", states = mapOf("l4" to l4), onEntry = listOf(TraceAction("l3_entry")))
-            val l2 = LogicState(id = "l2", initial = "l3", states = mapOf("l3" to l3), onEntry = listOf(TraceAction("l2_entry")))
-            val l1 = LogicState(id = "l1", initial = "l2", states = mapOf("l2" to l2), onEntry = listOf(TraceAction("l1_entry")))
+            val l4 = LogicState(
+                id = "l4",
+                initial = "l5",
+                states = mapOf("l5" to l5),
+                onEntry = listOf(TraceAction("l4_entry"))
+            )
+            val l3 = LogicState(
+                id = "l3",
+                initial = "l4",
+                states = mapOf("l4" to l4),
+                onEntry = listOf(TraceAction("l3_entry"))
+            )
+            val l2 = LogicState(
+                id = "l2",
+                initial = "l3",
+                states = mapOf("l3" to l3),
+                onEntry = listOf(TraceAction("l2_entry"))
+            )
+            val l1 = LogicState(
+                id = "l1",
+                initial = "l2",
+                states = mapOf("l2" to l2),
+                onEntry = listOf(TraceAction("l1_entry"))
+            )
             val definition =
                 StateMachineDefinition(
                     initial = "l1",
-                    initialContext = Context().put("trace", ListValue(emptyList())),
+                    initialContext = Context().put("trace", listOf<String>()),
                     states = mapOf("l1" to l1),
                 )
 
@@ -544,17 +538,14 @@ class StateMachineEngineTest :
                     engine.output.value.state shouldBe l5
                 }
                 Then("it should execute all entry actions in order") {
-                    (
-                        engine.output.value.context
-                            .get("trace") as? ListValue
-                    )?.value shouldBe
-                        listOf(
-                            StringPrimitive("l1_entry"),
-                            StringPrimitive("l2_entry"),
-                            StringPrimitive("l3_entry"),
-                            StringPrimitive("l4_entry"),
-                            StringPrimitive("l5_entry"),
-                        )
+
+                    engine.output.value.context.get("trace") shouldBe listOf(
+                        "l1_entry",
+                        "l2_entry",
+                        "l3_entry",
+                        "l4_entry",
+                        "l5_entry",
+                    )
                 }
             }
         }
@@ -608,12 +599,12 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT_A" to
-                                listOf(
-                                    Transition(
-                                        target = "StateB",
-                                        actions = listOf(DelayAction(10)),
+                                    listOf(
+                                        Transition(
+                                            target = "StateB",
+                                            actions = listOf(DelayAction(10)),
+                                        ),
                                     ),
-                                ),
                         ),
                 )
             val definition =

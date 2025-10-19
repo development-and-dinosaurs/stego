@@ -1,5 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.statemachine
 
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
+
 /**
  * Represents a directed transition between two [State]s in the state machine.
  *

@@ -11,5 +11,5 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 data class InvokableDefinition(
     val id: String,
     val src: Invokable,
-    val input: Map<String, DataValue> = emptyMap(),
+    val input: Map<String, Any> = emptyMap(),
 )

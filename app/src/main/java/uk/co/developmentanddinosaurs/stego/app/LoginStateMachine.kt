@@ -1,29 +1,23 @@
 package uk.co.developmentanddinosaurs.stego.app
 
 import kotlinx.coroutines.delay
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.modules.subclass
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
 import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.EqualsGuard
 import uk.co.developmentanddinosaurs.stego.ui.UiState
 import uk.co.developmentanddinosaurs.stego.ui.node.*
-import java.io.InputStreamReader
 
 /**
  * A mock invokable that simulates a login network request.
  */
 object LoginInvokable : Invokable {
-    override suspend fun invoke(input: Map<String, DataValue>): InvokableResult {
+    override suspend fun invoke(input: Map<String, Any?>): InvokableResult {
         delay(2000)
-        val username = (input["username"] as? StringPrimitive)?.value
+        val username = input["username"]
+        println("username is $username")
         return if (username == "stego") {
-            InvokableResult.Success(mapOf("loggedIn" to BooleanPrimitive(true)))
+            InvokableResult.Success(mapOf("loggedIn" to true))
         } else {
-            InvokableResult.Failure(mapOf("error" to StringPrimitive("Invalid username")))
+            InvokableResult.Failure(mapOf("error" to "Invalid username"))
         }
     }
 }
@@ -48,41 +42,41 @@ data object SaveErrorAction : Action {
     }
 }
 
-
-fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context): String {
-    val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
-    val reader = InputStreamReader(inputStream)
-    val jsonString = reader.readText()
-    reader.close()
-    return jsonString
-}
-
-private val json = Json {
-    serializersModule = SerializersModule {
-        polymorphic(StateDto::class) {
-            subclass(LogicStateDto::class)
-            subclass(UiStateDto::class)
-        }
-        polymorphic(ActionDto::class){
-            subclass(LogActionDto::class)
-            subclass(AssignActionDto::class)
-        }
-        polymorphic(ValueReferenceDto::class){
-            subclass(EventReferenceDto::class)
-        }
-        polymorphic(UiNodeDto::class) {
-            subclass(ColumnUiNodeDto::class)
-            subclass(TextFieldUiNodeDto::class)
-            subclass(ButtonUiNodeDto::class)
-            subclass(ProgressIndicatorUiNodeDto::class)
-            subclass(LabelUiNodeDto::class)
-        }
-    }
-}
-
-fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
-
-fun stateDef(context: android.content.Context): StateMachineDefinition = stateDefDto(context).toDomain()
+//
+//fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context): String {
+//    val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
+//    val reader = InputStreamReader(inputStream)
+//    val jsonString = reader.readText()
+//    reader.close()
+//    return jsonString
+//}
+//
+//private val json = Json {
+//    serializersModule = SerializersModule {
+//        polymorphic(StateDto::class) {
+//            subclass(LogicStateDto::class)
+//            subclass(UiStateDto::class)
+//        }
+//        polymorphic(ActionDto::class){
+//            subclass(LogActionDto::class)
+//            subclass(AssignActionDto::class)
+//        }
+//        polymorphic(ValueReferenceDto::class){
+//            subclass(EventReferenceDto::class)
+//        }
+//        polymorphic(UiNodeDto::class) {
+//            subclass(ColumnUiNodeDto::class)
+//            subclass(TextFieldUiNodeDto::class)
+//            subclass(ButtonUiNodeDto::class)
+//            subclass(ProgressIndicatorUiNodeDto::class)
+//            subclass(LabelUiNodeDto::class)
+//        }
+//    }
+//}
+//
+//fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
+//
+//fun stateDef(context: android.content.Context): StateMachineDefinition = stateDefDto(context).toDomain()
 
 val loginStateMachineDefinition = StateMachineDefinition(
     initial = "Idle",
@@ -122,11 +116,12 @@ val loginStateMachineDefinition = StateMachineDefinition(
             invoke = InvokableDefinition(
                 "login",
                 LoginInvokable,
-                mapOf("username" to ContextReference("username"))
+                mapOf("username" to "{context.username}")
             ),
             on = mapOf(
-                "done.invoke.login" to listOf(Transition("Success", guard = EqualsGuard(ContextReference("loggedIn"),
-                    LiteralReference(BooleanPrimitive(true))))),
+                "done.invoke.login" to listOf(
+                    Transition("Success", guard = EqualsGuard("{event.loggedIn}", true))
+                ),
                 "error.invoke.login" to listOf(Transition("Error", actions = listOf(SaveErrorAction)))
             )
         ),

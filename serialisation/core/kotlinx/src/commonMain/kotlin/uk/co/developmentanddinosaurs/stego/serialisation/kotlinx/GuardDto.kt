@@ -1,7 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.Serializable
-import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.statemachine.guards.*
 
 @Serializable
 sealed interface GuardDto {
@@ -10,12 +10,12 @@ sealed interface GuardDto {
 
 @Serializable
 data class AndGuardDto(val guards: List<GuardDto>) : GuardDto {
-    override fun toDomain(): Guard = AndGuard(guards.map { it.toDomain() })
+    override fun toDomain(): Guard = AndGuard(*guards.map { it.toDomain() }.toTypedArray())
 }
 
 @Serializable
 data class OrGuardDto(val guards: List<GuardDto>) : GuardDto {
-    override fun toDomain(): Guard = OrGuard(guards.map { it.toDomain() })
+    override fun toDomain(): Guard = OrGuard(*guards.map { it.toDomain() }.toTypedArray())
 }
 
 @Serializable
@@ -44,11 +44,11 @@ data class LessThanGuardDto(val left: ValueReferenceDto, val right: ValueReferen
 }
 
 @Serializable
-data class GreaterThanOrEqualsGuardDto(val left: ValueReferenceDto, val right: ValueReferenceDto) : GuardDto {
-    override fun toDomain(): Guard = GreaterThanOrEqualsGuard(left.toDomain(), right.toDomain())
+data class GreaterThanOrEqualToGuardDto(val left: ValueReferenceDto, val right: ValueReferenceDto) : GuardDto {
+    override fun toDomain(): Guard = GreaterThanOrEqualToGuard(left.toDomain(), right.toDomain())
 }
 
 @Serializable
-data class LessThanOrEqualsGuardDto(val left: ValueReferenceDto, val right: ValueReferenceDto) : GuardDto {
-    override fun toDomain(): Guard = LessThanOrEqualsGuard(left.toDomain(), right.toDomain())
+data class LessThanOrEqualToGuardDto(val left: ValueReferenceDto, val right: ValueReferenceDto) : GuardDto {
+    override fun toDomain(): Guard = LessThanOrEqualToGuard(left.toDomain(), right.toDomain())
 }

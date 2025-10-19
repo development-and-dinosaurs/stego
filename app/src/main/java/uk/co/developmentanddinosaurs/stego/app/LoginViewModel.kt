@@ -15,10 +15,16 @@ class LoginViewModel(application: Application,
                      dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : AndroidViewModel(application) {
 
+    val definition = stateDef(application.applicationContext)
     private val engine = StateMachineEngine(
-        definition = loginStateMachineDefinition,
+        definition = definition,
         scope = CoroutineScope(viewModelScope.coroutineContext + dispatcher)
     )
+
+    init {
+        println("Hello")
+        println(definition)
+    }
 
     val uiState: StateFlow<StateMachineOutput> = engine.output
 

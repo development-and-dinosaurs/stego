@@ -57,6 +57,8 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":ui:core"))
     implementation(project(":ui:android"))
+    implementation(project(":serialisation:core:kotlinx"))
+    implementation(project(":serialisation:ui:kotlinx"))
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)

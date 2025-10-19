@@ -1,7 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.ui
 
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 import uk.co.developmentanddinosaurs.stego.ui.UiState
@@ -9,23 +8,29 @@ import uk.co.developmentanddinosaurs.stego.ui.UiState
 /**
  * Maps a [UiStateDto] to a [UiState] domain object.
  *
- * This mapper orchestrates the mapping of the state itself, as well as its nested
- * actions, transitions, and invokable services.
+ * This mapper orchestrates the mapping of the state itself and its nested properties.
+ * It relies on a [StateMapper] to handle nested states, breaking potential circular dependencies.
  */
 class UiStateMapper(
-    private val actionMapper: ActionMapper,
+    private val stateMapper: StateDtoMapper,
+    private val actionMapper: ActionDtoMapper,
     private val invokableMapper: InvokableDefinitionMapper,
+    private val transitionMapper: TransitionMapper,
     private val uiNodeMapper: UiNodeMapper,
-) {
-    fun map(dto: UiStateDto): State =
-        UiState(
+) : StateDtoMapper {
+    override fun map(dto: StateDto): State {
+        if (dto !is UiStateDto) {
+            throw IllegalArgumentException("Invalid dto of type ${dto::class}!")
+        }
+        return UiState(
             id = dto.id,
             onEntry = dto.onEntry.map { actionMapper.map(it) },
             onExit = dto.onExit.map { actionMapper.map(it) },
-            on = dto.on.mapValues { (_, transitions) -> transitions.map { it.toDomain() } },
+            on = dto.on.mapValues { (_, transitions) -> transitions.map { transitionMapper.map(it) } },
             invoke = dto.invoke?.let { invokableMapper.map(it) },
             initial = dto.initial,
-            states = dto.states.mapValues { (_, stateDto) -> this.map(stateDto) },
+            states = dto.states.mapValues { (_, stateDto) -> stateMapper.map(stateDto) },
             uiNode = uiNodeMapper.map(dto.uiNode),
         )
+    }
 }

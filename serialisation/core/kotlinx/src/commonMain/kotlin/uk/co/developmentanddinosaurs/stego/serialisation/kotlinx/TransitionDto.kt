@@ -9,10 +9,4 @@ data class TransitionDto(
     val target: String,
     val actions: List<ActionDto> = emptyList(),
     val guard: String? = null
-) {
-    fun toDomain(): Transition = Transition(
-        target = target,
-        actions = listOf(),
-        guard = if(guard == null) null else Guard.create(guard)
-    )
-}
+)

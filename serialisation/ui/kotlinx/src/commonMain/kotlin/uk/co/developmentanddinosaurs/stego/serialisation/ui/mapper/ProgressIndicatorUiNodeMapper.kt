@@ -9,6 +9,6 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 class ProgressIndicatorUiNodeMapper : UiNodeMapper {
     override fun map(dto: UiNodeDto): UiNode {
         require(dto is ProgressIndicatorUiNodeDto)
-        return ProgressIndicatorUiNode
+        return ProgressIndicatorUiNode()
     }
 }

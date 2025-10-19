@@ -40,7 +40,7 @@ class StateMachineEngine(
         validateDefinition()
 
         val initialState = stateMap[definition.initial]!! // We've just validated this is here
-        _output = MutableStateFlow(StateMachineOutput(initialState, definition.initialContext))
+        _output = MutableStateFlow(StateMachineOutput(initialState, Context(definition.initialContext)))
 
         enterState(initialState, Event("stego.internal.init"))
     }
@@ -49,6 +49,10 @@ class StateMachineEngine(
      * Sends an event to the state machine for processing. This method is non-blocking and thread-safe.
      */
     fun send(event: Event) {
+        println("current context")
+        println(output.value.context.asMap())
+        println("current event")
+        println(event.data)
         scope.launch {
             processingMutex.withLock {
                 processEvent(event)

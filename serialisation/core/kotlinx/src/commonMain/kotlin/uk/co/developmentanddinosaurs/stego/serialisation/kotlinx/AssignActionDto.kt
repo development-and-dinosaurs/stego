@@ -8,7 +8,7 @@ import uk.co.developmentanddinosaurs.stego.statemachine.AssignAction
 @Serializable
 @SerialName("assign")
 data class AssignActionDto(val key: String, val value: DataValueDto) : ActionDto {
-    override fun toDomain(): Action {
+    fun toDomain(): Action {
         return AssignAction(key, value.toDomain())
     }
 }

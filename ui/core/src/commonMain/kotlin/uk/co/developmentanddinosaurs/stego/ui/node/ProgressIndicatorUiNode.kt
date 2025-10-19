@@ -1,3 +1,3 @@
 package uk.co.developmentanddinosaurs.stego.ui.node
 
-object ProgressIndicatorUiNode : UiNode
+class ProgressIndicatorUiNode : UiNode

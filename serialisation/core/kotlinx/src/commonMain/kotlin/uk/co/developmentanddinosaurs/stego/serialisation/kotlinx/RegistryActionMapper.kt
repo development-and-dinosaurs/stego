@@ -5,16 +5,17 @@ import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 import kotlin.reflect.KClass
 
 /**
- * Maps an [ActionDto] to an [Action] domain object.
+ * An [ActionDtoMapper] that uses a registry to map custom action DTOs and also handles built-in types.
  *
  * @param actionRegistry A map where keys are DTO types and values are the mapping functions to the corresponding [Action] implementations.
  */
-class ActionMapper(private val actionRegistry: Map<KClass<out ActionDto>, (ActionDto) -> Action>) {
+class RegistryActionMapper(private val actionRegistry: Map<KClass<out ActionDto>, (ActionDto) -> Action>) : ActionDtoMapper {
 
     /**
      * Performs the mapping from DTO to domain object.
      */
-    fun map(dto: ActionDto): Action {
+    override fun map(dto: ActionDto): Action {
+        println("Mapping action")
         // First, check for built-in types
         return when (dto) {
             is AssignActionDto -> dto.toDomain()

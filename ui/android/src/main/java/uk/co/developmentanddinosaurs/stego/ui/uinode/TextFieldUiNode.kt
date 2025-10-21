@@ -23,9 +23,8 @@ fun RenderTextFieldUiNode(textFieldUiNode: TextFieldUiNode, context: Context, on
         value = text,
         onValueChange = { newText ->
             text = newText
-            val eventData = textFieldUiNode.onTextChanged.data.toMutableMap()
-            eventData["text"] = newText
-            onEvent(textFieldUiNode.onTextChanged.copy(data = eventData))
+            val event = textFieldUiNode.onTextChanged
+            onEvent(event.copy(data = resolve(event.data, mapOf("text" to newText))))
         },
         label = { Text(resolve(textFieldUiNode.label, context)) }
     )

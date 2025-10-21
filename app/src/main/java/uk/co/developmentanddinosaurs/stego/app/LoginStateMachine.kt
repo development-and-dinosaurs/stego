@@ -1,10 +1,19 @@
 package uk.co.developmentanddinosaurs.stego.app
 
 import kotlinx.coroutines.delay
-import uk.co.developmentanddinosaurs.stego.statemachine.*
-import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
-import uk.co.developmentanddinosaurs.stego.ui.UiState
-import uk.co.developmentanddinosaurs.stego.ui.node.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
+import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
+import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult
+import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
+import java.io.InputStreamReader
 
 /**
  * A mock invokable that simulates a login network request.
@@ -22,129 +31,71 @@ object LoginInvokable : Invokable {
     }
 }
 
-/**
- * An action that saves the username from a TEXT_CHANGED event's data payload into the context.
- */
-data object SaveUsernameAction : Action {
-    override fun execute(context: Context, event: Event): Context {
-        val username = event.data["text"] ?: return context
-        return context.put("username", username)
+fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context): String {
+    val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
+    val reader = InputStreamReader(inputStream)
+    val jsonString = reader.readText()
+    println(jsonString)
+    reader.close()
+    return jsonString
+}
+
+private val json = Json {
+    serializersModule = SerializersModule {
+        polymorphic(StateDto::class) {
+            subclass(LogicStateDto::class)
+            subclass(UiStateDto::class)
+        }
+        polymorphic(ActionDto::class){
+            subclass(LogActionDto::class)
+            subclass(AssignActionDto::class)
+        }
+        polymorphic(UiNodeDto::class) {
+            subclass(ColumnUiNodeDto::class)
+            subclass(TextFieldUiNodeDto::class)
+            subclass(ButtonUiNodeDto::class)
+            subclass(ProgressIndicatorUiNodeDto::class)
+            subclass(LabelUiNodeDto::class)
+        }
     }
 }
 
-/**
- * An action that saves an error message from an event's data payload into the context.
- */
-data object SaveErrorAction : Action {
-    override fun execute(context: Context, event: Event): Context {
-        val errorMessage = event.data["error"] ?: return context
-        return context.put("error", errorMessage)
-    }
-}
+fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
 
-//
-//fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context): String {
-//    val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
-//    val reader = InputStreamReader(inputStream)
-//    val jsonString = reader.readText()
-//    reader.close()
-//    return jsonString
-//}
-//
-//private val json = Json {
-//    serializersModule = SerializersModule {
-//        polymorphic(StateDto::class) {
-//            subclass(LogicStateDto::class)
-//            subclass(UiStateDto::class)
-//        }
-//        polymorphic(ActionDto::class){
-//            subclass(LogActionDto::class)
-//            subclass(AssignActionDto::class)
-//        }
-//        polymorphic(ValueReferenceDto::class){
-//            subclass(EventReferenceDto::class)
-//        }
-//        polymorphic(UiNodeDto::class) {
-//            subclass(ColumnUiNodeDto::class)
-//            subclass(TextFieldUiNodeDto::class)
-//            subclass(ButtonUiNodeDto::class)
-//            subclass(ProgressIndicatorUiNodeDto::class)
-//            subclass(LabelUiNodeDto::class)
-//        }
-//    }
-//}
-//
-//fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
-//
-//fun stateDef(context: android.content.Context): StateMachineDefinition = stateDefDto(context).toDomain()
-
-val loginStateMachineDefinition = StateMachineDefinition(
-    initial = "Idle",
-    states = mapOf(
-        "Idle" to UiState(
-            id = "Idle",
-            uiNode = ColumnUiNode(
-                children = listOf(
-                    TextFieldUiNode(
-                        text = $$"${username}",
-                        label = "Username",
-                        onTextChanged = Event("TEXT_CHANGED")
-                    ),
-                    ButtonUiNode(
-                        text = "Log In",
-                        onClick = Event("SUBMIT")
-                    )
-                )
-            ),
-            on = mapOf(
-                "TEXT_CHANGED" to listOf(
-                    Transition(target = "Idle", actions = listOf(SaveUsernameAction))
-                ),
-                "SUBMIT" to listOf(
-                    Transition(target = "Loading")
-                )
-            )
-        ),
-        "Loading" to UiState(
-            id = "Loading",
-            uiNode = ColumnUiNode(
-                children = listOf(
-                    ProgressIndicatorUiNode,
-                    LabelUiNode("Logging in...")
-                )
-            ),
-            invoke = InvokableDefinition(
-                "login",
-                LoginInvokable,
-                mapOf("username" to "{context.username}")
-            ),
-            on = mapOf(
-                "done.invoke.login" to listOf(
-                    Transition("Success", guard = Guard.create("({event.loggedIn} == true)"))
-                ),
-                "error.invoke.login" to listOf(Transition("Error", actions = listOf(SaveErrorAction)))
-            )
-        ),
-        "Success" to UiState(
-            id = "Success",
-            uiNode = ColumnUiNode(
-                children = listOf(
-                    LabelUiNode($$"Welcome, ${username}!")
-                )
-            )
-        ),
-        "Error" to UiState(
-            id = "Error",
-            uiNode = ColumnUiNode(
-                children = listOf(
-                    LabelUiNode($$"Error for ${username}: ${error}"),
-                    ButtonUiNode(
-                        text = "Retry",
-                        onClick = Event("RETRY")
-                    )
-                )
-            ),
-            on = mapOf("RETRY" to listOf(Transition("Idle")))
+fun stateDef(context: android.content.Context): StateMachineDefinition {
+    val invokableMapper = InvokableDefinitionMapper(mapOf("LoginInvokable" to LoginInvokable))
+    val actionMapper = CompositeActionMapper(
+        mapOf(
+            AssignActionDto::class to AssignActionMapper(),
+            LogActionDto::class to LogActionMapper { message -> println(message) }
         )
     )
-)
+    val uiNodeMapper = CompositeUiNodeMapper(
+        simpleMappers = mapOf(
+            LabelUiNodeDto::class to LabelUiNodeMapper(),
+            ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
+            TextFieldUiNodeDto::class to TextFieldUiNodeMapper(),
+            ButtonUiNodeDto::class to ButtonUiNodeMapper()
+        ),
+        compositeAwareFactories = mapOf(
+            ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) }
+        )
+    )
+
+    val transitionMapper = TransitionMapper(actionMapper)
+    val compositeStateMapper = CompositeStateMapper(
+        mapperFactories = mapOf(
+            LogicStateDto::class to { stateMapper ->
+                LogicStateMapper(stateMapper, invokableMapper, transitionMapper, actionMapper)
+            },
+            UiStateDto::class to { stateMapper ->
+                UiStateMapper(stateMapper, actionMapper, invokableMapper, transitionMapper, uiNodeMapper)
+            }
+        )
+    )
+
+    // Perform the mapping using the fully constructed composite mapper.
+    val stateMachineDefinition = compositeStateMapper.map(stateDefDto(context))
+    println(stateMachineDefinition)
+    return stateMachineDefinition
+}

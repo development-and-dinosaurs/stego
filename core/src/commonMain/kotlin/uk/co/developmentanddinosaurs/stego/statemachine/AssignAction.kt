@@ -2,7 +2,10 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 
 import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
 
-class AssignAction(private val key: String, private val value: Any?) : Action {
+class AssignAction(
+    private val key: String,
+    private val value: Any?,
+) : Action {
     override fun execute(
         context: Context,
         event: Event,

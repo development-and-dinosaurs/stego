@@ -18,16 +18,16 @@ package uk.co.developmentanddinosaurs.stego.statemachine.guards
  *     from context (`{context.key}`) or events (`{event.key}`).
  */
 internal object GuardParser {
-
     /** Operator map for simple comparisons. The order is critical to ensure longest-match-first (e.g., '>=' before '>'). */
-    private val COMPARISON_OPERATOR_MAP = linkedMapOf(
-        "==" to ::EqualsGuard,
-        "!=" to ::NotEqualsGuard,
-        "<=" to ::LessThanOrEqualToGuard,
-        ">=" to ::GreaterThanOrEqualToGuard,
-        "<" to ::LessThanGuard,
-        ">" to ::GreaterThanGuard
-    )
+    private val COMPARISON_OPERATOR_MAP =
+        linkedMapOf(
+            "==" to ::EqualsGuard,
+            "!=" to ::NotEqualsGuard,
+            "<=" to ::LessThanOrEqualToGuard,
+            ">=" to ::GreaterThanOrEqualToGuard,
+            "<" to ::LessThanGuard,
+            ">" to ::GreaterThanGuard,
+        )
 
     /**
      * Parses a string expression into a [Guard] object.
@@ -69,7 +69,7 @@ internal object GuardParser {
             findSplitPoint(innerExpression, op)?.let {
                 return constructor(
                     innerExpression.substring(0, it).trim(),
-                    innerExpression.substring(it + op.length).trim()
+                    innerExpression.substring(it + op.length).trim(),
                 )
             }
         }
@@ -82,7 +82,10 @@ internal object GuardParser {
      * Finds the index of a binary operator (like '&&' or '||') at the top level of an expression,
      * ignoring operators inside parentheses. It searches from right to left.
      */
-    private fun findSplitPoint(expression: String, operator: String): Int? {
+    private fun findSplitPoint(
+        expression: String,
+        operator: String,
+    ): Int? {
         var parenDepth = 0
         for (i in expression.indices.reversed()) {
             if (parenDepth == 0 && expression.substring(i).startsWith(operator)) {

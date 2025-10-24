@@ -160,7 +160,7 @@ class StateMachineEngine(
     ) {
         val path =
             statesToEnter ?: getPathToState(targetState.id)
-            ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
+                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
 
         var tempContext = output.value.context
 

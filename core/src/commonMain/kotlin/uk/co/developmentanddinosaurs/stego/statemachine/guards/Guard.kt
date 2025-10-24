@@ -4,11 +4,12 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 
 interface Guard {
-    fun evaluate(context: Context, event: Event): Boolean
+    fun evaluate(
+        context: Context,
+        event: Event,
+    ): Boolean
 
     companion object {
-        fun create(expression: String): Guard {
-            return GuardParser.parse(expression)
-        }
+        fun create(expression: String): Guard = GuardParser.parse(expression)
     }
 }

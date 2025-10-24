@@ -181,10 +181,10 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT" to
-                                    listOf(
-                                        Transition(target = "Next", guard = falseGuard),
-                                        Transition(target = "Other", guard = trueGuard),
-                                    ),
+                                listOf(
+                                    Transition(target = "Next", guard = falseGuard),
+                                    Transition(target = "Other", guard = trueGuard),
+                                ),
                         ),
                 )
             val nextState = LogicState(id = "Next")
@@ -450,7 +450,8 @@ class StateMachineEngineTest :
                 val engine = StateMachineEngine(definition)
 
                 Then("it should execute entry actions for both parent and child in order") {
-                    engine.output.value.context.get("trace") shouldBe listOf("parent_entry", "child_entry")
+                    engine.output.value.context
+                        .get("trace") shouldBe listOf("parent_entry", "child_entry")
                 }
             }
         }
@@ -490,42 +491,50 @@ class StateMachineEngineTest :
                 engine.send(Event("MOVE"))
 
                 Then("only the relevant entry and exit actions should be executed") {
-                    engine.output.first { it.state == childTwo }.context.get("trace") shouldBe listOf(
-                        "parent_entry",
-                        "childOne_entry",
-                        "childOne_exit",
-                        "childTwo_entry",
-                    )
+                    engine.output
+                        .first { it.state == childTwo }
+                        .context
+                        .get("trace") shouldBe
+                        listOf(
+                            "parent_entry",
+                            "childOne_entry",
+                            "childOne_exit",
+                            "childTwo_entry",
+                        )
                 }
             }
         }
 
         Given("a deeply nested hierarchical state machine") {
             val l5 = LogicState(id = "l5", onEntry = listOf(TraceAction("l5_entry")))
-            val l4 = LogicState(
-                id = "l4",
-                initial = "l5",
-                states = mapOf("l5" to l5),
-                onEntry = listOf(TraceAction("l4_entry"))
-            )
-            val l3 = LogicState(
-                id = "l3",
-                initial = "l4",
-                states = mapOf("l4" to l4),
-                onEntry = listOf(TraceAction("l3_entry"))
-            )
-            val l2 = LogicState(
-                id = "l2",
-                initial = "l3",
-                states = mapOf("l3" to l3),
-                onEntry = listOf(TraceAction("l2_entry"))
-            )
-            val l1 = LogicState(
-                id = "l1",
-                initial = "l2",
-                states = mapOf("l2" to l2),
-                onEntry = listOf(TraceAction("l1_entry"))
-            )
+            val l4 =
+                LogicState(
+                    id = "l4",
+                    initial = "l5",
+                    states = mapOf("l5" to l5),
+                    onEntry = listOf(TraceAction("l4_entry")),
+                )
+            val l3 =
+                LogicState(
+                    id = "l3",
+                    initial = "l4",
+                    states = mapOf("l4" to l4),
+                    onEntry = listOf(TraceAction("l3_entry")),
+                )
+            val l2 =
+                LogicState(
+                    id = "l2",
+                    initial = "l3",
+                    states = mapOf("l3" to l3),
+                    onEntry = listOf(TraceAction("l2_entry")),
+                )
+            val l1 =
+                LogicState(
+                    id = "l1",
+                    initial = "l2",
+                    states = mapOf("l2" to l2),
+                    onEntry = listOf(TraceAction("l1_entry")),
+                )
             val definition =
                 StateMachineDefinition(
                     initial = "l1",
@@ -541,13 +550,15 @@ class StateMachineEngineTest :
                 }
                 Then("it should execute all entry actions in order") {
 
-                    engine.output.value.context.get("trace") shouldBe listOf(
-                        "l1_entry",
-                        "l2_entry",
-                        "l3_entry",
-                        "l4_entry",
-                        "l5_entry",
-                    )
+                    engine.output.value.context
+                        .get("trace") shouldBe
+                        listOf(
+                            "l1_entry",
+                            "l2_entry",
+                            "l3_entry",
+                            "l4_entry",
+                            "l5_entry",
+                        )
                 }
             }
         }
@@ -602,12 +613,12 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT_A" to
-                                    listOf(
-                                        Transition(
-                                            target = "StateB",
-                                            actions = listOf(DelayAction(10)),
-                                        ),
+                                listOf(
+                                    Transition(
+                                        target = "StateB",
+                                        actions = listOf(DelayAction(10)),
                                     ),
+                                ),
                         ),
                 )
             val definition =

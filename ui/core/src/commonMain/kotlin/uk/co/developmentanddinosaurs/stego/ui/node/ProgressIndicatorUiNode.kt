@@ -1,3 +1,5 @@
 package uk.co.developmentanddinosaurs.stego.ui.node
 
-class ProgressIndicatorUiNode : UiNode
+class ProgressIndicatorUiNode(
+    override val id: String
+) : UiNode

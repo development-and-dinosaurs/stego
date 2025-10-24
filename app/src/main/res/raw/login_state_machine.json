@@ -9,29 +9,25 @@
       "type": "ui",
       "uiNode": {
         "type": "column",
+        "id": "idle_column",
         "children": [
           {
             "type": "text_field",
+            "id": "username_field",
             "label": "Username",
             "text": "{username}",
-            "onTextChanged": {
-              "type": "TEXT_CHANGED",
-              "data": {
-                "text": "{text}"
-              }
-            }
+            "onTextChanged": { "trigger": "USERNAME_CHANGED" }
           },
           {
             "type": "button",
+            "id": "login_button",
             "text": "Log In",
-            "onClick": {
-              "type": "SUBMIT"
-            }
+            "onClick": { "trigger": "SUBMIT" }
           }
         ]
       },
       "on": {
-        "TEXT_CHANGED": [
+        "USERNAME_CHANGED": [
           {
             "target": "Idle",
             "actions": [
@@ -55,12 +51,15 @@
       "type": "ui",
       "uiNode": {
         "type": "column",
+        "id": "loading_column",
         "children": [
           {
-            "type": "progress_indicator"
+            "type": "progress_indicator",
+            "id": "loading_spinner"
           },
           {
             "type": "label",
+            "id": "loading_label",
             "text": "Reticulating splines..."
           }
         ]
@@ -97,9 +96,11 @@
       "type": "ui",
       "uiNode": {
         "type": "column",
+        "id": "success_column",
         "children": [
           {
             "type": "label",
+            "id": "success_label",
             "text": "Welcome, {username}!"
           }
         ]
@@ -110,17 +111,18 @@
       "type": "ui",
       "uiNode": {
         "type": "column",
+        "id": "error_column",
         "children": [
           {
             "type": "label",
+            "id": "error_label",
             "text": "Error for {username}: {error}"
           },
           {
             "type": "button",
+            "id": "retry_button",
             "text": "Retry",
-            "onClick": {
-              "type": "RETRY"
-            }
+            "onClick": { "trigger": "RETRY" }
           }
         ]
       },

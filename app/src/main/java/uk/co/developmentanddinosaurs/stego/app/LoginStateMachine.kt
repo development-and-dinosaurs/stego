@@ -70,12 +70,13 @@ fun stateDef(context: android.content.Context): StateMachineDefinition {
             LogActionDto::class to LogActionMapper { message -> println(message) }
         )
     )
+    val interactionMapper = InteractionMapper()
     val uiNodeMapper = CompositeUiNodeMapper(
         simpleMappers = mapOf(
             LabelUiNodeDto::class to LabelUiNodeMapper(),
             ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
-            TextFieldUiNodeDto::class to TextFieldUiNodeMapper(),
-            ButtonUiNodeDto::class to ButtonUiNodeMapper()
+            TextFieldUiNodeDto::class to TextFieldUiNodeMapper(interactionMapper),
+            ButtonUiNodeDto::class to ButtonUiNodeMapper(interactionMapper)
         ),
         compositeAwareFactories = mapOf(
             ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) }

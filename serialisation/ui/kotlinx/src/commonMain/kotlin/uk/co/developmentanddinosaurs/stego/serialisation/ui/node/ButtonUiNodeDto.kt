@@ -2,8 +2,11 @@ package uk.co.developmentanddinosaurs.stego.serialisation.ui.node
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.EventDto
 
 @Serializable
 @SerialName("button")
-data class ButtonUiNodeDto(val text: String, val onClick: EventDto) : UiNodeDto
+data class ButtonUiNodeDto(
+    override val id: String,
+    val text: String,
+    val onClick: InteractionDto,
+) : UiNodeDto

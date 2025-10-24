@@ -3,19 +3,20 @@ package uk.co.developmentanddinosaurs.stego.ui.uinode
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import uk.co.developmentanddinosaurs.stego.statemachine.Context
-import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.ui.node.TextFieldUiNode
-import uk.co.developmentanddinosaurs.stego.ui.resolve
+import uk.co.developmentanddinosaurs.stego.ui.node.InteractionDataKeys
+import uk.co.developmentanddinosaurs.stego.ui.node.UserInteractionHandler
 
 @Composable
-fun RenderTextFieldUiNode(textFieldUiNode: TextFieldUiNode, context: Context, onEvent: (Event) -> Unit) {
-    val resolvedText = resolve(textFieldUiNode.text, context)
-    var text by remember { mutableStateOf(resolvedText) }
+fun RenderTextFieldUiNode(
+    textFieldUiNode: TextFieldUiNode,
+    userInteractionHandler: UserInteractionHandler
+) {
+    var text by remember { mutableStateOf(textFieldUiNode.text) }
 
-    LaunchedEffect(resolvedText) {
-        if (text != resolvedText) {
-            text = resolvedText
+    LaunchedEffect(textFieldUiNode.text) {
+        if (text != textFieldUiNode.text) {
+            text = textFieldUiNode.text
         }
     }
 
@@ -23,9 +24,11 @@ fun RenderTextFieldUiNode(textFieldUiNode: TextFieldUiNode, context: Context, on
         value = text,
         onValueChange = { newText ->
             text = newText
-            val event = textFieldUiNode.onTextChanged
-            onEvent(event.copy(data = resolve(event.data, mapOf("text" to newText))))
+            userInteractionHandler(textFieldUiNode.onTextChanged.trigger, mapOf(
+                InteractionDataKeys.COMPONENT_ID to textFieldUiNode.id,
+                InteractionDataKeys.COMPONENT_TEXT to newText
+            ))
         },
-        label = { Text(resolve(textFieldUiNode.label, context)) }
+        label = { Text(textFieldUiNode.label) }
     )
 }

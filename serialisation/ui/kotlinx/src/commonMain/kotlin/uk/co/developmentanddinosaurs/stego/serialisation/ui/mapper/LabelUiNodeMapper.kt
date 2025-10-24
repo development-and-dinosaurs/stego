@@ -9,6 +9,9 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 class LabelUiNodeMapper : UiNodeMapper {
     override fun map(dto: UiNodeDto): UiNode {
         require(dto is LabelUiNodeDto)
-        return LabelUiNode(text = dto.text)
+        return LabelUiNode(
+            id = dto.id,
+            text = dto.text,
+        )
     }
 }

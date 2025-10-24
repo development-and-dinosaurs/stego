@@ -6,20 +6,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import uk.co.developmentanddinosaurs.stego.statemachine.Context
-import uk.co.developmentanddinosaurs.stego.statemachine.Event
-import uk.co.developmentanddinosaurs.stego.ui.Render
 import uk.co.developmentanddinosaurs.stego.ui.node.ColumnUiNode
+import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 
 @Composable
-fun RenderColumnUiNode(columnUiNode: ColumnUiNode, context: Context, onEvent: (Event) -> Unit) {
+fun RenderColumnUiNode(
+    columnUiNode: ColumnUiNode,
+    renderChild: @Composable (UiNode) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         columnUiNode.children.forEach {
-            Render(it, context, onEvent)
+            renderChild(it)
         }
     }
 }

@@ -6,14 +6,14 @@ import uk.co.developmentanddinosaurs.stego.ui.node.ButtonUiNode
 
 
 class ButtonUiNodeMapper(
-    private val interactionMapper: InteractionMapper
+    private val buttonActionMapper: ButtonActionMapper
 ) : UiNodeMapper {
     override fun map(dto: UiNodeDto): ButtonUiNode {
         require(dto is ButtonUiNodeDto)
         return ButtonUiNode(
             id = dto.id,
             text = dto.text,
-            onClick = interactionMapper.map(dto.onClick)
+            onClick = buttonActionMapper.map(dto.onClick)
         )
     }
 }

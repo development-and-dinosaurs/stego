@@ -10,6 +10,10 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MaxLengthValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLengthValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
@@ -35,7 +39,6 @@ fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context)
     val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
     val reader = InputStreamReader(inputStream)
     val jsonString = reader.readText()
-    println(jsonString)
     reader.close()
     return jsonString
 }
@@ -57,6 +60,15 @@ private val json = Json {
             subclass(ProgressIndicatorUiNodeDto::class)
             subclass(LabelUiNodeDto::class)
         }
+        polymorphic(ButtonActionDto::class) {
+            subclass(SubmitButtonActionDto::class)
+            subclass(BypassValidationButtonActionDto::class)
+        }
+        polymorphic(ValidationRuleDto::class) {
+            subclass(RequiredValidationRuleDto::class)
+            subclass(MinLengthValidationRuleDto::class)
+            subclass(MaxLengthValidationRuleDto::class)
+        }
     }
 }
 
@@ -71,12 +83,14 @@ fun stateDef(context: android.content.Context): StateMachineDefinition {
         )
     )
     val interactionMapper = InteractionMapper()
+    val buttonActionMapper = ButtonActionMapper()
+    val validationRuleMapper = ValidationRuleMapper()
     val uiNodeMapper = CompositeUiNodeMapper(
         simpleMappers = mapOf(
             LabelUiNodeDto::class to LabelUiNodeMapper(),
             ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
-            TextFieldUiNodeDto::class to TextFieldUiNodeMapper(interactionMapper),
-            ButtonUiNodeDto::class to ButtonUiNodeMapper(interactionMapper)
+            TextFieldUiNodeDto::class to TextFieldUiNodeMapper(interactionMapper, validationRuleMapper),
+            ButtonUiNodeDto::class to ButtonUiNodeMapper(buttonActionMapper)
         ),
         compositeAwareFactories = mapOf(
             ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) }
@@ -97,6 +111,5 @@ fun stateDef(context: android.content.Context): StateMachineDefinition {
 
     // Perform the mapping using the fully constructed composite mapper.
     val stateMachineDefinition = compositeStateMapper.map(stateDefDto(context))
-    println(stateMachineDefinition)
     return stateMachineDefinition
 }

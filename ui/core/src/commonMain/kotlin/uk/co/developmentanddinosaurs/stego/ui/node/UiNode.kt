@@ -12,3 +12,8 @@ interface UiNode {
  * The key identifies the interaction (e.g., "onTextChange"), and the data is any relevant payload.
  */
 typealias UserInteractionHandler = (interactionId: String, data: Map<String, Any?>) -> Unit
+
+/**
+ * Represents the validity state of all fields in a form, keyed by their component ID.
+ */
+typealias FormState = Map<String, Boolean>

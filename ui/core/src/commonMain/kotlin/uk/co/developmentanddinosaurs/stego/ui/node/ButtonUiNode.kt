@@ -10,5 +10,5 @@ package uk.co.developmentanddinosaurs.stego.ui.node
 data class ButtonUiNode(
     override val id: String,
     val text: String,
-    val onClick: UserInteraction,
+    val onClick: ButtonAction,
 ) : UiNode

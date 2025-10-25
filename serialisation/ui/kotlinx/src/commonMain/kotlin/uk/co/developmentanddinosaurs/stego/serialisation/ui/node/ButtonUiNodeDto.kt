@@ -8,5 +8,5 @@ import kotlinx.serialization.Serializable
 data class ButtonUiNodeDto(
     override val id: String,
     val text: String,
-    val onClick: InteractionDto,
+    val onClick: ButtonActionDto,
 ) : UiNodeDto

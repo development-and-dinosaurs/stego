@@ -16,13 +16,29 @@
             "id": "username_field",
             "label": "Username",
             "text": "{username}",
-            "onTextChanged": { "trigger": "USERNAME_CHANGED" }
+            "onTextChanged": { "trigger": "USERNAME_CHANGED" },
+            "validators": [
+              {
+                "type": "required",
+                "message": "Username is required"
+              },
+              {
+                "type": "minLength",
+                "length": 3,
+                "message": "Username must be at least 3 characters"
+              }
+            ]
           },
           {
             "type": "button",
             "id": "login_button",
             "text": "Log In",
-            "onClick": { "trigger": "SUBMIT" }
+            "onClick": {
+              "type": "submit",
+              "trigger": "SUBMIT",
+              "onValidationFail": "shake",
+              "validationScope": ["username_field"]
+            }
           }
         ]
       },
@@ -122,7 +138,10 @@
             "type": "button",
             "id": "retry_button",
             "text": "Retry",
-            "onClick": { "trigger": "RETRY" }
+            "onClick": {
+              "type": "submit",
+              "trigger": "RETRY"
+            }
           }
         ]
       },

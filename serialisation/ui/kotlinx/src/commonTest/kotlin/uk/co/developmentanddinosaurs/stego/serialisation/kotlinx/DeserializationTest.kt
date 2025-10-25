@@ -1,5 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
+import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -9,11 +10,14 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLengthValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
 
 class DeserializationTest : BehaviorSpec({
     val json = Json {
         prettyPrint = true
-        encodeDefaults = true
+        encodeDefaults = false
         serializersModule = SerializersModule {
             polymorphic(UiNodeDto::class) {
                 subclass(LabelUiNodeDto::class)
@@ -22,6 +26,14 @@ class DeserializationTest : BehaviorSpec({
                 subclass(TextFieldUiNodeDto::class)
                 subclass(ProgressIndicatorUiNodeDto::class)
             }
+            polymorphic(ButtonActionDto::class) {
+                subclass(SubmitButtonActionDto::class)
+                subclass(BypassValidationButtonActionDto::class)
+            }
+            polymorphic(ValidationRuleDto::class) {
+                subclass(RequiredValidationRuleDto::class)
+                subclass(MinLengthValidationRuleDto::class)
+            }
         }
         classDiscriminator = "type"
     }
@@ -29,6 +41,7 @@ class DeserializationTest : BehaviorSpec({
     given("a JSON representation of a LabelUiNode") {
         val labelJson = """
             {
+                "id": "label-1",
                 "type": "label",
                 "text": "I am a label"
             }
@@ -43,11 +56,14 @@ class DeserializationTest : BehaviorSpec({
             then("it should have the correct text") {
                 (uiNodeDto as LabelUiNodeDto).text shouldBe "I am a label"
             }
+            then("it should have the correct id") {
+                uiNodeDto.id shouldBe "label-1"
+            }
 
             `when`("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
                 then("the JSON should match the original") {
-                    serializedJson shouldBe labelJson
+                    serializedJson shouldEqualJson labelJson
                 }
             }
         }
@@ -56,11 +72,12 @@ class DeserializationTest : BehaviorSpec({
     given("a JSON representation of a ButtonUiNode") {
         val buttonJson = """
             {
+                "id": "button-1",
                 "type": "button",
                 "text": "Click me",
                 "onClick": {
-                    "type": "BUTTON_EVENT",
-                    "data": {}
+                    "type": "submit",
+                    "trigger": "SUBMIT_EVENT"
                 }
             }
         """.trimIndent()
@@ -74,14 +91,16 @@ class DeserializationTest : BehaviorSpec({
             then("it should have the correct text") {
                 (uiNodeDto as ButtonUiNodeDto).text shouldBe "Click me"
             }
-            then("it should have the correct onClick event") {
-                (uiNodeDto as ButtonUiNodeDto).onClick.type shouldBe "BUTTON_EVENT"
+            then("it should have the correct onClick action") {
+                val action = (uiNodeDto as ButtonUiNodeDto).onClick
+                action.shouldBeInstanceOf<SubmitButtonActionDto>()
+                action.trigger shouldBe "SUBMIT_EVENT"
             }
 
             `when`("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
                 then("the JSON should match the original") {
-                    serializedJson shouldBe buttonJson
+                    serializedJson shouldEqualJson buttonJson
                 }
             }
         }
@@ -91,12 +110,23 @@ class DeserializationTest : BehaviorSpec({
         val textFieldJson = """
             {
                 "type": "text_field",
+                "id": "text-field-1",
                 "text": "initial text",
                 "label": "label",
                 "onTextChanged": {
-                    "type": "TEXT_CHANGED",
-                    "data": {}
-                }
+                    "trigger": "TEXT_CHANGED"
+                },
+                "validators": [
+                    {
+                        "type": "required",
+                        "message": "This field is required"
+                    },
+                    {
+                        "type": "minLength",
+                        "message": "Must be at least 3 characters",
+                        "length": 3
+                    }
+                ]
             }
         """.trimIndent()
 
@@ -112,14 +142,22 @@ class DeserializationTest : BehaviorSpec({
             then("it should have the correct label") {
                 (uiNodeDto as TextFieldUiNodeDto).label shouldBe "label"
             }
-            then("it should have the correct onTextChanged event") {
-                (uiNodeDto as TextFieldUiNodeDto).onTextChanged.type shouldBe "TEXT_CHANGED"
+            then("it should have the correct onTextChanged interaction") {
+                (uiNodeDto as TextFieldUiNodeDto).onTextChanged.trigger shouldBe "TEXT_CHANGED"
+            }
+            then("it should have the correct validators") {
+                val validators = (uiNodeDto as TextFieldUiNodeDto).validators
+                validators.size shouldBe 2
+                validators[0].shouldBeInstanceOf<RequiredValidationRuleDto>()
+                val minLengthValidator = validators[1].shouldBeInstanceOf<MinLengthValidationRuleDto>()
+                minLengthValidator.length shouldBe 3
+                minLengthValidator.message shouldBe "Must be at least 3 characters"
             }
 
             `when`("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
                 then("the JSON should match the original") {
-                    serializedJson shouldBe textFieldJson
+                    serializedJson shouldEqualJson textFieldJson
                 }
             }
         }
@@ -128,7 +166,8 @@ class DeserializationTest : BehaviorSpec({
     given("a JSON representation of a ProgressIndicatorUiNode") {
         val progressIndicatorJson = """
             {
-                "type": "progress_indicator"
+                "type": "progress_indicator",
+                "id": "progress-1"
             }
         """.trimIndent()
 
@@ -142,7 +181,7 @@ class DeserializationTest : BehaviorSpec({
             `when`("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
                 then("the JSON should match the original") {
-                    serializedJson shouldBe progressIndicatorJson
+                    serializedJson shouldEqualJson progressIndicatorJson
                 }
             }
         }
@@ -152,17 +191,20 @@ class DeserializationTest : BehaviorSpec({
         val columnJson = """
             {
                 "type": "column",
+                "id": "column-1",
                 "children": [
                     {
                         "type": "label",
+                        "id": "label-in-column",
                         "text": "I am a label"
                     },
                     {
                         "type": "button",
+                        "id": "button-in-column",
                         "text": "Click me",
                         "onClick": {
-                            "type": "BUTTON_EVENT",
-                            "data": {}
+                            "type": "submit",
+                            "trigger": "BUTTON_EVENT"
                         }
                     }
                 ]
@@ -188,7 +230,7 @@ class DeserializationTest : BehaviorSpec({
             `when`("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
                 then("the JSON should match the original") {
-                    serializedJson shouldBe columnJson
+                    serializedJson shouldEqualJson columnJson
                 }
             }
         }
@@ -198,14 +240,9 @@ class DeserializationTest : BehaviorSpec({
         val uiStateJson = """
             {
                 "id": "testState",
-                "initial": null,
-                "invoke": null,
-                "on": {},
-                "onEntry": [],
-                "onExit": [],
-                "states": {},
                 "uiNode": {
                     "type": "label",
+                    "id": "ui-state-label",
                     "text": "Test UiNode"
                 }
             }
@@ -225,7 +262,7 @@ class DeserializationTest : BehaviorSpec({
             `when`("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiStateDto)
                 then("the JSON should match the original") {
-                    serializedJson shouldBe uiStateJson
+                    serializedJson shouldEqualJson uiStateJson
                 }
             }
         }

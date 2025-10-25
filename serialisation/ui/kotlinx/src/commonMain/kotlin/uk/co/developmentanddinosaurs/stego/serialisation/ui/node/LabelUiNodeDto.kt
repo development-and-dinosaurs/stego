@@ -5,4 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("label")
-data class LabelUiNodeDto(val text: String) : UiNodeDto
+data class LabelUiNodeDto(
+    override val id: String,
+    val text: String,
+    ) : UiNodeDto

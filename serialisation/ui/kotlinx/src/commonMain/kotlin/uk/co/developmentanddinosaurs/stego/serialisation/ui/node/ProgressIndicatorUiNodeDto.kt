@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("progress_indicator")
-class ProgressIndicatorUiNodeDto : UiNodeDto
+class ProgressIndicatorUiNodeDto(override val id: String) : UiNodeDto

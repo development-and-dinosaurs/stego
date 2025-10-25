@@ -7,7 +7,10 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
  * An interface for providing a value, either from the context or as a literal.
  */
 interface ValueProvider {
-    fun get(context: Context, event: Event?): Any?
+    fun get(
+        context: Context,
+        event: Event?,
+    ): Any?
 
     companion object {
         private val DYNAMIC_VALUE_REGEX = Regex("\\{(context|event)\\.(.+?)\\}")

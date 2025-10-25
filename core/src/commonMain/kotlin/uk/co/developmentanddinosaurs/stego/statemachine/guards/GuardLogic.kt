@@ -4,7 +4,6 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
 
-
 /**
  * Performs a comparison by fetching values from providers and executing a given comparison operation.
  * This function encapsulates the common logic for all comparison-based guards.
@@ -21,7 +20,7 @@ internal fun performComparison(
     right: Any,
     context: Context,
     event: Event,
-    operation: (left: Comparable<Any>, right: Any) -> Boolean
+    operation: (left: Comparable<Any>, right: Any) -> Boolean,
 ): Boolean {
     val leftValue = ValueProvider.resolve(left).get(context, event)
     val rightValue = ValueProvider.resolve(right).get(context, event)
@@ -35,7 +34,10 @@ internal fun performComparison(
         @Suppress("UNCHECKED_CAST")
         operation(leftValue as Comparable<Any>, rightValue)
     } catch (e: ClassCastException) {
-        throw IllegalStateException("Left type '${leftValue::class.simpleName}' and right type '${rightValue::class.simpleName}' are not comparable.", e)
+        throw IllegalStateException(
+            "Left type '${leftValue::class.simpleName}' and right type '${rightValue::class.simpleName}' are not comparable.",
+            e,
+        )
     }
 }
 
@@ -53,7 +55,7 @@ internal fun performEqualityCheck(
     left: Any,
     right: Any,
     context: Context,
-    event: Event
+    event: Event,
 ): Boolean {
     val leftValue = ValueProvider.resolve(left).get(context, event)
     val rightValue = ValueProvider.resolve(right).get(context, event)

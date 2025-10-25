@@ -1,0 +1,157 @@
+{
+  "initial": "Idle",
+  "initialContext": {
+    "username": "sean"
+  },
+  "states": {
+    "Idle": {
+      "id": "Idle",
+      "type": "ui",
+      "uiNode": {
+        "type": "column",
+        "id": "idle_column",
+        "children": [
+          {
+            "type": "text_field",
+            "id": "username_field",
+            "label": "Username",
+            "text": "{username}",
+            "onTextChanged": { "trigger": "USERNAME_CHANGED" },
+            "validators": [
+              {
+                "type": "required",
+                "message": "Username is required"
+              },
+              {
+                "type": "minLength",
+                "length": 3,
+                "message": "Username must be at least 3 characters"
+              }
+            ]
+          },
+          {
+            "type": "button",
+            "id": "login_button",
+            "text": "Log In",
+            "onClick": {
+              "type": "submit",
+              "trigger": "SUBMIT",
+              "onValidationFail": "shake",
+              "validationScope": ["username_field"]
+            }
+          }
+        ]
+      },
+      "on": {
+        "USERNAME_CHANGED": [
+          {
+            "target": "Idle",
+            "actions": [
+              {
+                "type": "assign",
+                "key": "username",
+                "value": "{event.text}"
+              }
+            ]
+          }
+        ],
+        "SUBMIT": [
+          {
+            "target": "Loading"
+          }
+        ]
+      }
+    },
+    "Loading": {
+      "id": "Loading",
+      "type": "ui",
+      "uiNode": {
+        "type": "column",
+        "id": "loading_column",
+        "children": [
+          {
+            "type": "progress_indicator",
+            "id": "loading_spinner"
+          },
+          {
+            "type": "label",
+            "id": "loading_label",
+            "text": "Reticulating splines..."
+          }
+        ]
+      },
+      "invoke": {
+        "id": "login",
+        "src": "LoginInvokable",
+        "input": {
+          "username": "{context.username}"
+        }
+      },
+      "on": {
+        "done.invoke.login": [
+          {
+            "target": "Success"
+          }
+        ],
+        "error.invoke.login": [
+          {
+            "target": "Error",
+            "actions": [
+              {
+                "type": "assign",
+                "key": "error",
+                "value": "{event.error}"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Success": {
+      "id": "Success",
+      "type": "ui",
+      "uiNode": {
+        "type": "column",
+        "id": "success_column",
+        "children": [
+          {
+            "type": "label",
+            "id": "success_label",
+            "text": "Welcome, {username}!"
+          }
+        ]
+      }
+    },
+    "Error": {
+      "id": "Error",
+      "type": "ui",
+      "uiNode": {
+        "type": "column",
+        "id": "error_column",
+        "children": [
+          {
+            "type": "label",
+            "id": "error_label",
+            "text": "Error for {username}: {error}"
+          },
+          {
+            "type": "button",
+            "id": "retry_button",
+            "text": "Retry",
+            "onClick": {
+              "type": "submit",
+              "trigger": "RETRY"
+            }
+          }
+        ]
+      },
+      "on": {
+        "RETRY": [
+          {
+            "target": "Idle"
+          }
+        ]
+      }
+    }
+  }
+}

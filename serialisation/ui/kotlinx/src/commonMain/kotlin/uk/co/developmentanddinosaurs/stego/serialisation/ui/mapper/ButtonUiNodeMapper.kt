@@ -3,15 +3,17 @@ package uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 import uk.co.developmentanddinosaurs.stego.ui.node.ButtonUiNode
-import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 
 
-class ButtonUiNodeMapper : UiNodeMapper {
-    override fun map(dto: UiNodeDto): UiNode {
+class ButtonUiNodeMapper(
+    private val buttonActionMapper: ButtonActionMapper
+) : UiNodeMapper {
+    override fun map(dto: UiNodeDto): ButtonUiNode {
         require(dto is ButtonUiNodeDto)
         return ButtonUiNode(
+            id = dto.id,
             text = dto.text,
-            onClick = dto.onClick.toDomain()
+            onClick = buttonActionMapper.map(dto.onClick)
         )
     }
 }

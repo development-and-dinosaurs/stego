@@ -9,6 +9,9 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 class ColumnUiNodeMapper(private val compositeUiNodeMapper: UiNodeMapper) : UiNodeMapper {
     override fun map(dto: UiNodeDto): UiNode {
         require(dto is ColumnUiNodeDto)
-        return ColumnUiNode(children = dto.children.map { compositeUiNodeMapper.map(it) })
+        return ColumnUiNode(
+            id = dto.id,
+            children = dto.children.map { compositeUiNodeMapper.map(it) },
+        )
     }
 }

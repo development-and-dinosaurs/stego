@@ -5,4 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("column")
-data class ColumnUiNodeDto(val children: List<UiNodeDto>) : UiNodeDto
+data class ColumnUiNodeDto(
+    override val id: String,
+    val children: List<UiNodeDto>,
+    ) : UiNodeDto

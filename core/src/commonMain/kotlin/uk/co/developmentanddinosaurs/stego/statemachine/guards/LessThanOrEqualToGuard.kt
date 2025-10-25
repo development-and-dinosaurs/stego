@@ -8,9 +8,10 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
  */
 class LessThanOrEqualToGuard(
     private val left: Any,
-    private val right: Any
+    private val right: Any,
 ) : Guard {
-    override fun evaluate(context: Context, event: Event): Boolean {
-        return performComparison(left, right, context, event) { l, r -> l <= r }
-    }
+    override fun evaluate(
+        context: Context,
+        event: Event,
+    ): Boolean = performComparison(left, right, context, event) { l, r -> l <= r }
 }

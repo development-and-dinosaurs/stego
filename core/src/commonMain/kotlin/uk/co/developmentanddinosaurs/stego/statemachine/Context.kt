@@ -6,7 +6,7 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  * It behaves like a map but provides a more constrained API to ensure immutability.
  * Every "put" operation returns a new Context instance with the data updated.
  */
-class Context (
+class Context(
     private val values: Map<String, Any?>,
 ) {
     /**

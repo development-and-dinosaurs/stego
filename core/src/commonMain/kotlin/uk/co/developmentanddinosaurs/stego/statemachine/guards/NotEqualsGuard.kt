@@ -8,9 +8,10 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
  */
 class NotEqualsGuard(
     private val left: Any,
-    private val right: Any
+    private val right: Any,
 ) : Guard {
-    override fun evaluate(context: Context, event: Event): Boolean {
-        return !performEqualityCheck(left, right, context, event)
-    }
+    override fun evaluate(
+        context: Context,
+        event: Event,
+    ): Boolean = !performEqualityCheck(left, right, context, event)
 }

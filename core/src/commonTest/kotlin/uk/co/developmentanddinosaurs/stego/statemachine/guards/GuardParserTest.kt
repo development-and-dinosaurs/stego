@@ -180,4 +180,74 @@ class GuardParserTest :
                 }
             }
         }
+
+        Given("a composite expression with a non-parenthesized sub-expression") {
+            val expression = "((a == b) && c < d)"
+
+            When("the expression is parsed") {
+                Then("it should throw an IllegalArgumentException") {
+                    val exception =
+                        shouldThrow<IllegalArgumentException> {
+                            GuardParser.parse(expression)
+                        }
+                    exception.message shouldBe "All expressions must be enclosed in parentheses or be a NOT expression: 'c < d'"
+                }
+            }
+        }
+
+        Given("an expression that is not exclusively enclosed in parentheses") {
+            val expression = "(a) == (b)"
+
+            When("the expression is parsed") {
+                val exception =
+                    shouldThrow<IllegalArgumentException> {
+                        GuardParser.parse(expression)
+                    }
+                Then("it should throw an IllegalArgumentException") {
+                    exception.message shouldBe "All expressions must be enclosed in parentheses or be a NOT expression: '(a) == (b)'"
+                }
+            }
+        }
+
+        Given("an expression that does not start with a parenthesis") {
+            val expression = "a == b)"
+
+            When("the expression is parsed") {
+                val exception =
+                    shouldThrow<IllegalArgumentException> {
+                        GuardParser.parse(expression)
+                    }
+                Then("it should throw an IllegalArgumentException") {
+                    exception.message shouldBe "Mismatched parentheses: Unexpected ')' in 'a == b)'"
+                }
+            }
+        }
+
+        Given("an expression that does not end with a parenthesis") {
+            val expression = "(a == b"
+
+            When("the expression is parsed") {
+                val exception =
+                    shouldThrow<IllegalArgumentException> {
+                        GuardParser.parse(expression)
+                    }
+                Then("it should throw an IllegalArgumentException") {
+                    exception.message shouldBe "Mismatched parentheses: Missing ')' in '(a == b'"
+                }
+            }
+        }
+
+        Given("an empty expression") {
+            val expression = "()"
+
+            When("the expression is parsed") {
+                Then("it should throw an IllegalArgumentException") {
+                    val exception =
+                        shouldThrow<IllegalArgumentException> {
+                            GuardParser.parse(expression)
+                        }
+                    exception.message shouldBe "Expression cannot be empty."
+                }
+            }
+        }
     })

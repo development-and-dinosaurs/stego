@@ -46,6 +46,7 @@ internal object GuardParser {
      */
     fun parse(expression: String): Guard {
         val trimmed = expression.trim()
+        if (trimmed.isBlank()) throw IllegalArgumentException("Expression cannot be empty.")
         validateParentheses(trimmed)
 
         // A valid expression must either be a NOT expression or be fully enclosed in parentheses.
@@ -108,8 +109,6 @@ internal object GuardParser {
      * For example, `(a && b)` is true, but `(a) && (b)` is false.
      */
     private fun isEnclosedByParentheses(expression: String): Boolean {
-        if (!expression.startsWith("(") || !expression.endsWith(")")) return false
-
         var parenDepth = 0
         for (i in 0 until expression.length - 1) {
             when (expression[i]) {

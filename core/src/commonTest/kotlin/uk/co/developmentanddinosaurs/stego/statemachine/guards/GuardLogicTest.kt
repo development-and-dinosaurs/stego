@@ -76,7 +76,9 @@ class GuardLogicTest :
 
         Given("performComparison with a non-comparable left value") {
             // A simple data class that does not implement Comparable
-            data class NotComparable(val value: Int)
+            data class NotComparable(
+                val value: Int,
+            )
 
             val leftProvider = ValueProvider.resolve(NotComparable(10))
             val rightProvider = ValueProvider.resolve(5)

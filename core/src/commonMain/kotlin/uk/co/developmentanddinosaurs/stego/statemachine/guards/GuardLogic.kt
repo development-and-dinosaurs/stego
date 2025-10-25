@@ -16,14 +16,14 @@ import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValuePro
  * @return The boolean result of the comparison.
  */
 internal fun performComparison(
-    left: Any,
-    right: Any,
+    left: ValueProvider,
+    right: ValueProvider,
     context: Context,
     event: Event,
     operation: (left: Comparable<Any>, right: Any) -> Boolean,
 ): Boolean {
-    val leftValue = ValueProvider.resolve(left).get(context, event)
-    val rightValue = ValueProvider.resolve(right).get(context, event)
+    val leftValue = left.get(context, event)
+    val rightValue = right.get(context, event)
 
     require(leftValue != null) { "Left value cannot be null." }
     require(rightValue != null) { "Right value cannot be null." }
@@ -52,13 +52,13 @@ internal fun performComparison(
  * @return The boolean result of the equality check.
  */
 internal fun performEqualityCheck(
-    left: Any,
-    right: Any,
+    left: ValueProvider,
+    right: ValueProvider,
     context: Context,
     event: Event,
 ): Boolean {
-    val leftValue = ValueProvider.resolve(left).get(context, event)
-    val rightValue = ValueProvider.resolve(right).get(context, event)
+    val leftValue = left.get(context, event)
+    val rightValue = right.get(context, event)
 
     return leftValue == rightValue
 }

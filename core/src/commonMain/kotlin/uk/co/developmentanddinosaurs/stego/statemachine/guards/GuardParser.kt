@@ -1,5 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.statemachine.guards
 
+import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
+
 /**
  * A recursive descent parser for creating composite guards from a string expression.
  *
@@ -66,10 +68,9 @@ internal object GuardParser {
         // If no composite operators are found, it must be a simple comparison.
         COMPARISON_OPERATOR_MAP.forEach { (op, constructor) ->
             findSplitPoint(innerExpression, op)?.let {
-                return constructor(
-                    innerExpression.substring(0, it).trim(),
-                    innerExpression.substring(it + op.length).trim(),
-                )
+                val left = ValueProvider.resolve(innerExpression.substring(0, it).trim())
+                val right = ValueProvider.resolve(innerExpression.substring(it + op.length).trim())
+                return constructor(left, right)
             }
         }
         // If the content inside the parentheses is not a valid composite or simple expression, recurse.

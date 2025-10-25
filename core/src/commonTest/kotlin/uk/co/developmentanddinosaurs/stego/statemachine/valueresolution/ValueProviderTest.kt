@@ -130,4 +130,40 @@ class ValueProviderTest :
                 }
             }
         }
+
+        Given("a string literal that starts with a quote but doesn't end with one") {
+            val expression = "\"hello"
+
+            When("the expression is resolved") {
+                val provider = ValueProvider.resolve(expression)
+                Then("it should create a LiteralValue provider with the string as-is") {
+                    provider.shouldBeInstanceOf<LiteralValue>()
+                    provider.get(context, event) shouldBe "\"hello"
+                }
+            }
+        }
+
+        Given("a string literal that ends with a quote but doesn't start with one") {
+            val expression = "world\""
+
+            When("the expression is resolved") {
+                val provider = ValueProvider.resolve(expression)
+                Then("it should create a LiteralValue provider with the string as-is") {
+                    provider.shouldBeInstanceOf<LiteralValue>()
+                    provider.get(context, event) shouldBe "world\""
+                }
+            }
+        }
+
+        Given("a string literal with quotes in the middle but not at the start/end") {
+            val expression = "hello\"world"
+
+            When("the expression is resolved") {
+                val provider = ValueProvider.resolve(expression)
+                Then("it should create a LiteralValue provider with the string as-is") {
+                    provider.shouldBeInstanceOf<LiteralValue>()
+                    provider.get(context, event) shouldBe "hello\"world"
+                }
+            }
+        }
     })

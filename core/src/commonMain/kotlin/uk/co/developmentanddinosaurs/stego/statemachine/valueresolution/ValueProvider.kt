@@ -30,8 +30,7 @@ interface ValueProvider {
                     val key = match.groupValues[2]
                     return when (source) {
                         "context" -> ContextValue(key)
-                        "event" -> EventValue(key)
-                        else -> error("Unknown value source: $source") // Should not happen
+                        else -> EventValue(key) // Regex guarantees this can only be "event"
                     }
                 }
 

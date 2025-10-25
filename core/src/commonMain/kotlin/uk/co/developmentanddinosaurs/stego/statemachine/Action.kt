@@ -3,10 +3,11 @@ package uk.co.developmentanddinosaurs.stego.statemachine
 /**
  * Represents an action that can be executed by the state machine.
  *
- * This is a regular interface to allow library consumers to provide their own custom action implementations.
+ * This is a functional interface to allow library consumers to provide their own custom action implementations.
  * Actions are the primary mechanism for causing side effects and updating the machine's extended state.
  */
-interface Action {
+fun interface Action {
+
     /**
      * Executes the logic of the action.
      *

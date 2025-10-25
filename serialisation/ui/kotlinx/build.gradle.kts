@@ -1,7 +1,8 @@
 plugins {
+    alias(libs.plugins.diffplug.spotless)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.diffplug.spotless)
+    alias(libs.plugins.kotlinx.kover)
 }
 
 kotlin {
@@ -30,7 +31,7 @@ kotlin {
     }
 }
 
-tasks.withType<Test>() {
+tasks.withType<Test> {
     useJUnitPlatform()
     filter {
         isFailOnNoMatchingTests = false

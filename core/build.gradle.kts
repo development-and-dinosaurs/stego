@@ -3,10 +3,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.diffplug.spotless)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlinx.kover)
     alias(libs.plugins.vanniktech.mavenPublish)
-    alias(libs.plugins.diffplug.spotless)
 }
 
 group = "uk.co.developmentanddinosaurs"

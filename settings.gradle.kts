@@ -20,5 +20,5 @@ include(
     "serialisation:ui:kotlinx",
     "ui:core",
     "ui:android",
-    "app"
+    "examples:android"
 )

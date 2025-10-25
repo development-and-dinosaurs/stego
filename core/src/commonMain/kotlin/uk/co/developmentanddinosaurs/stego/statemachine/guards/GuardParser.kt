@@ -42,7 +42,6 @@ internal object GuardParser {
     fun parse(expression: String): Guard {
         val trimmed = expression.trim()
         validateParentheses(trimmed)
-        println(trimmed)
 
         // A valid expression must either be a NOT expression or be fully enclosed in parentheses.
         if (trimmed.startsWith("!")) {

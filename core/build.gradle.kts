@@ -1,21 +1,19 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.diffplug.spotless)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.vanniktech.mavenPublish)
 }
 
 group = "uk.co.developmentanddinosaurs"
-version = "1.0.0"
 
 kotlin {
-    jvm()
-    androidLibrary {
-        namespace = "uk.co.developmentanddinosaurs"
+    android {
+        namespace = "uk.co.developmentanddinosaurs.stego.core"
         compileSdk =
             libs.versions.android.compileSdk
                 .get()
@@ -25,23 +23,13 @@ kotlin {
                 .get()
                 .toInt()
 
-        withJava()
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }
-
         compilations.configureEach {
             compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
+                compilerOptions.jvmTarget = JvmTarget.JVM_11
             }
         }
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-    linuxX64()
+    jvm()
 
     sourceSets {
         commonMain.dependencies {
@@ -50,7 +38,6 @@ kotlin {
         }
 
         commonTest.dependencies {
-//            implementation(project(":serialisation:kotlinx"))
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.kotest.framework.engine)

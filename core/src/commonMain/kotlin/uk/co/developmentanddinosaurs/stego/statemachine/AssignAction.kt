@@ -10,11 +10,8 @@ class AssignAction(
         context: Context,
         event: Event,
     ): Context {
-        println(event)
         val resolve = ValueProvider.resolve(value)
-        println(resolve)
         val resolvedValue = resolve.get(context, event)
-        println("AssignAction: $key = $resolvedValue")
         return context.put(key, resolvedValue)
     }
 }

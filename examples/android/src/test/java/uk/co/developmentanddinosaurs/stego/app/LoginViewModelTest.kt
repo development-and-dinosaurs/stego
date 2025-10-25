@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.test.testCoroutineScheduler
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import uk.co.developmentanddinosaurs.stego.statemachine.*
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
@@ -12,7 +13,6 @@ import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 class LoginViewModelTest : BehaviorSpec({
     coroutineTestScope = true
 
-    // Define a minimal, self-contained state machine for this test
     val testLoginStateMachineDefinition = StateMachineDefinition(
         initial = "Start",
         states = mapOf(
@@ -20,7 +20,7 @@ class LoginViewModelTest : BehaviorSpec({
                 id = "Start",
                 on = mapOf(
                     "SUBMIT" to listOf(
-                        Transition("Success", guard = Guard.create("event.username == 'stego'")),
+                        Transition("Success", guard = Guard.create("({event.username} == stego)")),
                         Transition("Error", actions = listOf(AssignAction("error", "Invalid username")))
                     )
                 )
@@ -40,6 +40,7 @@ class LoginViewModelTest : BehaviorSpec({
             testCoroutineScheduler.advanceUntilIdle()
 
             Then("the final state should be Success") {
+                viewModel.uiState.first { it.state.id == "Success" }
                 viewModel.uiState.value.state.id shouldBe "Success"
             }
         }

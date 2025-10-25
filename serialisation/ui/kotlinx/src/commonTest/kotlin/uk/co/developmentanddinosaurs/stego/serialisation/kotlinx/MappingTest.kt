@@ -4,10 +4,17 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLengthValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
 import uk.co.developmentanddinosaurs.stego.ui.node.*
+import uk.co.developmentanddinosaurs.stego.ui.validators.MinLengthValidationRule
+import uk.co.developmentanddinosaurs.stego.ui.validators.RequiredValidationRule
 
 class MappingTest : BehaviorSpec({
+    val interactionMapper = InteractionMapper()
+    val buttonActionMapper = ButtonActionMapper()
+    val validationRuleMapper = ValidationRuleMapper()
     val uiNodeMapper = CompositeUiNodeMapper(
         simpleMappers = mapOf(
             LabelUiNodeDto::class to LabelUiNodeMapper(),
@@ -15,13 +22,18 @@ class MappingTest : BehaviorSpec({
         ),
         compositeAwareFactories = mapOf(
             ColumnUiNodeDto::class to { mapper: UiNodeMapper -> ColumnUiNodeMapper(mapper) },
-            ButtonUiNodeDto::class to { _: UiNodeMapper -> ButtonUiNodeMapper() },
-            TextFieldUiNodeDto::class to { _: UiNodeMapper -> TextFieldUiNodeMapper() }
+            ButtonUiNodeDto::class to { _: UiNodeMapper -> ButtonUiNodeMapper(buttonActionMapper) },
+            TextFieldUiNodeDto::class to { _: UiNodeMapper ->
+                TextFieldUiNodeMapper(
+                    interactionMapper,
+                    validationRuleMapper
+                )
+            }
         )
     )
 
     Given("a LabelUiNodeDto") {
-        val labelUiNodeDto = LabelUiNodeDto("Hello, World!")
+        val labelUiNodeDto = LabelUiNodeDto("label-1", "Hello, World!")
         When("it is mapped to a domain object") {
             val uiNode = uiNodeMapper.map(labelUiNodeDto)
             Then("it should be a LabelUiNode") {
@@ -34,7 +46,12 @@ class MappingTest : BehaviorSpec({
     }
 
     Given("a ButtonUiNodeDto") {
-        val buttonUiNodeDto = ButtonUiNodeDto("Click me", EventDto("EVENT_TYPE"))
+        val buttonUiNodeDto = ButtonUiNodeDto(
+            "button-1", "Click me",
+            SubmitButtonActionDto(
+                trigger = "EVENT_TYPE"
+            )
+        )
         When("it is mapped to a domain object") {
             val uiNode = uiNodeMapper.map(buttonUiNodeDto)
             Then("it should be a ButtonUiNode") {
@@ -43,17 +60,20 @@ class MappingTest : BehaviorSpec({
             Then("it should have the correct text") {
                 (uiNode as ButtonUiNode).text shouldBe "Click me"
             }
-            Then("it should have the correct onClick event") {
-                (uiNode as ButtonUiNode).onClick.type shouldBe "EVENT_TYPE"
+            Then("it should have the correct onClick action") {
+                val action = (uiNode as ButtonUiNode).onClick
+                action.shouldBeInstanceOf<SubmitButtonAction>()
+                action.trigger shouldBe "EVENT_TYPE"
             }
         }
     }
 
     Given("a ColumnUiNodeDto") {
         val columnUiNodeDto = ColumnUiNodeDto(
+            "column-1",
             children = listOf(
-                LabelUiNodeDto("I am a label"),
-                ButtonUiNodeDto("I am a button", EventDto("BUTTON_EVENT"))
+                LabelUiNodeDto("label-in-column", "I am a label"),
+                ButtonUiNodeDto("button-in-column", "I am a button", SubmitButtonActionDto("BUTTON_EVENT"))
             )
         )
         When("it is mapped to a domain object") {
@@ -74,7 +94,16 @@ class MappingTest : BehaviorSpec({
     }
 
     Given("a TextFieldUiNodeDto") {
-        val textFieldUiNodeDto = TextFieldUiNodeDto("initial text", "label", EventDto("TEXT_CHANGED"))
+        val textFieldUiNodeDto = TextFieldUiNodeDto(
+            "text-field-1",
+            "initial text",
+            "label",
+            InteractionDto("TEXT_CHANGED"),
+            listOf(
+                RequiredValidationRuleDto("Required"),
+                MinLengthValidationRuleDto("Too short", 5)
+            )
+        )
         When("it is mapped to a domain object") {
             val uiNode = uiNodeMapper.map(textFieldUiNodeDto)
             Then("it should be a TextFieldUiNode") {
@@ -86,14 +115,21 @@ class MappingTest : BehaviorSpec({
             Then("it should have the correct label") {
                 (uiNode as TextFieldUiNode).label shouldBe "label"
             }
-            Then("it should have the correct onTextChanged event") {
-                (uiNode as TextFieldUiNode).onTextChanged.type shouldBe "TEXT_CHANGED"
+            Then("it should have the correct onTextChanged interaction") {
+                (uiNode as TextFieldUiNode).onTextChanged.trigger shouldBe "TEXT_CHANGED"
+            }
+            Then("it should have the correct validators") {
+                val validators = (uiNode as TextFieldUiNode).validation
+                validators.size shouldBe 2
+                validators[0].shouldBeInstanceOf<RequiredValidationRule>()
+                val minLengthValidator = validators[1].shouldBeInstanceOf<MinLengthValidationRule>()
+                minLengthValidator.length shouldBe 5
             }
         }
     }
 
     Given("a ProgressIndicatorUiNodeDto") {
-        val progressIndicatorUiNodeDto = ProgressIndicatorUiNodeDto()
+        val progressIndicatorUiNodeDto = ProgressIndicatorUiNodeDto("progress-1")
         When("it is mapped to a domain object") {
             val uiNode = uiNodeMapper.map(progressIndicatorUiNodeDto)
             Then("it should be a ProgressIndicatorUiNode") {

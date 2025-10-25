@@ -8,17 +8,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
-// A simple test action that assigns a primitive value to the context.
-private data class AssignAction(
-    val key: String,
-    val value: Any,
-) : Action {
-    override fun execute(
-        context: Context,
-        event: Event,
-    ): Context = context.put(key, value)
-}
-
 // A test action that appends a string to a "trace" list in the context.
 private data class TraceAction(
     val name: String,

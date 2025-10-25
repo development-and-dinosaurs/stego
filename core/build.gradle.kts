@@ -11,7 +11,6 @@ plugins {
 }
 
 group = "uk.co.developmentanddinosaurs"
-version = "1.0.0"
 
 kotlin {
     jvm()
@@ -51,7 +50,6 @@ kotlin {
         }
 
         commonTest.dependencies {
-//            implementation(project(":serialisation:kotlinx"))
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.kotest.framework.engine)

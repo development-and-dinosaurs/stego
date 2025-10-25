@@ -34,4 +34,6 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle
-      run: ./gradlew check --scan
+      run: ./gradlew check sonar --scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

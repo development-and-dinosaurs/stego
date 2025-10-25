@@ -7,7 +7,6 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  * Actions are the primary mechanism for causing side effects and updating the machine's extended state.
  */
 fun interface Action {
-
     /**
      * Executes the logic of the action.
      *

@@ -6,16 +6,19 @@ import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValuePro
  * A recursive descent parser for creating composite guards from a string expression.
  *
  * This parser implements a specific grammar with the following rules:
+ *
  * 1.  **Strict Parenthesizing**: All expressions, simple or composite, must be enclosed in parentheses,
  *     with the only exception being the unary `NOT` (`!`) operator at the start of an expression.
  *     - Valid: `(a < b)`, `((a < b) && (c > d))`, `!(a < b)`
  *     - Invalid: `a < b`, `(a < b) && (c > d)`
+ *
  * 2.  **Operator Precedence** (from highest to lowest):
  *     - `()`: Grouping
  *     - `!`: Logical NOT
  *     - `&&`: Logical AND
  *     - `||`: Logical OR
  *     - `==, !=, <, <=, >, >=`: Comparison operators
+ *
  * 3.  **Operands**: Can be literals (e.g., `5`, `"hello"`, `true`) or dynamic values resolved
  *     from context (`{context.key}`) or events (`{event.key}`).
  */

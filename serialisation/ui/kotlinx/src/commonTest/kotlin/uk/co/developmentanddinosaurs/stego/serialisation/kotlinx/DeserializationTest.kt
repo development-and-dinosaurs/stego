@@ -38,7 +38,7 @@ class DeserializationTest : BehaviorSpec({
         classDiscriminator = "type"
     }
 
-    given("a JSON representation of a LabelUiNode") {
+    Given("a JSON representation of a LabelUiNode") {
         val labelJson = """
             {
                 "id": "label-1",
@@ -47,29 +47,29 @@ class DeserializationTest : BehaviorSpec({
             }
         """.trimIndent()
 
-        `when`("it is deserialized") {
+        When("it is deserialized") {
             val uiNodeDto = json.decodeFromString<UiNodeDto>(labelJson)
 
-            then("it should be a LabelUiNodeDto") {
+            Then("it should be a LabelUiNodeDto") {
                 uiNodeDto.shouldBeInstanceOf<LabelUiNodeDto>()
             }
-            then("it should have the correct text") {
+            Then("it should have the correct text") {
                 (uiNodeDto as LabelUiNodeDto).text shouldBe "I am a label"
             }
-            then("it should have the correct id") {
+            Then("it should have the correct id") {
                 uiNodeDto.id shouldBe "label-1"
             }
 
-            `when`("it is serialized back to JSON") {
+            When("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
-                then("the JSON should match the original") {
+                Then("the JSON should match the original") {
                     serializedJson shouldEqualJson labelJson
                 }
             }
         }
     }
 
-    given("a JSON representation of a ButtonUiNode") {
+    Given("a JSON representation of a ButtonUiNode") {
         val buttonJson = """
             {
                 "id": "button-1",
@@ -82,31 +82,31 @@ class DeserializationTest : BehaviorSpec({
             }
         """.trimIndent()
 
-        `when`("it is deserialized") {
+        When("it is deserialized") {
             val uiNodeDto = json.decodeFromString<UiNodeDto>(buttonJson)
 
-            then("it should be a ButtonUiNodeDto") {
+            Then("it should be a ButtonUiNodeDto") {
                 uiNodeDto.shouldBeInstanceOf<ButtonUiNodeDto>()
             }
-            then("it should have the correct text") {
+            Then("it should have the correct text") {
                 (uiNodeDto as ButtonUiNodeDto).text shouldBe "Click me"
             }
-            then("it should have the correct onClick action") {
+            Then("it should have the correct onClick action") {
                 val action = (uiNodeDto as ButtonUiNodeDto).onClick
                 action.shouldBeInstanceOf<SubmitButtonActionDto>()
                 action.trigger shouldBe "SUBMIT_EVENT"
             }
 
-            `when`("it is serialized back to JSON") {
+            When("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
-                then("the JSON should match the original") {
+                Then("the JSON should match the original") {
                     serializedJson shouldEqualJson buttonJson
                 }
             }
         }
     }
 
-    given("a JSON representation of a TextFieldUiNode") {
+    Given("a JSON representation of a TextFieldUiNode") {
         val textFieldJson = """
             {
                 "type": "text_field",
@@ -130,22 +130,22 @@ class DeserializationTest : BehaviorSpec({
             }
         """.trimIndent()
 
-        `when`("it is deserialized") {
+        When("it is deserialized") {
             val uiNodeDto = json.decodeFromString<UiNodeDto>(textFieldJson)
 
-            then("it should be a TextFieldUiNodeDto") {
+            Then("it should be a TextFieldUiNodeDto") {
                 uiNodeDto.shouldBeInstanceOf<TextFieldUiNodeDto>()
             }
-            then("it should have the correct text") {
+            Then("it should have the correct text") {
                 (uiNodeDto as TextFieldUiNodeDto).text shouldBe "initial text"
             }
-            then("it should have the correct label") {
+            Then("it should have the correct label") {
                 (uiNodeDto as TextFieldUiNodeDto).label shouldBe "label"
             }
-            then("it should have the correct onTextChanged interaction") {
+            Then("it should have the correct onTextChanged interaction") {
                 (uiNodeDto as TextFieldUiNodeDto).onTextChanged.trigger shouldBe "TEXT_CHANGED"
             }
-            then("it should have the correct validators") {
+            Then("it should have the correct validators") {
                 val validators = (uiNodeDto as TextFieldUiNodeDto).validators
                 validators.size shouldBe 2
                 validators[0].shouldBeInstanceOf<RequiredValidationRuleDto>()
@@ -154,16 +154,16 @@ class DeserializationTest : BehaviorSpec({
                 minLengthValidator.message shouldBe "Must be at least 3 characters"
             }
 
-            `when`("it is serialized back to JSON") {
+            When("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
-                then("the JSON should match the original") {
+                Then("the JSON should match the original") {
                     serializedJson shouldEqualJson textFieldJson
                 }
             }
         }
     }
 
-    given("a JSON representation of a ProgressIndicatorUiNode") {
+    Given("a JSON representation of a ProgressIndicatorUiNode") {
         val progressIndicatorJson = """
             {
                 "type": "progress_indicator",
@@ -171,23 +171,23 @@ class DeserializationTest : BehaviorSpec({
             }
         """.trimIndent()
 
-        `when`("it is deserialized") {
+        When("it is deserialized") {
             val uiNodeDto = json.decodeFromString<UiNodeDto>(progressIndicatorJson)
 
-            then("it should be a ProgressIndicatorUiNodeDto") {
+            Then("it should be a ProgressIndicatorUiNodeDto") {
                 uiNodeDto.shouldBeInstanceOf<ProgressIndicatorUiNodeDto>()
             }
 
-            `when`("it is serialized back to JSON") {
+            When("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
-                then("the JSON should match the original") {
+                Then("the JSON should match the original") {
                     serializedJson shouldEqualJson progressIndicatorJson
                 }
             }
         }
     }
 
-    given("a JSON representation of a ColumnUiNode") {
+    Given("a JSON representation of a ColumnUiNode") {
         val columnJson = """
             {
                 "type": "column",
@@ -211,32 +211,32 @@ class DeserializationTest : BehaviorSpec({
             }
         """.trimIndent()
 
-        `when`("it is deserialized") {
+        When("it is deserialized") {
             val uiNodeDto = json.decodeFromString<UiNodeDto>(columnJson)
 
-            then("it should be a ColumnUiNodeDto") {
+            Then("it should be a ColumnUiNodeDto") {
                 uiNodeDto.shouldBeInstanceOf<ColumnUiNodeDto>()
             }
-            then("it should have the correct number of children") {
+            Then("it should have the correct number of children") {
                 (uiNodeDto as ColumnUiNodeDto).children.size shouldBe 2
             }
-            then("the first child should be a LabelUiNodeDto") {
+            Then("the first child should be a LabelUiNodeDto") {
                 (uiNodeDto as ColumnUiNodeDto).children[0].shouldBeInstanceOf<LabelUiNodeDto>()
             }
-            then("the second child should be a ButtonUiNodeDto") {
+            Then("the second child should be a ButtonUiNodeDto") {
                 (uiNodeDto as ColumnUiNodeDto).children[1].shouldBeInstanceOf<ButtonUiNodeDto>()
             }
 
-            `when`("it is serialized back to JSON") {
+            When("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiNodeDto)
-                then("the JSON should match the original") {
+                Then("the JSON should match the original") {
                     serializedJson shouldEqualJson columnJson
                 }
             }
         }
     }
 
-    given("a JSON representation of a UiState") {
+    Given("a JSON representation of a UiState") {
         val uiStateJson = """
             {
                 "id": "testState",
@@ -248,20 +248,20 @@ class DeserializationTest : BehaviorSpec({
             }
         """.trimIndent()
 
-        `when`("it is deserialized") {
+        When("it is deserialized") {
             val uiStateDto = json.decodeFromString<UiStateDto>(uiStateJson)
 
-            then("it should have the correct id") {
+            Then("it should have the correct id") {
                 uiStateDto.id shouldBe "testState"
             }
-            then("it should have the correct view") {
+            Then("it should have the correct view") {
                 uiStateDto.uiNode.shouldBeInstanceOf<LabelUiNodeDto>()
                 uiStateDto.uiNode.text shouldBe "Test UiNode"
             }
 
-            `when`("it is serialized back to JSON") {
+            When("it is serialized back to JSON") {
                 val serializedJson = json.encodeToString(uiStateDto)
-                then("the JSON should match the original") {
+                Then("the JSON should match the original") {
                     serializedJson shouldEqualJson uiStateJson
                 }
             }

@@ -15,7 +15,6 @@ class RegistryActionMapper(private val actionRegistry: Map<KClass<out ActionDto>
      * Performs the mapping from DTO to domain object.
      */
     override fun map(dto: ActionDto): Action {
-        println("Mapping action")
         // First, check for built-in types
         return when (dto) {
             is AssignActionDto -> dto.toDomain()

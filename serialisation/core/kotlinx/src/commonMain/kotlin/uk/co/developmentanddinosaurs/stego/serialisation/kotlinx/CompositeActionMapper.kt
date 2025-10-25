@@ -12,7 +12,6 @@ class CompositeActionMapper(
     private val mapperMap: Map<KClass<out ActionDto>, ActionDtoMapper>
 ) : ActionDtoMapper {
     override fun map(dto: ActionDto): Action {
-        println("Mapping $dto")
         val mapper = mapperMap[dto::class]
             ?: throw StateMachineException("Unsupported ActionDto type: ${dto::class.simpleName}")
         return mapper.map(dto)

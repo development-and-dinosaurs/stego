@@ -1,8 +1,4 @@
-import com.android.build.api.dsl.androidLibrary
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.diffplug.spotless)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
@@ -14,34 +10,6 @@ group = "uk.co.developmentanddinosaurs"
 
 kotlin {
     jvm()
-    androidLibrary {
-        namespace = "uk.co.developmentanddinosaurs"
-        compileSdk =
-            libs.versions.android.compileSdk
-                .get()
-                .toInt()
-        minSdk =
-            libs.versions.android.minSdk
-                .get()
-                .toInt()
-
-        withJava()
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
-            }
-        }
-    }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-    linuxX64()
 
     sourceSets {
         commonMain.dependencies {

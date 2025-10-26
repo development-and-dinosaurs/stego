@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
  *
  * This class represents an action that assigns a value to a key in the state machine's context.
  * It is typically deserialized from a configuration file (e.g., JSON) and then mapped
- * to a domain [uk.co.developmentanddinosaurs.stego.statemachine.AssignAction] by the [ActionMapper].
+ * to a domain [uk.co.developmentanddinosaurs.stego.statemachine.AssignAction] by the [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionMapper].
  *
  * @property key The name of the variable in the context to assign the value to.
  * @property value The value to be assigned, represented as a [DataValueDto].

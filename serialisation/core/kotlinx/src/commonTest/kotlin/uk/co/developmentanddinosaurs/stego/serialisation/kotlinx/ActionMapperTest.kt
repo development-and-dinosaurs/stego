@@ -4,6 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.*
 import kotlin.reflect.KClass
 
@@ -64,7 +66,7 @@ class ActionMapperTest : BehaviorSpec({
     Given("an ActionMapper with a custom action mapper provided via a lambda") {
         val customMappers =
             mapOf<KClass<out ActionDto>, ActionDtoMapper>(
-                CustomActionDto::class to ActionDtoMapper { dto -> CustomAction((dto as CustomActionDto).data)},
+                CustomActionDto::class to ActionDtoMapper { dto -> CustomAction((dto as CustomActionDto).data) },
             )
         val mapper = ActionMapper(customMappers)
         val dto = CustomActionDto("custom data")

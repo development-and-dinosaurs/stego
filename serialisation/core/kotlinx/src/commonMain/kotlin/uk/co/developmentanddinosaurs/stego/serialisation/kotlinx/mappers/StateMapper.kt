@@ -1,5 +1,8 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogicStateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto
 import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition

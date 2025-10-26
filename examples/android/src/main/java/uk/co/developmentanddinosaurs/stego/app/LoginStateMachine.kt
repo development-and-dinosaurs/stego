@@ -6,6 +6,12 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.AssignActionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.CompositeStateMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.InvokableDefinitionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.LogActionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.LogicStateMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.TransitionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*

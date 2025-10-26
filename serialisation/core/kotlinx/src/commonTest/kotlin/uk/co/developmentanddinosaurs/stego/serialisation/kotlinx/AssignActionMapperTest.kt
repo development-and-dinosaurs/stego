@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.AssignActionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.AssignAction
 
 private data class OtherActionDto(val data: String) : ActionDto

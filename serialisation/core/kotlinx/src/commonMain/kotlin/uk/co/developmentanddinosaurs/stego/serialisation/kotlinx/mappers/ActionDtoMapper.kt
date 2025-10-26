@@ -1,5 +1,6 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 
 /**

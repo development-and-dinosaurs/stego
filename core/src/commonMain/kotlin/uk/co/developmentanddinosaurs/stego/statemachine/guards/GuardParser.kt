@@ -46,7 +46,7 @@ internal object GuardParser {
      */
     fun parse(expression: String): Guard {
         val trimmed = expression.trim()
-        if (trimmed.isBlank()) throw IllegalArgumentException("Expression cannot be empty.")
+        require(!(trimmed.isBlank())) { "Expression cannot be empty." }
         validateParentheses(trimmed)
 
         // A valid expression must either be a NOT expression or be fully enclosed in parentheses.

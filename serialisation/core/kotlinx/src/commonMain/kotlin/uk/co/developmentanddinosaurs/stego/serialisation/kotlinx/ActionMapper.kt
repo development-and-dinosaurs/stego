@@ -1,44 +1,68 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionMapper.Companion.defaultMappers
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 import kotlin.reflect.KClass
 
 /**
- * Maps serializable [ActionDto] objects to their corresponding domain [Action] implementations.
+ * Maps serializable [ActionDto] objects to their corresponding domain [Action] implementations
+ * using a configurable registry of mappers.
  *
  * This class acts as a bridge between the data transfer layer and the core state machine logic.
- * It has built-in support for standard actions like [AssignActionDto] and [LogActionDto].
- * For any other custom actions, it consults a provided registry.
+ * It is configured with a registry that maps DTO types to their specific [ActionDtoMapper].
  *
- * Built-in actions always take precedence over the registry.
+ * To use, provide a map of any custom mappers. These will be merged with the
+ * [defaultMappers]. Providing a custom mapper for a default type will override it.
  *
- * @param actionRegistry A map for registering custom action types. The key should be the
- *   [KClass] of the custom DTO, and the value should be a lambda that maps the DTO to its
- *   corresponding domain [Action].
- *   Example:
+ *   Example for adding a new custom action:
  *   ```
- *   val registry = mapOf(
- *       CustomActionDto::class to { dto -> (dto as CustomActionDto).toDomain() }
- *   )
- *   val mapper = ActionMapper(registry)
+ *   // This mapper will support AssignAction, LogAction, and CustomAction.
+ *   val mapper = ActionMapper(mapOf(
+ *       CustomActionDto::class to CustomActionMapper()
+ *   ))
  *   ```
+ *
+ *   Example for overriding a default action (e.g., for platform-specific logging):
+ *   ```
+ *   // On Android, you might do this to use Android's Logcat.
+ *   val androidLogMapper = LogActionMapper { message -> Log.d("StateMachine", message) }
+ *   val mapper = ActionMapper(mapOf(
+ *       LogActionDto::class to androidLogMapper
+ *   ))
+ *   ```
+ *
+ * @param customMappers A map of custom mappers to be added to the default set. If a key
+ *   in this map conflicts with a default mapper, the custom mapper will be used.
  */
-class ActionMapper(private val actionRegistry: Map<KClass<out ActionDto>, (ActionDto) -> Action>) {
+class ActionMapper(
+    customMappers: Map<KClass<out ActionDto>, ActionDtoMapper> = emptyMap(),
+) {
+    private val mappers: Map<KClass<out ActionDto>, ActionDtoMapper> = defaultMappers + customMappers
+
+    companion object {
+        /**
+         * A map containing the default, built-in action mappers provided by the library.
+         */
+        val defaultMappers: Map<KClass<out ActionDto>, ActionDtoMapper> =
+            mapOf(
+                AssignActionDto::class to AssignActionMapper(),
+                LogActionDto::class to LogActionMapper(),
+            )
+    }
+
     /**
      * Performs the mapping from a single [ActionDto] to its domain [Action] counterpart.
      *
      * @param dto The data transfer object to map.
      * @return The corresponding domain [Action] object.
      * @throws StateMachineException if the DTO type is not a built-in type and is not found
-     *   in the `actionRegistry`.
+     *   in the provided `mappers` registry.
      */
     fun map(dto: ActionDto): Action {
-        return when (dto) {
-            is AssignActionDto -> dto.toDomain()
-            is LogActionDto -> dto.toDomain()
-            else -> actionRegistry[dto::class]?.invoke(dto)
-                ?: throw StateMachineException("Action DTO type '${dto::class.simpleName}' not found in registry and is not a built-in type.")
-        }
+        val mapper =
+            mappers[dto::class]
+                ?: throw StateMachineException("Action DTO type '${dto::class.simpleName}' not found in mapper registry.")
+        return mapper.map(dto)
     }
 }

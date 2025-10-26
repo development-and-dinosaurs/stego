@@ -16,9 +16,13 @@ private data class CustomAction(val data: String) : Action {
     ): Context = context
 }
 
+private class OverridingAssignActionMapper : ActionDtoMapper {
+    override fun map(dto: ActionDto): Action = CustomAction("overridden")
+}
+
 class ActionMapperTest : BehaviorSpec({
-    Given("an ActionMapper with an empty registry") {
-        val mapper = ActionMapper(emptyMap())
+    Given("an ActionMapper with default mappers") {
+        val mapper = ActionMapper()
 
         and("a built-in AssignActionDto") {
             val dto = AssignActionDto("key", StringDataValueDto("value"))
@@ -49,16 +53,20 @@ class ActionMapperTest : BehaviorSpec({
 
             When("the dto is mapped") {
                 Then("it should throw a StateMachineException") {
-                    val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
-                    exception.message shouldBe "Action DTO type 'CustomActionDto' not found in registry and is not a built-in type."
+                    val exception =
+                        shouldThrow<StateMachineException> { mapper.map(dto) }
+                    exception.message shouldBe "Action DTO type 'CustomActionDto' not found in mapper registry."
                 }
             }
         }
     }
 
-    Given("an ActionMapper with a custom action in the registry") {
-        val registry = mapOf<KClass<out ActionDto>, (ActionDto) -> Action>(CustomActionDto::class to { dto: ActionDto -> CustomAction((dto as CustomActionDto).data) })
-        val mapper = ActionMapper(registry)
+    Given("an ActionMapper with a custom action mapper provided via a lambda") {
+        val customMappers =
+            mapOf<KClass<out ActionDto>, ActionDtoMapper>(
+                CustomActionDto::class to ActionDtoMapper { dto -> CustomAction((dto as CustomActionDto).data)},
+            )
+        val mapper = ActionMapper(customMappers)
         val dto = CustomActionDto("custom data")
 
         When("the custom dto is mapped") {
@@ -71,20 +79,20 @@ class ActionMapperTest : BehaviorSpec({
         }
     }
 
-    Given("an ActionMapper with a registry that shadows a built-in type") {
-        val customAssignAction = CustomAction("shadowed")
-        val registry =
-            mapOf<KClass<out ActionDto>, (ActionDto) -> Action>(
-                AssignActionDto::class to { customAssignAction },
+    Given("an ActionMapper that overrides a default mapper") {
+        val customMappers =
+            mapOf<KClass<out ActionDto>, ActionDtoMapper>(
+                AssignActionDto::class to OverridingAssignActionMapper(),
             )
-        val mapper = ActionMapper(registry)
+        val mapper = ActionMapper(customMappers)
         val dto = AssignActionDto("key", StringDataValueDto("value"))
 
         When("the built-in dto is mapped") {
             val action = mapper.map(dto)
 
-            Then("it should return the built-in action, not the one from the registry") {
-                action.shouldBeInstanceOf<AssignAction>()
+            Then("it should return the overridden action") {
+                action.shouldBeInstanceOf<CustomAction>()
+                action.data shouldBe "overridden"
             }
         }
     }

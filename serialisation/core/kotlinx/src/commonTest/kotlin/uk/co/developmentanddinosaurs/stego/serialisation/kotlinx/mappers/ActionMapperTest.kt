@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -10,7 +10,8 @@ import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionM
 import uk.co.developmentanddinosaurs.stego.statemachine.*
 import kotlin.reflect.KClass
 
-private data class CustomActionDto(val data: String) : ActionDto
+private data class CustomActionDto(val data: String) :
+    uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
 
 private data class CustomAction(val data: String) : Action {
     override fun execute(
@@ -20,7 +21,7 @@ private data class CustomAction(val data: String) : Action {
 }
 
 private class OverridingAssignActionMapper : ActionDtoMapper {
-    override fun map(dto: ActionDto): Action = CustomAction("overridden")
+    override fun map(dto: uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto): Action = CustomAction("overridden")
 }
 
 class ActionMapperTest : BehaviorSpec({
@@ -28,7 +29,10 @@ class ActionMapperTest : BehaviorSpec({
         val mapper = ActionMapper()
 
         and("a built-in AssignActionDto") {
-            val dto = AssignActionDto("key", StringDataValueDto("value"))
+            val dto = _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.AssignActionDto(
+                "key",
+                StringDataValueDto("value")
+            )
 
             When("the dto is mapped") {
                 val action = mapper.map(dto)
@@ -40,7 +44,8 @@ class ActionMapperTest : BehaviorSpec({
         }
 
         and("a built-in LogActionDto") {
-            val dto = LogActionDto("message")
+            val dto =
+                _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogActionDto("message")
 
             When("the dto is mapped") {
                 val action = mapper.map(dto)
@@ -66,7 +71,7 @@ class ActionMapperTest : BehaviorSpec({
 
     Given("an ActionMapper with a custom action mapper provided via a lambda") {
         val customMappers =
-            mapOf<KClass<out ActionDto>, ActionDtoMapper>(
+            mapOf<KClass<out uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto>, ActionDtoMapper>(
                 CustomActionDto::class to ActionDtoMapper { dto -> CustomAction((dto as CustomActionDto).data) },
             )
         val mapper = ActionMapper(customMappers)
@@ -84,11 +89,14 @@ class ActionMapperTest : BehaviorSpec({
 
     Given("an ActionMapper that overrides a default mapper") {
         val customMappers =
-            mapOf<KClass<out ActionDto>, ActionDtoMapper>(
-                AssignActionDto::class to OverridingAssignActionMapper(),
+            mapOf<KClass<out uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto>, ActionDtoMapper>(
+                _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.AssignActionDto::class to OverridingAssignActionMapper(),
             )
         val mapper = ActionMapper(customMappers)
-        val dto = AssignActionDto("key", StringDataValueDto("value"))
+        val dto = _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.AssignActionDto(
+            "key",
+            StringDataValueDto("value")
+        )
 
         When("the built-in dto is mapped") {
             val action = mapper.map(dto)

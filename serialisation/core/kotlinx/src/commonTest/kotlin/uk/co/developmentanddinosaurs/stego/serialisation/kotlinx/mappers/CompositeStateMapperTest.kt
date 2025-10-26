@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -17,35 +17,35 @@ import kotlin.reflect.KClass
 private data class SimpleStateDto(
     override val id: String,
     override val initial: String? = null,
-    override val invoke: InvokableDefinitionDto? = null,
-    override val on: Map<String, List<TransitionDto>> = emptyMap(),
-    override val onEntry: List<ActionDto> = emptyList(),
-    override val onExit: List<ActionDto> = emptyList(),
-    override val states: Map<String, StateDto> = emptyMap(),
-) : StateDto
+    override val invoke: uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto? = null,
+    override val on: Map<String, List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto>> = emptyMap(),
+    override val onEntry: List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto> = emptyList(),
+    override val onExit: List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto> = emptyList(),
+    override val states: Map<String, uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto> = emptyMap(),
+) : uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
 
 private data class HierarchicalStateDto(
     override val id: String,
-    override val states: Map<String, StateDto> = emptyMap(),
+    override val states: Map<String, uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto> = emptyMap(),
     override val initial: String? = null,
-    override val invoke: InvokableDefinitionDto? = null,
-    override val on: Map<String, List<TransitionDto>> = emptyMap(),
-    override val onEntry: List<ActionDto> = emptyList(),
-    override val onExit: List<ActionDto> = emptyList(),
-) : StateDto
+    override val invoke: uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto? = null,
+    override val on: Map<String, List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto>> = emptyMap(),
+    override val onEntry: List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto> = emptyList(),
+    override val onExit: List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto> = emptyList(),
+) : uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
 
 private data class UnknownStateDto(
     override val id: String,
     override val initial: String? = null,
-    override val invoke: InvokableDefinitionDto? = null,
-    override val on: Map<String, List<TransitionDto>> = emptyMap(),
-    override val onEntry: List<ActionDto> = emptyList(),
-    override val onExit: List<ActionDto> = emptyList(),
-    override val states: Map<String, StateDto> = emptyMap(),
-) : StateDto
+    override val invoke: uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto? = null,
+    override val on: Map<String, List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto>> = emptyMap(),
+    override val onEntry: List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto> = emptyList(),
+    override val onExit: List<uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto> = emptyList(),
+    override val states: Map<String, uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto> = emptyMap(),
+) : uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
 
 private class SimpleStateMapper : StateDtoMapper {
-    override fun map(dto: StateDto): State {
+    override fun map(dto: uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto): State {
         require(dto is SimpleStateDto)
         return LogicState(dto.id)
     }
@@ -54,7 +54,7 @@ private class SimpleStateMapper : StateDtoMapper {
 private class HierarchicalStateMapper(
     private val compositeStateMapper: StateDtoMapper,
 ) : StateDtoMapper {
-    override fun map(dto: StateDto): State {
+    override fun map(dto: uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto): State {
         require(dto is HierarchicalStateDto)
         return LogicState(
             id = dto.id,
@@ -65,7 +65,7 @@ private class HierarchicalStateMapper(
 
 class CompositeStateMapperTest : BehaviorSpec({
     val mapperFactories =
-        mapOf<KClass<out StateDto>, (StateDtoMapper) -> StateDtoMapper>(
+        mapOf<KClass<out uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto>, (StateDtoMapper) -> StateDtoMapper>(
             SimpleStateDto::class to { _ -> SimpleStateMapper() },
             HierarchicalStateDto::class to { compositeMapper -> HierarchicalStateMapper(compositeMapper) },
         )
@@ -75,7 +75,7 @@ class CompositeStateMapperTest : BehaviorSpec({
 
         and("a simple state machine definition") {
             val dto =
-                StateMachineDefinitionDto(
+                _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto(
                     initial = "Initial",
                     states = mapOf("Initial" to SimpleStateDto("Initial")),
                 )
@@ -93,15 +93,15 @@ class CompositeStateMapperTest : BehaviorSpec({
 
         and("a hierarchical state machine definition") {
             val dto =
-                StateMachineDefinitionDto(
+                _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto(
                     initial = "Parent",
                     states =
                         mapOf(
                             "Parent" to
-                                HierarchicalStateDto(
-                                    id = "Parent",
-                                    states = mapOf("Child" to SimpleStateDto("Child")),
-                                ),
+                                    HierarchicalStateDto(
+                                        id = "Parent",
+                                        states = mapOf("Child" to SimpleStateDto("Child")),
+                                    ),
                         ),
                 )
 
@@ -118,7 +118,7 @@ class CompositeStateMapperTest : BehaviorSpec({
 
         and("a definition with an unknown state type") {
             val dto =
-                StateMachineDefinitionDto(
+                _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto(
                     initial = "Initial",
                     states = mapOf("Initial" to UnknownStateDto("Initial")),
                 )
@@ -133,7 +133,7 @@ class CompositeStateMapperTest : BehaviorSpec({
 
         and("a definition with a null initial context value") {
             val dto =
-                StateMachineDefinitionDto(
+                _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto(
                     initial = "Initial",
                     states = mapOf("Initial" to SimpleStateDto("Initial")),
                     initialContext = mapOf("badValue" to NullDataValueDto),

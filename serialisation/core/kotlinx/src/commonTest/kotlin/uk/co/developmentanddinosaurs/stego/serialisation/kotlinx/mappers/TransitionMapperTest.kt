@@ -7,22 +7,10 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TestAction
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TestActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto
-import uk.co.developmentanddinosaurs.stego.statemachine.Action
-import uk.co.developmentanddinosaurs.stego.statemachine.Context
-import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.EqualsGuard
-
-// Test-specific action DTO and action for verifying the action mapper is called.
-private data class TestActionDto(val data: String) : ActionDto
-
-private data class TestAction(val data: String) : Action {
-    override fun execute(
-        context: Context,
-        event: Event,
-    ): Context = context
-}
 
 class TransitionMapperTest : BehaviorSpec({
     // A simple action mapper for testing purposes.

@@ -8,20 +8,8 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
-import uk.co.developmentanddinosaurs.stego.statemachine.Action
-import uk.co.developmentanddinosaurs.stego.statemachine.Context
-import uk.co.developmentanddinosaurs.stego.statemachine.Event
+import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
-
-// Test-specific DTOs and Actions for verification
-private data class TestActionDto(val data: String) : ActionDto
-
-private data class TestAction(val data: String) : Action {
-    override fun execute(
-        context: Context,
-        event: Event,
-    ): Context = context
-}
 
 private data class OtherStateDto(
     override val id: String,
@@ -33,6 +21,10 @@ private data class OtherStateDto(
     override val states: Map<String, StateDto> = emptyMap(),
 ) : StateDto
 
+private object TestInvokable : Invokable {
+    override suspend fun invoke(input: Map<String, Any?>) = throw NotImplementedError("Not used in this test")
+}
+
 class LogicStateMapperTest : BehaviorSpec({
     // Create mock/stub mappers for dependency injection
     val actionMapper = ActionMapper(
@@ -40,7 +32,8 @@ class LogicStateMapperTest : BehaviorSpec({
             TestActionDto::class to ActionDtoMapper { dto -> TestAction((dto as TestActionDto).data) },
         ),
     )
-    val invokableMapper = InvokableDefinitionMapper()
+    val invokableRegistry = mapOf("testSrc" to TestInvokable)
+    val invokableMapper = InvokableDefinitionMapper(invokableRegistry)
     val transitionMapper = TransitionMapper(actionMapper)
 
     // A simple state mapper for testing recursive calls
@@ -115,6 +108,7 @@ class LogicStateMapperTest : BehaviorSpec({
                 Then("it should map the invokable definition correctly") {
                     state.invoke.shouldNotBeNull()
                     state.invoke?.id shouldBe "testInvoke"
+                    state.invoke?.src shouldBe TestInvokable
                 }
             }
         }

@@ -1,21 +1,22 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.OtherActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.StringDataValueDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.AssignActionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.AssignAction
-
-private data class OtherActionDto(val data: String) : ActionDto
 
 class AssignActionMapperTest : BehaviorSpec({
     Given("an AssignActionMapper") {
         val mapper = AssignActionMapper()
 
         and("an AssignActionDto") {
-            val dto = AssignActionDto("testKey", StringDataValueDto("testValue"))
+            val dto = _root_ide_package_.uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.AssignActionDto(
+                "testKey",
+                StringDataValueDto("testValue")
+            )
 
             When("the dto is mapped") {
                 val action = mapper.map(dto)

@@ -8,6 +8,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.BooleanDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.NullDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.NumberDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.StringDataValueDto
 
 class DeserialisationTest : BehaviorSpec({
 

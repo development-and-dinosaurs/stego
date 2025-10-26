@@ -39,7 +39,7 @@ class StateMachineEngine(
 
         validateDefinition()
 
-        val initialState = stateMap[definition.initial]!! // We've just validated this is here
+        val initialState = stateMap.getValue(definition.initial)
         _output = MutableStateFlow(StateMachineOutput(initialState, Context(definition.initialContext)))
 
         enterState(initialState, Event("stego.internal.init"))
@@ -65,13 +65,19 @@ class StateMachineEngine(
      */
     private fun processEvent(event: Event) {
         try {
-            val sourceState = output.value.state
-            val transition = findTransition(event) ?: return
-
-            val targetState = resolveTargetState(transition)
-            if (targetState != null) {
-                executeTransition(sourceState, targetState, transition, event)
+            val currentState = output.value.state
+            val (transitionSourceState, transition) = findTransition(event) ?: return
+            if (transition.target == null) {
+                val tempContext =
+                    output.value.context.let { context ->
+                        transition.actions.fold(context) { acc, action -> action.execute(acc, event) }
+                    }
+                _output.value = _output.value.copy(context = tempContext)
+                return
             }
+
+            val targetState = stateMap.getValue(transition.target)
+            executeTransition(currentState, transitionSourceState, targetState, transition, event)
         } catch (e: Exception) {
             if (event.type == "error.execution") {
                 return
@@ -91,8 +97,10 @@ class StateMachineEngine(
         }
         for (state in stateMap.values) {
             state.on.values.flatten().forEach { transition ->
-                if (!stateMap.containsKey(transition.target)) {
-                    throw StateMachineException("State '${state.id}' has a transition to non-existent target state '${transition.target}'.")
+                transition.target?.let { target ->
+                    if (!stateMap.containsKey(target)) {
+                        throw StateMachineException("State '${state.id}' has a transition to non-existent target state '$target'.")
+                    }
                 }
             }
             state.initial?.let { initialId ->
@@ -103,21 +111,22 @@ class StateMachineEngine(
         }
     }
 
-    private fun findTransition(event: Event): Transition? {
+    private fun findTransition(event: Event): Pair<State, Transition>? {
         var currentState: State? = output.value.state
         while (currentState != null) {
             val transition =
                 currentState.on[event.type]?.firstOrNull { transition ->
                     transition.guard?.evaluate(output.value.context, event) ?: true
                 }
-            if (transition != null) return transition
+            if (transition != null) return currentState to transition
             currentState = findParentState(currentState.id)
         }
         return null
     }
 
     private fun executeTransition(
-        sourceState: State,
+        currentState: State,
+        transitionSourceState: State,
         targetState: State,
         transition: Transition,
         event: Event,
@@ -125,20 +134,21 @@ class StateMachineEngine(
         activeInvokableJob?.cancel()
         activeInvokableJob = null
 
-        val sourcePath =
-            getPathToState(sourceState.id)
-                ?: throw StateMachineException("Failed to find path to source state '${sourceState.id}'. Definition may be inconsistent.")
-        val targetPath =
-            getPathToState(targetState.id)
-                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'. Definition may be inconsistent.")
+        // The state machine's validation guarantees these paths will exist.
+        val sourcePath = getPathToState(currentState.id)
+        val targetPath = getPathToState(targetState.id)
 
         val lcaIndex =
             (0 until min(sourcePath.size, targetPath.size))
                 .firstOrNull { i -> sourcePath[i].id != targetPath[i].id }
-                ?.let { it - 1 }
-                ?: (min(sourcePath.size, targetPath.size) - 1)
+                ?.let { it - 1 } ?: (min(sourcePath.size, targetPath.size) - 1)
 
-        val statesToExit = sourcePath.subList(lcaIndex + 1, sourcePath.size).reversed()
+        // If the source and target are the same, we need to exit and re-enter the state.
+        // Decrementing the LCA index achieves this by including the state in the exit/entry paths.
+        val finalLcaIndex =
+            if (transitionSourceState.id == targetState.id) lcaIndex - 1 else lcaIndex
+
+        val statesToExit = sourcePath.subList(finalLcaIndex + 1, sourcePath.size).reversed()
 
         var tempContext = output.value.context
 
@@ -149,7 +159,7 @@ class StateMachineEngine(
         tempContext = transition.actions.fold(tempContext) { acc, action -> action.execute(acc, event) }
         _output.value = _output.value.copy(context = tempContext)
 
-        val statesToEnter = targetPath.subList(lcaIndex + 1, targetPath.size)
+        val statesToEnter = targetPath.subList(finalLcaIndex + 1, targetPath.size)
         enterState(targetState, event, statesToEnter)
     }
 
@@ -158,9 +168,7 @@ class StateMachineEngine(
         event: Event,
         statesToEnter: List<State>? = null,
     ) {
-        val path =
-            statesToEnter ?: getPathToState(targetState.id)
-                ?: throw StateMachineException("Failed to find path to target state '${targetState.id}'.")
+        val path = statesToEnter ?: getPathToState(targetState.id)
 
         var tempContext = output.value.context
 
@@ -170,13 +178,16 @@ class StateMachineEngine(
 
         var finalTargetState = targetState
         val descentPath = mutableListOf<State>()
-        while (finalTargetState.initial != null) {
-            val nextStateId = finalTargetState.initial
-            val nextState =
-                finalTargetState.states[nextStateId]
-                    ?: throw StateMachineException("Nested initial state '$nextStateId' not found in parent '${finalTargetState.id}'.")
-            descentPath.add(nextState)
-            finalTargetState = nextState
+        // Only descend into initial substates if we are actually entering the target state,
+        // not just transitioning to it as an ancestor.
+        if (path.isNotEmpty()) {
+            while (finalTargetState.initial != null) {
+                val nextStateId = finalTargetState.initial
+                // The validation in the constructor guarantees that this nested initial state will always exist.
+                val nextState = finalTargetState.states[nextStateId]!!
+                descentPath.add(nextState)
+                finalTargetState = nextState
+            }
         }
 
         descentPath.forEach { state ->
@@ -189,7 +200,10 @@ class StateMachineEngine(
             activeInvokableJob =
                 scope.launch {
                     val resolvedParams =
-                        it.input.map { input -> input.key to ValueProvider.resolve(input.value).get(_output.value.context, null) }.toMap()
+                        it.input
+                            .map { input ->
+                                input.key to ValueProvider.resolve(input.value).get(_output.value.context, null)
+                            }.toMap()
                     try {
                         when (
                             val result = it.src.invoke(resolvedParams)
@@ -214,15 +228,11 @@ class StateMachineEngine(
         }
     }
 
-    private fun resolveTargetState(transition: Transition): State? = findStateById(transition.target)
-
-    private fun findStateById(id: String): State? = stateMap[id]
-
     private fun findParentState(childId: String): State? = parentMap[childId]
 
-    private fun getPathToState(stateId: String): List<State>? {
+    private fun getPathToState(stateId: String): List<State> {
         val path = mutableListOf<State>()
-        var current = stateMap[stateId] ?: return null
+        var current = stateMap.getValue(stateId)
         while (true) {
             path.add(current)
             current = parentMap[current.id] ?: break

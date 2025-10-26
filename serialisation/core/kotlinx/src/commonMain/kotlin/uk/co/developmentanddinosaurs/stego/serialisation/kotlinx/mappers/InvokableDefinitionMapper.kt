@@ -1,11 +1,12 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.InvokableDefinition
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 
 /**
- * Maps an [InvokableDefinitionDto] to an [InvokableDefinition] domain object.
+ * Maps an [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto] to an [InvokableDefinition] domain object.
  *
  * @param invokableRegistry A map where keys are string identifiers and values are the corresponding [Invokable] implementations.
  */

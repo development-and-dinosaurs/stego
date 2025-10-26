@@ -30,8 +30,8 @@ private fun RenderInternal(
     val onStateChange = { id: String, state: FieldState -> formFields[id] = state }
     val focusManager = LocalFocusManager.current
 
-    val interactionHandler: UserInteractionHandler = {
-        interactionId, data -> onEvent(Event(interactionId, data))
+    val interactionHandler: UserInteractionHandler = { interactionId, data ->
+        onEvent(Event(interactionId, data))
     }
 
     fun handleSubmit(buttonNode: ButtonUiNode) {

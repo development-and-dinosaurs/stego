@@ -2,13 +2,14 @@ package uk.co.developmentanddinosaurs.stego.statemachine.guards
 
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
+import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
 
 /**
  * A guard that checks if a 'left' value is greater than a 'right' value.
  */
 class GreaterThanGuard(
-    private val left: Any,
-    private val right: Any,
+    private val left: ValueProvider,
+    private val right: ValueProvider,
 ) : Guard {
     override fun evaluate(
         context: Context,

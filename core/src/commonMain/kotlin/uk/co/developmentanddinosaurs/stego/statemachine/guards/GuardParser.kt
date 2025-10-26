@@ -1,19 +1,24 @@
 package uk.co.developmentanddinosaurs.stego.statemachine.guards
 
+import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
+
 /**
  * A recursive descent parser for creating composite guards from a string expression.
  *
  * This parser implements a specific grammar with the following rules:
+ *
  * 1.  **Strict Parenthesizing**: All expressions, simple or composite, must be enclosed in parentheses,
  *     with the only exception being the unary `NOT` (`!`) operator at the start of an expression.
  *     - Valid: `(a < b)`, `((a < b) && (c > d))`, `!(a < b)`
  *     - Invalid: `a < b`, `(a < b) && (c > d)`
+ *
  * 2.  **Operator Precedence** (from highest to lowest):
  *     - `()`: Grouping
  *     - `!`: Logical NOT
  *     - `&&`: Logical AND
  *     - `||`: Logical OR
  *     - `==, !=, <, <=, >, >=`: Comparison operators
+ *
  * 3.  **Operands**: Can be literals (e.g., `5`, `"hello"`, `true`) or dynamic values resolved
  *     from context (`{context.key}`) or events (`{event.key}`).
  */
@@ -41,6 +46,7 @@ internal object GuardParser {
      */
     fun parse(expression: String): Guard {
         val trimmed = expression.trim()
+        require(!(trimmed.isBlank())) { "Expression cannot be empty." }
         validateParentheses(trimmed)
 
         // A valid expression must either be a NOT expression or be fully enclosed in parentheses.
@@ -66,10 +72,9 @@ internal object GuardParser {
         // If no composite operators are found, it must be a simple comparison.
         COMPARISON_OPERATOR_MAP.forEach { (op, constructor) ->
             findSplitPoint(innerExpression, op)?.let {
-                return constructor(
-                    innerExpression.substring(0, it).trim(),
-                    innerExpression.substring(it + op.length).trim(),
-                )
+                val left = ValueProvider.resolve(innerExpression.substring(0, it).trim())
+                val right = ValueProvider.resolve(innerExpression.substring(it + op.length).trim())
+                return constructor(left, right)
             }
         }
         // If the content inside the parentheses is not a valid composite or simple expression, recurse.
@@ -104,8 +109,6 @@ internal object GuardParser {
      * For example, `(a && b)` is true, but `(a) && (b)` is false.
      */
     private fun isEnclosedByParentheses(expression: String): Boolean {
-        if (!expression.startsWith("(") || !expression.endsWith(")")) return false
-
         var parenDepth = 0
         for (i in 0 until expression.length - 1) {
             when (expression[i]) {

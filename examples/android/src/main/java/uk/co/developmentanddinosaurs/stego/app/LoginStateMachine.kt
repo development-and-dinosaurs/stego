@@ -6,6 +6,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.*
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
@@ -35,7 +36,7 @@ object LoginInvokable : Invokable {
     }
 }
 
-fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context): String {
+fun loadLoginStateMachineDefinitionJsonString(context: android.content.Context): String {
     val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
     val reader = InputStreamReader(inputStream)
     val jsonString = reader.readText()
@@ -49,7 +50,7 @@ private val json = Json {
             subclass(LogicStateDto::class)
             subclass(UiStateDto::class)
         }
-        polymorphic(ActionDto::class){
+        polymorphic(ActionDto::class) {
             subclass(LogActionDto::class)
             subclass(AssignActionDto::class)
         }
@@ -72,11 +73,12 @@ private val json = Json {
     }
 }
 
-fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
+fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto =
+    json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
 
 fun stateDef(context: android.content.Context): StateMachineDefinition {
     val invokableMapper = InvokableDefinitionMapper(mapOf("LoginInvokable" to LoginInvokable))
-    val actionMapper = CompositeActionMapper(
+    val actionMapper = ActionMapper(
         mapOf(
             AssignActionDto::class to AssignActionMapper(),
             LogActionDto::class to LogActionMapper { message -> println(message) }
@@ -101,7 +103,7 @@ fun stateDef(context: android.content.Context): StateMachineDefinition {
     val compositeStateMapper = CompositeStateMapper(
         mapperFactories = mapOf(
             LogicStateDto::class to { stateMapper ->
-                LogicStateMapper(stateMapper, invokableMapper, transitionMapper, actionMapper)
+                LogicStateMapper(actionMapper, invokableMapper, transitionMapper, stateMapper)
             },
             UiStateDto::class to { stateMapper ->
                 UiStateMapper(stateMapper, actionMapper, invokableMapper, transitionMapper, uiNodeMapper)

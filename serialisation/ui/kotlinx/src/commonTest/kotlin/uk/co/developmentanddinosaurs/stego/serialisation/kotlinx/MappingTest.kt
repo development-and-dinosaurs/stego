@@ -4,9 +4,9 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLengthValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredValidationRuleDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*
 import uk.co.developmentanddinosaurs.stego.ui.node.*
 import uk.co.developmentanddinosaurs.stego.ui.validators.MinLengthValidationRule
 import uk.co.developmentanddinosaurs.stego.ui.validators.RequiredValidationRule

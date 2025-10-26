@@ -1,6 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.Serializable
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.DataValueDto
 
 @Serializable
 data class StateMachineDefinitionDto(

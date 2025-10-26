@@ -1,8 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.Serializable
-import uk.co.developmentanddinosaurs.stego.statemachine.Transition
-import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
 @Serializable
 data class TransitionDto(

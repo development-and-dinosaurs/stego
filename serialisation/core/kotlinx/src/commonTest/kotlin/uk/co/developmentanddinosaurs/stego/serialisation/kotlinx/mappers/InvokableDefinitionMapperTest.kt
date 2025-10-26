@@ -1,9 +1,13 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.BooleanDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.NumberDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.StringDataValueDto
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
@@ -34,12 +38,12 @@ class InvokableDefinitionMapperTest : BehaviorSpec({
                 definition.id shouldBe "testId"
                 definition.src shouldBe dummyInvokable
                 definition.input shouldContainExactly
-                    mapOf<String, Any?>(
-                        "literalString" to "hello",
-                        "literalLong" to 123L,
-                        "literalDouble" to 45.6,
-                        "literalBoolean" to true
-                    )
+                        mapOf<String, Any?>(
+                            "literalString" to "hello",
+                            "literalLong" to 123L,
+                            "literalDouble" to 45.6,
+                            "literalBoolean" to true
+                        )
             }
         }
     }

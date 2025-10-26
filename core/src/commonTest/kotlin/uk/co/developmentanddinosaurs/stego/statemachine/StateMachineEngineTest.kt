@@ -185,10 +185,10 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT" to
-                                    listOf(
-                                        Transition(target = "Next", guard = falseGuard),
-                                        Transition(target = "Other", guard = trueGuard),
-                                    ),
+                                listOf(
+                                    Transition(target = "Next", guard = falseGuard),
+                                    Transition(target = "Other", guard = trueGuard),
+                                ),
                         ),
                 )
             val nextState = LogicState(id = "Next")
@@ -499,12 +499,12 @@ class StateMachineEngineTest :
                         .first { it.state == childTwo }
                         .context
                         .get("trace") shouldBe
-                            listOf(
-                                "parent_entry",
-                                "childOne_entry",
-                                "childOne_exit",
-                                "childTwo_entry",
-                            )
+                        listOf(
+                            "parent_entry",
+                            "childOne_entry",
+                            "childOne_exit",
+                            "childTwo_entry",
+                        )
                 }
             }
         }
@@ -556,13 +556,13 @@ class StateMachineEngineTest :
 
                     engine.output.value.context
                         .get("trace") shouldBe
-                            listOf(
-                                "l1_entry",
-                                "l2_entry",
-                                "l3_entry",
-                                "l4_entry",
-                                "l5_entry",
-                            )
+                        listOf(
+                            "l1_entry",
+                            "l2_entry",
+                            "l3_entry",
+                            "l4_entry",
+                            "l5_entry",
+                        )
                 }
             }
         }
@@ -617,12 +617,12 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT_A" to
-                                    listOf(
-                                        Transition(
-                                            target = "StateB",
-                                            actions = listOf(DelayAction(10)),
-                                        ),
+                                listOf(
+                                    Transition(
+                                        target = "StateB",
+                                        actions = listOf(DelayAction(10)),
                                     ),
+                                ),
                         ),
                 )
             val definition =

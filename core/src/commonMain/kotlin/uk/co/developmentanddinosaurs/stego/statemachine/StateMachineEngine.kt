@@ -68,9 +68,10 @@ class StateMachineEngine(
             val currentState = output.value.state
             val (transitionSourceState, transition) = findTransition(event) ?: return
             if (transition.target == null) {
-                val tempContext = output.value.context.let { context ->
-                    transition.actions.fold(context) { acc, action -> action.execute(acc, event) }
-                }
+                val tempContext =
+                    output.value.context.let { context ->
+                        transition.actions.fold(context) { acc, action -> action.execute(acc, event) }
+                    }
                 _output.value = _output.value.copy(context = tempContext)
                 return
             }
@@ -199,9 +200,10 @@ class StateMachineEngine(
             activeInvokableJob =
                 scope.launch {
                     val resolvedParams =
-                        it.input.map { input ->
-                            input.key to ValueProvider.resolve(input.value).get(_output.value.context, null)
-                        }.toMap()
+                        it.input
+                            .map { input ->
+                                input.key to ValueProvider.resolve(input.value).get(_output.value.context, null)
+                            }.toMap()
                     try {
                         when (
                             val result = it.src.invoke(resolvedParams)

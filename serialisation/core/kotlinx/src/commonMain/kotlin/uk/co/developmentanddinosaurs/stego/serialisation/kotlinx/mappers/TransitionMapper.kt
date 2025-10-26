@@ -12,7 +12,7 @@ class TransitionMapper(private val actionMapper: ActionDtoMapper) {
         return Transition(
             target = dto.target,
             actions = dto.actions.map { actionMapper.map(it) },
-            guard = dto.guard?.let { Guard.Companion.create(it) }
+            guard = dto.guard?.let { Guard.create(it) }
         )
     }
 }

@@ -2,15 +2,29 @@ package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.LogAction
-import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 
 /**
- * Maps a [LogActionDto] to a [LogAction] domain object.
+ * A specific mapper responsible for converting a [LogActionDto] into a [LogAction].
+ *
+ * This mapper is designed for a single purpose and will fail if provided with any DTO
+ * other than [LogActionDto]. It is typically used as part of a larger mapping strategy,
+ * for example, within the [ActionMapper] registry.
+ *
+ * @param logger A lambda that defines the logging implementation (e.g., `println`, `Log.d`, etc.).
+ * Defaults to `println`.
  */
-class LogActionMapper(private val logger: (String) -> Unit) : ActionDtoMapper {
+class LogActionMapper(
+    private val logger: (String) -> Unit = ::println,
+) : ActionDtoMapper {
+    /**
+     * Maps a [LogActionDto] to its domain [LogAction] counterpart.
+     *
+     * @param dto The data transfer object to map. Must be an instance of [LogActionDto].
+     * @return The corresponding domain [LogAction] object.
+     * @throws IllegalArgumentException if the provided `dto` is not a [LogActionDto].
+     */
     override fun map(dto: ActionDto): Action {
-        val logActionDto = dto as? LogActionDto
-            ?: throw StateMachineException("LogActionMapper can only map LogActionDto")
-        return LogAction(logActionDto.message, logger)
+        require(dto is LogActionDto) { "LogActionMapper can only map LogActionDto" }
+        return LogAction(dto.message, logger)
     }
 }

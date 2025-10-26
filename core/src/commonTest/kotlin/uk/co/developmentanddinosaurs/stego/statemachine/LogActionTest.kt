@@ -8,20 +8,35 @@ class LogActionTest :
         val event = Event("TEST_EVENT")
         val context = Context()
 
-        Given("a LogAction with a literal message") {
+        Given("a logger") {
             var loggedMessage: String? = null
             val logger: (String) -> Unit = { loggedMessage = it }
-            val action = LogAction("Hello, World!", logger)
 
-            When("the action is executed") {
-                val newContext = action.execute(context, event)
+            and("a LogAction with a literal message") {
+                val action = LogAction("Hello, World!", logger)
 
-                Then("it should call the logger with the correct message") {
-                    loggedMessage shouldBe "LogAction: Hello, World!"
+                When("the action is executed") {
+                    val newContext = action.execute(context, event)
+
+                    Then("it should call the logger with the correct message") {
+                        loggedMessage shouldBe "LogAction: Hello, World!"
+                    }
+
+                    and("it should return the context unmodified") {
+                        newContext shouldBe context
+                    }
                 }
+            }
 
-                and("it should return the context unmodified") {
-                    newContext shouldBe context
+            and("a LogAction with an empty message") {
+                val action = LogAction("", logger)
+
+                When("the action is executed") {
+                    action.execute(context, event)
+
+                    Then("it should call the logger with the correct empty message") {
+                        loggedMessage shouldBe "LogAction: "
+                    }
                 }
             }
         }

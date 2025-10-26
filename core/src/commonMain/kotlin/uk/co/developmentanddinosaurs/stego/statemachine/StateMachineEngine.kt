@@ -39,7 +39,7 @@ class StateMachineEngine(
 
         validateDefinition()
 
-        val initialState = stateMap[definition.initial]!! // We've just validated this is here
+        val initialState = stateMap.getValue(definition.initial)
         _output = MutableStateFlow(StateMachineOutput(initialState, Context(definition.initialContext)))
 
         enterState(initialState, Event("stego.internal.init"))

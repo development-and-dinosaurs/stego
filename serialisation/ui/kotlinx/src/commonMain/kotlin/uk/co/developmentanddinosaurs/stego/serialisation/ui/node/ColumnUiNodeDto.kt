@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 data class ColumnUiNodeDto(
     override val id: String,
     val children: List<UiNodeDto>,
-    ) : UiNodeDto
+) : UiNodeDto

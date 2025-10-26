@@ -36,7 +36,7 @@ object LoginInvokable : Invokable {
     }
 }
 
-fun loadLoginStateMachineDefinitionJsonString(context:  android.content.Context): String {
+fun loadLoginStateMachineDefinitionJsonString(context: android.content.Context): String {
     val inputStream = context.resources.openRawResource(R.raw.login_state_machine)
     val reader = InputStreamReader(inputStream)
     val jsonString = reader.readText()
@@ -50,7 +50,7 @@ private val json = Json {
             subclass(LogicStateDto::class)
             subclass(UiStateDto::class)
         }
-        polymorphic(ActionDto::class){
+        polymorphic(ActionDto::class) {
             subclass(LogActionDto::class)
             subclass(AssignActionDto::class)
         }
@@ -73,7 +73,8 @@ private val json = Json {
     }
 }
 
-fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
+fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto =
+    json.decodeFromString<StateMachineDefinitionDto>(loadLoginStateMachineDefinitionJsonString(context))
 
 fun stateDef(context: android.content.Context): StateMachineDefinition {
     val invokableMapper = InvokableDefinitionMapper(mapOf("LoginInvokable" to LoginInvokable))

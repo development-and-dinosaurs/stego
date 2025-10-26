@@ -31,6 +31,7 @@ object DataValueDtoSerializer : KSerializer<DataValueDto> {
                 jsonElement.booleanOrNull != null -> BooleanDataValueDto(jsonElement.booleanOrNull!!)
                 else -> error("Unsupported JSON primitive type for DataValueDto")
             }
+
             else -> error("DataValueDto can only be deserialized from a JSON primitive or null")
         }
     }

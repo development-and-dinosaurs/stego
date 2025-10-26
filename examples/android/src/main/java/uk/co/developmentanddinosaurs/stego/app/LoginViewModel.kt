@@ -11,8 +11,9 @@ import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineEngine
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineOutput
 
-class LoginViewModel(definition: StateMachineDefinition,
-                     dispatcher: CoroutineDispatcher = Dispatchers.Main
+class LoginViewModel(
+    definition: StateMachineDefinition,
+    dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
 
     private val engine = StateMachineEngine(

@@ -14,6 +14,7 @@ class ButtonActionMapper {
             validationScope = dto.validationScope,
             onValidationFail = dto.onValidationFail
         )
+
         is BypassValidationButtonActionDto -> BypassValidationButtonAction(trigger = dto.trigger)
     }
 }

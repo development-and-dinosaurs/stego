@@ -868,7 +868,11 @@ class StateMachineEngineTest :
                 val engine = StateMachineEngine(definition, this)
                 Then("the invokable should receive the correctly resolved parameters") {
                     val finalOutput = engine.output.first { it.state == successState }
-                    finalOutput.context.get("capturedInput") shouldBe mapOf("userId" to "test-user-id", "literal" to 123L)
+                    finalOutput.context.get("capturedInput") shouldBe
+                        mapOf(
+                            "userId" to "test-user-id",
+                            "literal" to 123L,
+                        )
                 }
             }
         }

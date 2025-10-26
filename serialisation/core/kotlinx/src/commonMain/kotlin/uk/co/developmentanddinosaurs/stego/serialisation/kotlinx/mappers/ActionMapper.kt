@@ -40,7 +40,7 @@ import kotlin.reflect.KClass
  */
 class ActionMapper(
     customMappers: Map<KClass<out ActionDto>, ActionDtoMapper> = emptyMap(),
-): ActionDtoMapper {
+) : ActionDtoMapper {
     private val mappers: Map<KClass<out ActionDto>, ActionDtoMapper> = defaultMappers + customMappers
 
     companion object {

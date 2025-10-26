@@ -36,7 +36,7 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Action
  *
  * @see ActionMapper
  */
- fun interface ActionDtoMapper {
+fun interface ActionDtoMapper {
     /**
      * Maps the given [ActionDto] to an [Action].
      *

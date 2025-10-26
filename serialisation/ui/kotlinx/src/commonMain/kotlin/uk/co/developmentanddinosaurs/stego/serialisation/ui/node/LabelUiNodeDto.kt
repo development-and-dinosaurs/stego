@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 data class LabelUiNodeDto(
     override val id: String,
     val text: String,
-    ) : UiNodeDto
+) : UiNodeDto

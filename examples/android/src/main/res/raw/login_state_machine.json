@@ -16,7 +16,9 @@
             "id": "username_field",
             "label": "Username",
             "text": "{username}",
-            "onTextChanged": { "trigger": "USERNAME_CHANGED" },
+            "onTextChanged": {
+              "trigger": "USERNAME_CHANGED"
+            },
             "validators": [
               {
                 "type": "required",
@@ -37,7 +39,9 @@
               "type": "submit",
               "trigger": "SUBMIT",
               "onValidationFail": "shake",
-              "validationScope": ["username_field"]
+              "validationScope": [
+                "username_field"
+              ]
             }
           }
         ]

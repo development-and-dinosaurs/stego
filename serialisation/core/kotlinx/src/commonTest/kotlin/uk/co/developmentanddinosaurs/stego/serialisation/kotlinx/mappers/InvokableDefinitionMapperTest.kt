@@ -38,12 +38,12 @@ class InvokableDefinitionMapperTest : BehaviorSpec({
                 definition.id shouldBe "testId"
                 definition.src shouldBe dummyInvokable
                 definition.input shouldContainExactly
-                    mapOf<String, Any?>(
-                        "literalString" to "hello",
-                        "literalLong" to 123L,
-                        "literalDouble" to 45.6,
-                        "literalBoolean" to true
-                    )
+                        mapOf<String, Any?>(
+                            "literalString" to "hello",
+                            "literalLong" to 123L,
+                            "literalDouble" to 45.6,
+                            "literalBoolean" to true
+                        )
             }
         }
     }

@@ -18,7 +18,9 @@ import kotlinx.serialization.modules.SerializersModule
 @ExperimentalSerializationApi
 private object NotJsonEncoder : Encoder {
     override val serializersModule: SerializersModule = EmptySerializersModule()
-    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder = throw UnsupportedOperationException("Not used in this test")
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder =
+        throw UnsupportedOperationException("Not used in this test")
+
     override fun encodeBoolean(value: Boolean) {}
     override fun encodeByte(value: Byte) {}
     override fun encodeChar(value: Char) {}
@@ -37,7 +39,9 @@ private object NotJsonEncoder : Encoder {
 @ExperimentalSerializationApi
 private object NotJsonDecoder : Decoder {
     override val serializersModule: SerializersModule = EmptySerializersModule()
-    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder = throw UnsupportedOperationException("Not used in this test")
+    override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder =
+        throw UnsupportedOperationException("Not used in this test")
+
     override fun decodeBoolean(): Boolean = false
     override fun decodeByte(): Byte = 0
     override fun decodeChar(): Char = ' '

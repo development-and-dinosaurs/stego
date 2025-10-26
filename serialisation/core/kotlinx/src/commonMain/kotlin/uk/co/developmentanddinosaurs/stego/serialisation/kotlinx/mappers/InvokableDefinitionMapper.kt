@@ -10,7 +10,7 @@ import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
  *
  * @param invokableRegistry A map where keys are string identifiers and values are the corresponding [Invokable] implementations.
  */
-class InvokableDefinitionMapper(private val invokableRegistry: Map<String, Invokable>) {
+class InvokableDefinitionMapper(private val invokableRegistry: Map<String, Invokable> = mapOf()) {
     /**
      * Performs the mapping from DTO to domain object.
      */

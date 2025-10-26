@@ -4,6 +4,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.BooleanDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.NumberDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.StringDataValueDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.InvokableDefinitionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult

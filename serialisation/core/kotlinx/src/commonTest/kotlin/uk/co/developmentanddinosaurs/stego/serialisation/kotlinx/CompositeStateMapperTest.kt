@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.NullDataValueDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.CompositeStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.StateDtoMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.LogicState

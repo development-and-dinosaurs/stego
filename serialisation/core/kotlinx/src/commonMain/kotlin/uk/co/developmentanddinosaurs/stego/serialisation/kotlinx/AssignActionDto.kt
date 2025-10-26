@@ -2,6 +2,7 @@ package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.DataValueDto
 
 /**
  * The serializable Data Transfer Object (DTO) for an assign action.
@@ -11,7 +12,7 @@ import kotlinx.serialization.Serializable
  * to a domain [uk.co.developmentanddinosaurs.stego.statemachine.AssignAction] by the [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionMapper].
  *
  * @property key The name of the variable in the context to assign the value to.
- * @property value The value to be assigned, represented as a [DataValueDto].
+ * @property value The value to be assigned, represented as a [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.DataValueDto].
  */
 @Serializable
 @SerialName("assign")

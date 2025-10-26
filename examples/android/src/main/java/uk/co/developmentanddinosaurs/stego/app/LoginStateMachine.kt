@@ -6,12 +6,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.AssignActionMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.CompositeStateMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.InvokableDefinitionMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.LogActionMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.LogicStateMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.TransitionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.*
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
@@ -82,7 +77,7 @@ fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto = j
 
 fun stateDef(context: android.content.Context): StateMachineDefinition {
     val invokableMapper = InvokableDefinitionMapper(mapOf("LoginInvokable" to LoginInvokable))
-    val actionMapper = CompositeActionMapper(
+    val actionMapper = ActionMapper(
         mapOf(
             AssignActionDto::class to AssignActionMapper(),
             LogActionDto::class to LogActionMapper { message -> println(message) }
@@ -107,7 +102,7 @@ fun stateDef(context: android.content.Context): StateMachineDefinition {
     val compositeStateMapper = CompositeStateMapper(
         mapperFactories = mapOf(
             LogicStateDto::class to { stateMapper ->
-                LogicStateMapper(stateMapper, invokableMapper, transitionMapper, actionMapper)
+                LogicStateMapper(actionMapper, invokableMapper, transitionMapper, stateMapper)
             },
             UiStateDto::class to { stateMapper ->
                 UiStateMapper(stateMapper, actionMapper, invokableMapper, transitionMapper, uiNodeMapper)

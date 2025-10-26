@@ -40,7 +40,7 @@ import kotlin.reflect.KClass
  */
 class ActionMapper(
     customMappers: Map<KClass<out ActionDto>, ActionDtoMapper> = emptyMap(),
-) {
+): ActionDtoMapper {
     private val mappers: Map<KClass<out ActionDto>, ActionDtoMapper> = defaultMappers + customMappers
 
     companion object {
@@ -62,7 +62,7 @@ class ActionMapper(
      * @throws StateMachineException if the DTO type is not a built-in type and is not found
      *   in the provided `mappers` registry.
      */
-    fun map(dto: ActionDto): Action {
+    override fun map(dto: ActionDto): Action {
         val mapper =
             mappers[dto::class]
                 ?: throw StateMachineException("Action DTO type '${dto::class.simpleName}' not found in mapper registry.")

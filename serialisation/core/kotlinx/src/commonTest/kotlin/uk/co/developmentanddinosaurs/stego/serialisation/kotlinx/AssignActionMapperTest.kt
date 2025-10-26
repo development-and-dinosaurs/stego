@@ -5,7 +5,6 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.statemachine.AssignAction
-import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 
 private data class OtherActionDto(val data: String) : ActionDto
 
@@ -29,11 +28,11 @@ class AssignActionMapperTest : BehaviorSpec({
             val dto = OtherActionDto("some data")
 
             When("the dto is mapped") {
-                val exception = shouldThrow<StateMachineException> {
+                val exception = shouldThrow<IllegalArgumentException> {
                     mapper.map(dto)
                 }
 
-                Then("it should throw a StateMachineException") {
+                Then("it should throw a IllegalArgumentException") {
                     exception.message shouldBe "AssignActionMapper can only map AssignActionDto"
                 }
             }

@@ -13,7 +13,7 @@ import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
  * @property guard An optional [Guard] condition that must be met for the transition to be taken.
  */
 data class Transition(
-    val target: String,
+    val target: String? = null,
     val actions: List<Action> = emptyList(),
     val guard: Guard? = null,
 )

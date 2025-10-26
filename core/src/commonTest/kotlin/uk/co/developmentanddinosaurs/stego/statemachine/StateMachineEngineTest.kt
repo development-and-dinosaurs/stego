@@ -62,6 +62,21 @@ private data class DelayAction(
     }
 }
 
+private class FailingInvokable(
+    private val data: Map<String, Any> = emptyMap(),
+) : Invokable {
+    override suspend fun invoke(input: Map<String, Any?>): InvokableResult = InvokableResult.Failure(data)
+}
+
+// An invokable that captures the input it receives and returns it in the success data.
+private class CapturingInvokable : Invokable {
+    override suspend fun invoke(input: Map<String, Any?>): InvokableResult {
+        // We wrap the received input in a "captured" key to avoid key collisions.
+        val successData = mapOf("captured" to input)
+        return InvokableResult.Success(successData)
+    }
+}
+
 class TestInvokable(
     private val duration: Long = 1000,
 ) : Invokable {
@@ -170,10 +185,10 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT" to
-                                listOf(
-                                    Transition(target = "Next", guard = falseGuard),
-                                    Transition(target = "Other", guard = trueGuard),
-                                ),
+                                    listOf(
+                                        Transition(target = "Next", guard = falseGuard),
+                                        Transition(target = "Other", guard = trueGuard),
+                                    ),
                         ),
                 )
             val nextState = LogicState(id = "Next")
@@ -484,12 +499,12 @@ class StateMachineEngineTest :
                         .first { it.state == childTwo }
                         .context
                         .get("trace") shouldBe
-                        listOf(
-                            "parent_entry",
-                            "childOne_entry",
-                            "childOne_exit",
-                            "childTwo_entry",
-                        )
+                            listOf(
+                                "parent_entry",
+                                "childOne_entry",
+                                "childOne_exit",
+                                "childTwo_entry",
+                            )
                 }
             }
         }
@@ -541,13 +556,13 @@ class StateMachineEngineTest :
 
                     engine.output.value.context
                         .get("trace") shouldBe
-                        listOf(
-                            "l1_entry",
-                            "l2_entry",
-                            "l3_entry",
-                            "l4_entry",
-                            "l5_entry",
-                        )
+                            listOf(
+                                "l1_entry",
+                                "l2_entry",
+                                "l3_entry",
+                                "l4_entry",
+                                "l5_entry",
+                            )
                 }
             }
         }
@@ -602,12 +617,12 @@ class StateMachineEngineTest :
                     on =
                         mapOf(
                             "EVENT_A" to
-                                listOf(
-                                    Transition(
-                                        target = "StateB",
-                                        actions = listOf(DelayAction(10)),
+                                    listOf(
+                                        Transition(
+                                            target = "StateB",
+                                            actions = listOf(DelayAction(10)),
+                                        ),
                                     ),
-                                ),
                         ),
                 )
             val definition =
@@ -624,6 +639,236 @@ class StateMachineEngineTest :
                 Then("the machine should process both events sequentially and end in the final state") {
                     engine.output.first { it.state == stateC }
                     engine.output.value.state shouldBe stateC
+                }
+            }
+        }
+
+        Given("an error handler that itself throws an exception") {
+            val errorTransition = Transition(target = "ErrorState", actions = listOf(CrashingAction))
+            val crashingTransition = Transition(target = "Next", actions = listOf(CrashingAction))
+            val initialState =
+                LogicState(
+                    id = "Initial",
+                    on =
+                        mapOf(
+                            "CRASH_EVENT" to listOf(crashingTransition),
+                            "error.execution" to listOf(errorTransition),
+                        ),
+                )
+            val nextState = LogicState(id = "Next")
+            val errorState = LogicState(id = "ErrorState")
+            val definition =
+                StateMachineDefinition(
+                    initial = "Initial",
+                    states = mapOf("Initial" to initialState, "Next" to nextState, "ErrorState" to errorState),
+                )
+
+            When("an event causes a crash, and the error handling also crashes") {
+                val engine = StateMachineEngine(definition)
+                engine.send(Event("CRASH_EVENT"))
+
+                Then("the engine should abort processing and remain in the original state") {
+                    // Allow time for the internal error event to be processed
+                    delay(100)
+                    engine.output.value.state shouldBe initialState
+                }
+            }
+        }
+
+        Given("a state with an invokable that returns Failure") {
+            val failureData = mapOf("reason" to "API call failed")
+            val failingInvokable = FailingInvokable(data = failureData)
+            val errorTransition =
+                Transition(
+                    target = "ErrorState",
+                    actions = listOf(AssignAction("errorReason", "{event.reason}")),
+                )
+            val loadingState =
+                LogicState(
+                    id = "Loading",
+                    invoke = InvokableDefinition(id = "testInvoke", src = failingInvokable),
+                    on = mapOf("error.invoke.testInvoke" to listOf(errorTransition)),
+                )
+            val errorState = LogicState(id = "ErrorState")
+            val definition =
+                StateMachineDefinition(
+                    initial = "Loading",
+                    states = mapOf("Loading" to loadingState, "ErrorState" to errorState),
+                )
+
+            When("the engine is created") {
+                val engine = StateMachineEngine(definition, this)
+                Then("it should transition to the error state and pass the failure data") {
+                    val finalOutput = engine.output.first { it.state == errorState }
+                    finalOutput.context.get("errorReason") shouldBe "API call failed"
+                }
+            }
+        }
+
+        Given("a hierarchical transition from a parent to a child") {
+            val parentEntryAction = TraceAction("parent_entry")
+            val parentExitAction = TraceAction("parent_exit")
+            val childEntryAction = TraceAction("child_entry")
+
+            val child = LogicState(id = "Child", onEntry = listOf(childEntryAction))
+            val parent =
+                LogicState(
+                    id = "Parent",
+                    initial = "Child",
+                    onEntry = listOf(parentEntryAction),
+                    onExit = listOf(parentExitAction),
+                    on = mapOf("DEEPER" to listOf(Transition("Child"))),
+                    states = mapOf("Child" to child),
+                )
+            val definition =
+                StateMachineDefinition(
+                    initial = "Parent",
+                    initialContext = mapOf("trace" to listOf<String>()),
+                    states = mapOf("Parent" to parent),
+                )
+            val engine = StateMachineEngine(definition)
+
+            When("the engine is in the parent state and a transition to the child occurs") {
+                engine.send(Event("DEEPER"))
+
+                Then("the parent state should not be exited and re-entered") {
+                    val finalOutput = engine.output.value
+                    finalOutput.context.get("trace") shouldBe listOf("parent_entry", "child_entry")
+                }
+            }
+        }
+
+        Given("a hierarchical transition from a child to its parent") {
+            val parentEntryAction = TraceAction("parent_entry")
+            val parentExitAction = TraceAction("parent_exit")
+            val childEntryAction = TraceAction("child_entry")
+            val childExitAction = TraceAction("child_exit")
+
+            val child =
+                LogicState(
+                    id = "Child",
+                    onEntry = listOf(childEntryAction),
+                    onExit = listOf(childExitAction),
+                    on = mapOf("UP" to listOf(Transition("Parent"))),
+                )
+            val parent =
+                LogicState(
+                    id = "Parent",
+                    initial = "Child",
+                    onEntry = listOf(parentEntryAction),
+                    onExit = listOf(parentExitAction),
+                    states = mapOf("Child" to child),
+                )
+            val definition =
+                StateMachineDefinition(
+                    initial = "Parent",
+                    initialContext = mapOf("trace" to listOf<String>()),
+                    states = mapOf("Parent" to parent),
+                )
+
+            When("a transition occurs from the child to the parent") {
+                val engine = StateMachineEngine(definition)
+                engine.send(Event("UP"))
+
+                Then("only the child's exit action should be called") {
+                    val finalOutput = engine.output.value
+                    finalOutput.context.get("trace") shouldBe listOf("parent_entry", "child_entry", "child_exit")
+                    finalOutput.state shouldBe parent
+                }
+            }
+        }
+
+        Given("a state with a self-transition") {
+            val entryAction = TraceAction("entry")
+            val exitAction = TraceAction("exit")
+            val state =
+                LogicState(
+                    id = "Loop",
+                    onEntry = listOf(entryAction),
+                    onExit = listOf(exitAction),
+                    on = mapOf("LOOP" to listOf(Transition("Loop"))),
+                )
+            val definition =
+                StateMachineDefinition(
+                    initial = "Loop",
+                    initialContext = mapOf("trace" to listOf<String>()),
+                    states = mapOf("Loop" to state),
+                )
+
+            When("the self-transition event is sent") {
+                val engine = StateMachineEngine(definition)
+                engine.send(Event("LOOP"))
+
+                Then("the state's exit and entry actions should be re-executed") {
+                    val finalOutput = engine.output.value
+                    finalOutput.context.get("trace") shouldBe listOf("entry", "exit", "entry")
+                }
+            }
+        }
+
+        Given("a state with an internal self-transition") {
+            val entryAction = TraceAction("entry")
+            val exitAction = TraceAction("exit")
+            val transitionAction = TraceAction("transition")
+            val state =
+                LogicState(
+                    id = "Internal",
+                    onEntry = listOf(entryAction),
+                    onExit = listOf(exitAction),
+                    on = mapOf("INTERNAL_EVENT" to listOf(Transition(actions = listOf(transitionAction)))),
+                )
+            val definition =
+                StateMachineDefinition(
+                    initial = "Internal",
+                    initialContext = mapOf("trace" to listOf<String>()),
+                    states = mapOf("Internal" to state),
+                )
+
+            When("the internal event is sent") {
+                val engine = StateMachineEngine(definition)
+                engine.send(Event("INTERNAL_EVENT"))
+
+                Then("only the transition's action should be executed") {
+                    // We need a small delay to ensure the event has been processed
+                    delay(100)
+                    val finalOutput = engine.output.value
+                    finalOutput.context.get("trace") shouldBe listOf("entry", "transition")
+                    finalOutput.state shouldBe state
+                }
+            }
+        }
+
+        Given("a state with an invokable that takes input parameters") {
+            val capturingInvokable = CapturingInvokable()
+            val successTransition =
+                Transition(
+                    target = "Success",
+                    actions = listOf(AssignAction("capturedInput", "{event.captured}")),
+                )
+            val loadingState =
+                LogicState(
+                    id = "Loading",
+                    invoke =
+                        InvokableDefinition(
+                            id = "testInvoke",
+                            src = capturingInvokable,
+                            input = mapOf("userId" to "{context.userId}", "literal" to 123),
+                        ),
+                    on = mapOf("done.invoke.testInvoke" to listOf(successTransition)),
+                )
+            val successState = LogicState(id = "Success")
+            val definition =
+                StateMachineDefinition(
+                    initial = "Loading",
+                    initialContext = mapOf("userId" to "test-user-id"),
+                    states = mapOf("Loading" to loadingState, "Success" to successState),
+                )
+
+            When("the engine is created") {
+                val engine = StateMachineEngine(definition, this)
+                Then("the invokable should receive the correctly resolved parameters") {
+                    val finalOutput = engine.output.first { it.state == successState }
+                    finalOutput.context.get("capturedInput") shouldBe mapOf("userId" to "test-user-id", "literal" to 123L)
                 }
             }
         }

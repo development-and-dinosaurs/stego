@@ -12,6 +12,12 @@
         "id": "idle_column",
         "children": [
           {
+            "type": "image",
+            "id": "image_field",
+            "url": "https://agilekatas.co.uk/img/katas/kata_berlinclock.png",
+            "contentDescription": "Berlin Clock"
+          },
+          {
             "type": "text_field",
             "id": "username_field",
             "label": "Username",

@@ -60,6 +60,7 @@ private val json = Json {
             subclass(ButtonUiNodeDto::class)
             subclass(ProgressIndicatorUiNodeDto::class)
             subclass(LabelUiNodeDto::class)
+            subclass(ImageUiNodeDto::class)
         }
         polymorphic(ButtonActionDto::class) {
             subclass(SubmitButtonActionDto::class)
@@ -92,7 +93,8 @@ fun stateDef(context: android.content.Context): StateMachineDefinition {
             LabelUiNodeDto::class to LabelUiNodeMapper(),
             ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
             TextFieldUiNodeDto::class to TextFieldUiNodeMapper(interactionMapper, validationRuleMapper),
-            ButtonUiNodeDto::class to ButtonUiNodeMapper(buttonActionMapper)
+            ButtonUiNodeDto::class to ButtonUiNodeMapper(buttonActionMapper),
+            ImageUiNodeDto::class to ImageUiNodeDtoMapper()
         ),
         compositeAwareFactories = mapOf(
             ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) }

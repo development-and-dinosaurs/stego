@@ -70,6 +70,7 @@ private fun RenderInternal(
         is ButtonUiNode -> RenderButton(uiNode, context, ::handleSubmit, ::handleBypass)
         is TextFieldUiNode -> RenderTextField(uiNode, context, interactionHandler, onStateChange, shakeTrigger)
         is ProgressIndicatorUiNode -> RenderProgressIndicatorUiNode()
+        is ImageUiNode -> RenderImageUiNode(uiNode)
     }
 }
 

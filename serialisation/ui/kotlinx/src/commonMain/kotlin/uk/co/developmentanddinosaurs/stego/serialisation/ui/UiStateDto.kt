@@ -2,10 +2,10 @@ package uk.co.developmentanddinosaurs.stego.serialisation.ui
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.InvokableDefinitionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.InvokableDefinitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.TransitionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 
 @Serializable

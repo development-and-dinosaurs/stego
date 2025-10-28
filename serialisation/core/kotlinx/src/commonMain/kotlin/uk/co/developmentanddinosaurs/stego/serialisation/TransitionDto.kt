@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation
 
 import kotlinx.serialization.Serializable
 

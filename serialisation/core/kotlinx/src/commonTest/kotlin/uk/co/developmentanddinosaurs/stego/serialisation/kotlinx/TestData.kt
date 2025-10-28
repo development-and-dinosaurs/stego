@@ -1,5 +1,6 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
 
+import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event

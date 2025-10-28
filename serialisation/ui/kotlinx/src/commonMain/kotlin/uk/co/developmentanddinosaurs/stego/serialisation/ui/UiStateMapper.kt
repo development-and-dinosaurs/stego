@@ -1,10 +1,10 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.ui
 
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionDtoMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.InvokableDefinitionMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.StateDtoMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.TransitionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.InvokableDefinitionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.StateDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.TransitionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 import uk.co.developmentanddinosaurs.stego.ui.UiState
@@ -13,7 +13,7 @@ import uk.co.developmentanddinosaurs.stego.ui.UiState
  * Maps a [UiStateDto] to a [UiState] domain object.
  *
  * This mapper orchestrates the mapping of the state itself and its nested properties.
- * It relies on a [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.CompositeStateMapper] to handle nested states, breaking potential circular dependencies.
+ * It relies on a [uk.co.developmentanddinosaurs.stego.serialisation.mappers.CompositeStateMapper] to handle nested states, breaking potential circular dependencies.
  */
 class UiStateMapper(
     private val stateMapper: StateDtoMapper,

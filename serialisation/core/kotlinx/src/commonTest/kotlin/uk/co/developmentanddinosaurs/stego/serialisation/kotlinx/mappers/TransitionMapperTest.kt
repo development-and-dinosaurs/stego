@@ -9,7 +9,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TestAction
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TestActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.TransitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.TransitionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.EqualsGuard
 
 class TransitionMapperTest : BehaviorSpec({

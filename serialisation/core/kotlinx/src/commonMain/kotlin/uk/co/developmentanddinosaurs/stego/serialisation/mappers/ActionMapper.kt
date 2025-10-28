@@ -1,15 +1,15 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
+package uk.co.developmentanddinosaurs.stego.serialisation.mappers
 
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.AssignActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionMapper.Companion.defaultMappers
+import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.AssignActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.LogActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionMapper.Companion.defaultMappers
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 import kotlin.reflect.KClass
 
 /**
- * Maps serializable [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto] objects to their corresponding domain [Action] implementations
+ * Maps serializable [ActionDto] objects to their corresponding domain [Action] implementations
  * using a configurable registry of mappers.
  *
  * This class acts as a bridge between the data transfer layer and the core state machine logic.

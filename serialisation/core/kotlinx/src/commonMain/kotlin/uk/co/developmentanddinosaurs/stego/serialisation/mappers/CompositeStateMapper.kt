@@ -1,14 +1,14 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
+package uk.co.developmentanddinosaurs.stego.serialisation.mappers
 
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.StateMachineDefinitionDto
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 import kotlin.reflect.KClass
 
 /**
- * The primary entry point for mapping a complete [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto] into its
+ * The primary entry point for mapping a complete [StateMachineDefinitionDto] into its
  * domain [StateMachineDefinition] counterpart.
  *
  * This class acts as a composite mapper, holding a registry of specific [StateDtoMapper]
@@ -24,7 +24,7 @@ class CompositeStateMapper(
         mapperFactories.mapValues { (_, factory) -> factory(this) }
 
     /**
-     * Maps a top-level [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateMachineDefinitionDto] to a [StateMachineDefinition].
+     * Maps a top-level [StateMachineDefinitionDto] to a [StateMachineDefinition].
      *
      * This function handles the mapping of the initial state, the initial context, and then
      * delegates the mapping of each individual state DTO to the appropriate registered mapper.

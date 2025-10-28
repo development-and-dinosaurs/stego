@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue
+package uk.co.developmentanddinosaurs.stego.serialisation.datavalue
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor

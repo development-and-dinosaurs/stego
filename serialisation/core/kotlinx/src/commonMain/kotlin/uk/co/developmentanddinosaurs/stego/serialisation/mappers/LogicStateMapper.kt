@@ -1,12 +1,12 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
+package uk.co.developmentanddinosaurs.stego.serialisation.mappers
 
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogicStateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.StateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.LogicStateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
 import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 
 /**
- * A specific mapper responsible for converting a [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogicStateDto] into a [LogicState].
+ * A specific mapper responsible for converting a [LogicStateDto] into a [LogicState].
  *
  * This mapper handles the conversion of all properties of a state, including its
  * entry/exit actions and any nested states.

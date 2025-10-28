@@ -7,7 +7,18 @@ import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.InvokableDefinitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.LogicStateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
+import uk.co.developmentanddinosaurs.stego.serialisation.TransitionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.*
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.InvokableDefinitionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.LogicStateMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.StateDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.TransitionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
 

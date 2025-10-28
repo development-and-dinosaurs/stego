@@ -1,11 +1,11 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers
+package uk.co.developmentanddinosaurs.stego.serialisation.mappers
 
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.TransitionDto
 import uk.co.developmentanddinosaurs.stego.statemachine.Transition
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
 /**
- * Maps a [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.TransitionDto] to a [uk.co.developmentanddinosaurs.stego.statemachine.Transition] domain object.
+ * Maps a [TransitionDto] to a [Transition] domain object.
  */
 class TransitionMapper(private val actionMapper: ActionDtoMapper) {
     fun map(dto: TransitionDto): Transition {

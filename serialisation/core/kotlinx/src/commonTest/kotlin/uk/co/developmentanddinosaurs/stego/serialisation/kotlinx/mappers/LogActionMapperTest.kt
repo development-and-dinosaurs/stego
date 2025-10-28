@@ -4,8 +4,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.LogActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.OtherActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.LogActionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.LogAction

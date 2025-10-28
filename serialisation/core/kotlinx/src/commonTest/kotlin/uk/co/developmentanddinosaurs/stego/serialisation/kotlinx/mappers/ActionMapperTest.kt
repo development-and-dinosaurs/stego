@@ -4,10 +4,12 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.ActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.AssignActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.LogActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.datavalue.StringDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.AssignActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.LogActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.StringDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionDtoMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.*
 import kotlin.reflect.KClass
 

@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.kotlinx
+package uk.co.developmentanddinosaurs.stego.serialisation
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
  *
  * This class represents an action that logs a message. It is typically deserialized
  * from a configuration file (e.g., JSON) and then mapped to a domain [uk.co.developmentanddinosaurs.stego.statemachine.LogAction]
- * by the [uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.mappers.ActionMapper].
+ * by the [uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionMapper].
  *
  * @property message The static string message to be logged.
  */

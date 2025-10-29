@@ -1,0 +1,22 @@
+package uk.co.developmentanddinosaurs.stego.di.koin.kotlinx.core
+
+import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.*
+import uk.co.developmentanddinosaurs.stego.serialisation.module.stegoCoreSerializersModule
+
+/**
+ * Provides the Koin module for core dependencies.
+ */
+class StegoCoreKoinModule {
+    val module: Module = module {
+        single(named("stegoCoreSerializersModule")) { stegoCoreSerializersModule }
+        single { ActionMapper() } bind ActionDtoMapper::class
+        singleOf(::AssignActionMapper)
+        single { LogActionMapper { message -> println(message) } }
+        singleOf(::TransitionMapper)
+    }
+}

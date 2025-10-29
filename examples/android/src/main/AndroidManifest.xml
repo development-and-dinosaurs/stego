@@ -5,6 +5,7 @@
 
     <application
             android:allowBackup="true"
+            android:name=".StegoApplication"
             android:icon="@android:drawable/ic_media_play"
             android:label="Stego App"
             android:supportsRtl="true"

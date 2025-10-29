@@ -20,5 +20,7 @@ include(
     "serialisation:ui:kotlinx",
     "ui:core",
     "ui:android",
-    "examples:android"
+    "examples:android",
+    "di:koin:kotlinx:core",
+    "di:koin:kotlinx:ui"
 )

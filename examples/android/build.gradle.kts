@@ -57,8 +57,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":ui:core"))
     implementation(project(":ui:android"))
-    implementation(project(":serialisation:core:kotlinx"))
-    implementation(project(":serialisation:ui:kotlinx"))
+    implementation(project(":di:koin:kotlinx:ui"))
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
@@ -68,6 +67,8 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose.viewmodel)
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.cash.turbine)

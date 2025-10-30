@@ -65,17 +65,30 @@ private fun RenderInternal(
 
     // The when block is now a clean dispatcher.
     when (uiNode) {
-        is ColumnUiNode -> RenderColumn(uiNode, context, onEvent, formFields, shakeTrigger, onShake)
-        is LabelUiNode -> RenderLabel(uiNode, context)
         is ButtonUiNode -> RenderButton(uiNode, context, ::handleSubmit, ::handleBypass)
-        is TextFieldUiNode -> RenderTextField(uiNode, context, interactionHandler, onStateChange, shakeTrigger)
-        is ProgressIndicatorUiNode -> RenderProgressIndicatorUiNode()
+        is ColumnUiNode -> RenderColumn(uiNode, context, onEvent, formFields, shakeTrigger, onShake)
+        is GridUiNode -> RenderGrid(uiNode, context, onEvent, formFields, shakeTrigger, onShake)
         is ImageUiNode -> RenderImageUiNode(uiNode)
+        is LabelUiNode -> RenderLabel(uiNode, context)
+        is ProgressIndicatorUiNode -> RenderProgressIndicatorUiNode()
+        is TextFieldUiNode -> RenderTextField(uiNode, context, interactionHandler, onStateChange, shakeTrigger)
     }
 }
 
 // Each of these private functions encapsulates the logic for a single node type.
 
+@Composable
+private fun RenderGrid(
+    uiNode: GridUiNode,
+    context: Context,
+    onEvent: (Event) -> Unit,
+    formFields: SnapshotStateMap<String, FieldState>,
+    shakeTrigger: Int,
+    onShake: () -> Unit) {
+    RenderGridUiNode(uiNode) { childNode ->
+        RenderInternal(childNode, context, onEvent, formFields, shakeTrigger, onShake)
+    }
+}
 @Composable
 private fun RenderColumn(
     uiNode: ColumnUiNode,

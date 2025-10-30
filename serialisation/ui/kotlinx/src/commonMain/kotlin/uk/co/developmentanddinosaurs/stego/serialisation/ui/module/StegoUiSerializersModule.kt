@@ -22,6 +22,7 @@ val stegoUiSerializersModule = SerializersModule {
         subclass(ProgressIndicatorUiNodeDto::class)
         subclass(LabelUiNodeDto::class)
         subclass(ImageUiNodeDto::class)
+        subclass(GridUiNodeDto::class)
     }
     polymorphic(ButtonActionDto::class) {
         subclass(SubmitButtonActionDto::class)

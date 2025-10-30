@@ -31,10 +31,11 @@ class StegoUiKoinModule {
                     ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
                     TextFieldUiNodeDto::class to TextFieldUiNodeMapper(get(), get()),
                     ButtonUiNodeDto::class to ButtonUiNodeMapper(get()),
-                    ImageUiNodeDto::class to ImageUiNodeDtoMapper()
+                    ImageUiNodeDto::class to ImageUiNodeDtoMapper(),
                 ),
                 compositeAwareFactories = mapOf(
-                    ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) }
+                    ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) },
+                    GridUiNodeDto::class to { mapper -> GridUiNodeMapper(mapper) }
                 )
             )
         } bind UiNodeMapper::class

@@ -22,8 +22,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":di:koin:kotlinx:core"))
-                api(project(":serialisation:core:kotlinx"))
-                api(project(":serialisation:ui:kotlinx"))
+                api(project(":data:serialisation:kotlinx:core"))
+                api(project(":data:serialisation:kotlinx:ui-core"))
                 api(libs.kotlinx.serialization.json)
                 api(libs.koin.core)
             }

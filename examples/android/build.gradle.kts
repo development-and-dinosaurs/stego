@@ -54,9 +54,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":ui:core"))
-    implementation(project(":ui:android"))
+    implementation(project(":domain:core"))
+    implementation(project(":domain:ui-core"))
+    implementation(project(":presentation:ui:android"))
     implementation(project(":di:koin:kotlinx:ui"))
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.activity.compose)

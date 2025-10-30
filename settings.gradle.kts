@@ -15,12 +15,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "stego"
 include(
-    "core",
-    "serialisation:core:kotlinx",
-    "serialisation:ui:kotlinx",
-    "ui:core",
-    "ui:android",
-    "examples:android",
+    "data:serialisation:kotlinx:core",
+    "data:serialisation:kotlinx:ui-core",
     "di:koin:kotlinx:core",
-    "di:koin:kotlinx:ui"
+    "di:koin:kotlinx:ui",
+    "domain:core",
+    "domain:ui-core",
+    "presentation:ui:android",
+    "examples:android",
 )

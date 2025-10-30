@@ -1,16 +1,16 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.diffplug.spotless)
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.diffplug.spotless)
 }
 
 kotlin {
     android {
-        namespace = "uk.co.developmentanddinosaurs.stego.serialisation.ui.kotlinx"
+        withJava()
+        namespace = "uk.co.developmentanddinosaurs.stego.ui"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -23,16 +23,24 @@ kotlin {
     jvm()
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(project(":core"))
-            implementation(project(":ui:core"))
-            implementation(project(":serialisation:core:kotlinx"))
-            api(libs.kotlinx.serialization.json)
-            implementation(libs.koin.core)
+        androidMain.dependencies {
+            implementation(project(":domain:core"))
+            implementation(project(":domain:ui-core"))
+            implementation(project.dependencies.platform(libs.compose.bom))
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.okhttp)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.ui)
+            implementation(libs.google.material)
         }
+
         commonTest.dependencies {
             implementation(libs.kotest.assertions.core)
-            implementation(libs.kotest.assertions.json)
             implementation(libs.kotest.framework.engine)
         }
 

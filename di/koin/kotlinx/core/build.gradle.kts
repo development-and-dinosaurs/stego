@@ -21,7 +21,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":serialisation:core:kotlinx"))
+                api(project(":data:serialisation:kotlinx:core"))
                 api(libs.kotlinx.serialization.json)
                 api(libs.koin.core)
             }

@@ -24,7 +24,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":core"))
+            implementation(project(":domain:core"))
             api(libs.kotlinx.serialization.json)
             implementation(libs.koin.core)
         }

@@ -134,6 +134,6 @@ internal object GuardParser {
             }
             require(parenDepth >= 0) { "Mismatched parentheses: Unexpected ')' in '$expression'" }
         }
-        if (parenDepth != 0) throw IllegalArgumentException("Mismatched parentheses: Missing ')' in '$expression'")
+        require(parenDepth == 0) { "Mismatched parentheses: Missing ')' in '$expression'" }
     }
 }

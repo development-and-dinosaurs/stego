@@ -12,5 +12,5 @@ data class LogicStateDto(
     override val on: Map<String, List<TransitionDto>> = emptyMap(),
     override val onEntry: List<ActionDto> = emptyList(),
     override val onExit: List<ActionDto> = emptyList(),
-    override val states: Map<String, LogicStateDto> = emptyMap()
+    override val states: Map<String, LogicStateDto> = emptyMap(),
 ) : StateDto

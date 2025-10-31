@@ -13,5 +13,7 @@ sealed interface ValidationResult {
      * Represents a failed validation.
      * @property message The error message describing the failure.
      */
-    data class Failure(val message: String) : ValidationResult
+    data class Failure(
+        val message: String,
+    ) : ValidationResult
 }

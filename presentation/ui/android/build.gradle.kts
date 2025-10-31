@@ -1,22 +1,28 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    `spotless-convention`
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.diffplug.spotless)
 }
 
 kotlin {
     android {
         withJava()
         namespace = "uk.co.developmentanddinosaurs.stego.ui"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         compilations.configureEach {
             compileTaskProvider.configure {
-                compilerOptions.jvmTarget = JvmTarget.JVM_11
+                compilerOptions.jvmTarget = JvmTarget.JVM_17
             }
         }
     }

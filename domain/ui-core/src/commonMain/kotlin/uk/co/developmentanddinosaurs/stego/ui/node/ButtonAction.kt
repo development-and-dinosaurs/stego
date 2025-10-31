@@ -10,9 +10,9 @@ sealed interface ButtonAction {
 data class SubmitButtonAction(
     override val trigger: String,
     val validationScope: List<String>? = null,
-    val onValidationFail: String = "shake"
+    val onValidationFail: String = "shake",
 ) : ButtonAction
 
 data class BypassValidationButtonAction(
-    override val trigger: String
+    override val trigger: String,
 ) : ButtonAction

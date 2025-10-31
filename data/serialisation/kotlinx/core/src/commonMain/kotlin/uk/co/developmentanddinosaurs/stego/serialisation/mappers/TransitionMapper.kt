@@ -7,12 +7,13 @@ import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 /**
  * Maps a [TransitionDto] to a [Transition] domain object.
  */
-class TransitionMapper(private val actionMapper: ActionDtoMapper) {
-    fun map(dto: TransitionDto): Transition {
-        return Transition(
+class TransitionMapper(
+    private val actionMapper: ActionDtoMapper,
+) {
+    fun map(dto: TransitionDto): Transition =
+        Transition(
             target = dto.target,
             actions = dto.actions.map { actionMapper.map(it) },
-            guard = dto.guard?.let { Guard.create(it) }
+            guard = dto.guard?.let { Guard.create(it) },
         )
-    }
 }

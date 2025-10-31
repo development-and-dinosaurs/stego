@@ -4,7 +4,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -21,18 +26,23 @@ fun RenderTextFieldUiNode(
     textFieldUiNode: TextFieldUiNode,
     userInteractionHandler: UserInteractionHandler,
     onStateChange: (id: String, state: FieldState) -> Unit,
-    shakeTrigger: Int
+    shakeTrigger: Int,
 ) {
     val focusManager = LocalFocusManager.current
     var text by remember { mutableStateOf(textFieldUiNode.text) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var hasBeenFocused by remember { mutableStateOf(false) }
 
-    fun validateAndReport(value: String, isFocused: Boolean = hasBeenFocused) {
-        val firstError = textFieldUiNode.validation.asSequence()
-            .map { it.validate(value) }
-            .filterIsInstance<ValidationResult.Failure>()
-            .firstOrNull()
+    fun validateAndReport(
+        value: String,
+        isFocused: Boolean = hasBeenFocused,
+    ) {
+        val firstError =
+            textFieldUiNode.validation
+                .asSequence()
+                .map { it.validate(value) }
+                .filterIsInstance<ValidationResult.Failure>()
+                .firstOrNull()
         if (isFocused) {
             errorMessage = firstError?.message
         }
@@ -43,8 +53,8 @@ fun RenderTextFieldUiNode(
                 triggerValidation = {
                     validateAndReport(text, true)
                     return@FieldState textFieldUiNode.validation.all { it.validate(text) is ValidationResult.Success }
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -64,10 +74,11 @@ fun RenderTextFieldUiNode(
         val hasFailed = textFieldUiNode.validation.any { it.validate(text) is ValidationResult.Failure }
         if (!hasFailed) {
             userInteractionHandler(
-                textFieldUiNode.onTextChanged.trigger, mapOf(
+                textFieldUiNode.onTextChanged.trigger,
+                mapOf(
                     InteractionDataKeys.COMPONENT_ID to textFieldUiNode.id,
-                    InteractionDataKeys.COMPONENT_TEXT to text
-                )
+                    InteractionDataKeys.COMPONENT_TEXT to text,
+                ),
             )
         }
     }
@@ -86,18 +97,20 @@ fun RenderTextFieldUiNode(
         },
         isError = errorMessage != null,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = {
-            commitChange()
-            focusManager.clearFocus()
-        }),
-        modifier = Modifier
-            .shake(if (errorMessage != null) shakeTrigger else 0)
-            .onFocusChanged { focusState ->
-                if (focusState.isFocused) hasBeenFocused = true
-                if (!focusState.isFocused) {
-                    validateAndReport(text, true)
-                    commitChange()
-                }
-            }
+        keyboardActions =
+            KeyboardActions(onDone = {
+                commitChange()
+                focusManager.clearFocus()
+            }),
+        modifier =
+            Modifier
+                .shake(if (errorMessage != null) shakeTrigger else 0)
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) hasBeenFocused = true
+                    if (!focusState.isFocused) {
+                        validateAndReport(text, true)
+                        commitChange()
+                    }
+                },
     )
 }

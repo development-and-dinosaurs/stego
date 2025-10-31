@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @SerialName("minLength")
 data class MinLengthValidationRuleDto(
     override val message: String,
-    val length: Int
+    val length: Int,
 ) : ValidationRuleDto

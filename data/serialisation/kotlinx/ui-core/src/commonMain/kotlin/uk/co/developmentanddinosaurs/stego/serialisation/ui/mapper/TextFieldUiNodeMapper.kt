@@ -4,7 +4,6 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.TextFieldUiNode
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 import uk.co.developmentanddinosaurs.stego.ui.node.TextFieldUiNode
 
-
 class TextFieldUiNodeMapper(
     private val interactionMapper: InteractionMapper,
     private val validationRuleMapper: ValidationRuleMapper,

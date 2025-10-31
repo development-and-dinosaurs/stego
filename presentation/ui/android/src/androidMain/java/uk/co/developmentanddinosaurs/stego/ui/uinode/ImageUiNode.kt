@@ -8,6 +8,6 @@ import uk.co.developmentanddinosaurs.stego.ui.node.ImageUiNode
 fun RenderImageUiNode(imageUiNode: ImageUiNode) {
     AsyncImage(
         model = imageUiNode.url,
-        contentDescription = imageUiNode.contentDescription
+        contentDescription = imageUiNode.contentDescription,
     )
 }

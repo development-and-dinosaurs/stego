@@ -5,4 +5,6 @@ package uk.co.developmentanddinosaurs.stego.ui.node
  *
  * @property trigger The unique identifier for the interaction.
  */
-data class UserInteraction(val trigger: String)
+data class UserInteraction(
+    val trigger: String,
+)

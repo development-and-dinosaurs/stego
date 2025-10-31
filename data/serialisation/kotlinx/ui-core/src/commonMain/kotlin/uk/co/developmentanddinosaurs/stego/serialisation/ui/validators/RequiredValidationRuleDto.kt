@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("required")
 data class RequiredValidationRuleDto(
-    override val message: String
+    override val message: String,
 ) : ValidationRuleDto

@@ -1,6 +1,10 @@
 package uk.co.developmentanddinosaurs.stego.ui
 
-import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.statemachine.Action
+import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
+import uk.co.developmentanddinosaurs.stego.statemachine.InvokableDefinition
+import uk.co.developmentanddinosaurs.stego.statemachine.State
+import uk.co.developmentanddinosaurs.stego.statemachine.Transition
 import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 
 /**

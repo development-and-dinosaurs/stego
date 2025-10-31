@@ -8,4 +8,6 @@ import kotlinx.serialization.Serializable
  * @property trigger The unique identifier for the interaction, which maps to a state machine event type.
  */
 @Serializable
-data class InteractionDto(val trigger: String)
+data class InteractionDto(
+    val trigger: String,
+)

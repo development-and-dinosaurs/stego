@@ -16,4 +16,7 @@ import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.DataValueDto
  */
 @Serializable
 @SerialName("assign")
-data class AssignActionDto(val key: String, val value: DataValueDto) : ActionDto
+data class AssignActionDto(
+    val key: String,
+    val value: DataValueDto,
+) : ActionDto

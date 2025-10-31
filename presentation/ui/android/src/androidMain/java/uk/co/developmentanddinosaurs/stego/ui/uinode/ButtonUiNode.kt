@@ -8,7 +8,7 @@ import uk.co.developmentanddinosaurs.stego.ui.node.ButtonUiNode
 @Composable
 fun RenderButtonUiNode(
     buttonUiNode: ButtonUiNode,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,

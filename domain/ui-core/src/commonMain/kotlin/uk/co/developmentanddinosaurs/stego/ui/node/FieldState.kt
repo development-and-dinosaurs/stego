@@ -8,5 +8,5 @@ package uk.co.developmentanddinosaurs.stego.ui.node
  */
 data class FieldState(
     val isValid: Boolean = false,
-    val triggerValidation: () -> Boolean = { true }
+    val triggerValidation: () -> Boolean = { true },
 )

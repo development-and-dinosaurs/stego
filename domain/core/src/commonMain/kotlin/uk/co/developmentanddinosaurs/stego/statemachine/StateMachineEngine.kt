@@ -99,7 +99,9 @@ class StateMachineEngine(
             state.on.values.flatten().forEach { transition ->
                 transition.target?.let { target ->
                     if (!stateMap.containsKey(target)) {
-                        throw StateMachineException("State '${state.id}' has a transition to non-existent target state '$target'.")
+                        throw StateMachineException(
+                            "State '${state.id}' has a transition to non-existent target state '$target'.",
+                        )
                     }
                 }
             }

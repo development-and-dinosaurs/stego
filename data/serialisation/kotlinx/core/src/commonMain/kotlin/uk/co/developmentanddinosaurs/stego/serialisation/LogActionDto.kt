@@ -14,4 +14,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 @SerialName("log")
-data class LogActionDto(val message: String) : ActionDto
+data class LogActionDto(
+    val message: String,
+) : ActionDto

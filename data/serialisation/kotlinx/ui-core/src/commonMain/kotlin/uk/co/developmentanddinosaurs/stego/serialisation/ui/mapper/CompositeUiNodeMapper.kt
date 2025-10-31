@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  */
 class CompositeUiNodeMapper(
     simpleMappers: Map<KClass<out UiNodeDto>, UiNodeMapper>,
-    compositeAwareFactories: Map<KClass<out UiNodeDto>, (UiNodeMapper) -> UiNodeMapper>
+    compositeAwareFactories: Map<KClass<out UiNodeDto>, (UiNodeMapper) -> UiNodeMapper>,
 ) : UiNodeMapper {
     private val mapperMap: Map<KClass<out UiNodeDto>, UiNodeMapper>
 
@@ -20,8 +20,9 @@ class CompositeUiNodeMapper(
     }
 
     override fun map(dto: UiNodeDto): UiNode {
-        val mapper = mapperMap[dto::class]
-            ?: throw IllegalArgumentException("Unsupported UiNodeDto type: ${dto::class.simpleName}")
+        val mapper =
+            mapperMap[dto::class]
+                ?: throw IllegalArgumentException("Unsupported UiNodeDto type: ${dto::class.simpleName}")
         return mapper.map(dto)
     }
 }

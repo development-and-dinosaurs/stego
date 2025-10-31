@@ -8,5 +8,5 @@ import kotlinx.serialization.Serializable
 data class GridUiNodeDto(
     override val id: String,
     val columns: Int,
-    val children: List<UiNodeDto>
+    val children: List<UiNodeDto>,
 ) : UiNodeDto

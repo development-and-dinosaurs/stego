@@ -35,10 +35,11 @@ class CompositeStateMapper(
      *   initial context value or an unregistered state DTO type.
      */
     fun map(dto: StateMachineDefinitionDto): StateMachineDefinition {
-        val initialContext = dto.initialContext.mapValues { (_, valueDto) ->
-            valueDto.toDomain()
-                ?: throw StateMachineException("Failed to map initial context value: $valueDto")
-        }
+        val initialContext =
+            dto.initialContext.mapValues { (_, valueDto) ->
+                valueDto.toDomain()
+                    ?: throw StateMachineException("Failed to map initial context value: $valueDto")
+            }
         return StateMachineDefinition(
             initial = dto.initial,
             states = dto.states.mapValues { (_, stateDto) -> map(stateDto) },
@@ -55,8 +56,9 @@ class CompositeStateMapper(
      * @throws StateMachineException if no mapper is found for the given DTO type.
      */
     override fun map(dto: StateDto): State {
-        val mapper = mapperMap[dto::class]
-            ?: throw StateMachineException("Unsupported StateDto type: ${dto::class.simpleName}")
+        val mapper =
+            mapperMap[dto::class]
+                ?: throw StateMachineException("Unsupported StateDto type: ${dto::class.simpleName}")
         return mapper.map(dto)
     }
 }

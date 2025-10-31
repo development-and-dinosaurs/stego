@@ -10,5 +10,5 @@ package uk.co.developmentanddinosaurs.stego.ui.node
 data class GridUiNode(
     override val id: String,
     val columns: Int,
-    val children: List<UiNode>
+    val children: List<UiNode>,
 ) : UiNode

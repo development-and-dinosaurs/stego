@@ -8,5 +8,5 @@ import kotlinx.serialization.Serializable
 data class ImageUiNodeDto(
     override val id: String,
     val url: String,
-    val contentDescription: String
+    val contentDescription: String,
 ) : UiNodeDto

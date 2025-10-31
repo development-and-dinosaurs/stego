@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @SerialName("maxLength")
 data class MaxLengthValidationRuleDto(
     override val message: String,
-    val length: Int
+    val length: Int,
 ) : ValidationRuleDto

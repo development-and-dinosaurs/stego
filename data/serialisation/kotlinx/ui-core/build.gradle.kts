@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.diffplug.spotless)
+    `spotless-convention`
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
@@ -11,12 +11,18 @@ plugins {
 kotlin {
     android {
         namespace = "uk.co.developmentanddinosaurs.stego.serialisation.ui.kotlinx"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        compileSdk =
+            libs.versions.android.compileSdk
+                .get()
+                .toInt()
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         compilations.configureEach {
             compileTaskProvider.configure {
-                compilerOptions.jvmTarget = JvmTarget.JVM_11
+                compilerOptions.jvmTarget = JvmTarget.JVM_17
             }
         }
     }

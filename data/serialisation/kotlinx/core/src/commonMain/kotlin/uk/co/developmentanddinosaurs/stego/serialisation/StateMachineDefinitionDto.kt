@@ -7,5 +7,5 @@ import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.DataValueDto
 data class StateMachineDefinitionDto(
     val initial: String,
     val states: Map<String, StateDto>,
-    val initialContext: Map<String, DataValueDto> = emptyMap()
+    val initialContext: Map<String, DataValueDto> = emptyMap(),
 )

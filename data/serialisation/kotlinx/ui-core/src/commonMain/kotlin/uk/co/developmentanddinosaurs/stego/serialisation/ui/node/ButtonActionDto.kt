@@ -15,12 +15,12 @@ sealed interface ButtonActionDto {
 @SerialName("submit")
 data class SubmitButtonActionDto(
     override val trigger: String,
-    val validationScope: List<String>? = null, // List of field IDs to validate. Null means all.
-    val onValidationFail: String = "shake" // "shake" or "proceed"
+    val validationScope: List<String>? = null,
+    val onValidationFail: String = "shake",
 ) : ButtonActionDto
 
 @Serializable
 @SerialName("bypassValidation")
 data class BypassValidationButtonActionDto(
-    override val trigger: String
+    override val trigger: String,
 ) : ButtonActionDto

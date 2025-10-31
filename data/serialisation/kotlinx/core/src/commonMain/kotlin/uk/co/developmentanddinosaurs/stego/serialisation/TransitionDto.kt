@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class TransitionDto(
     val target: String,
     val actions: List<ActionDto> = emptyList(),
-    val guard: String? = null
+    val guard: String? = null,
 )

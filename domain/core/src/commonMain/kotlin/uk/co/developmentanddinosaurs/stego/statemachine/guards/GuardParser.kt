@@ -55,7 +55,9 @@ internal object GuardParser {
         }
 
         if (!isEnclosedByParentheses(trimmed)) {
-            throw IllegalArgumentException("All expressions must be enclosed in parentheses or be a NOT expression: '$expression'")
+            throw IllegalArgumentException(
+                "All expressions must be enclosed in parentheses or be a NOT expression: '$expression'",
+            )
         }
 
         // The content inside the parentheses is a new sub-expression to be parsed.
@@ -132,7 +134,11 @@ internal object GuardParser {
                 '(' -> parenDepth++
                 ')' -> parenDepth--
             }
-            if (parenDepth < 0) throw IllegalArgumentException("Mismatched parentheses: Unexpected ')' in '$expression'")
+            if (parenDepth <
+                0
+            ) {
+                throw IllegalArgumentException("Mismatched parentheses: Unexpected ')' in '$expression'")
+            }
         }
         if (parenDepth != 0) throw IllegalArgumentException("Mismatched parentheses: Missing ')' in '$expression'")
     }

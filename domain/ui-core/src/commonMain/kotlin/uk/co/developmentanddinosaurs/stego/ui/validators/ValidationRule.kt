@@ -5,5 +5,6 @@ package uk.co.developmentanddinosaurs.stego.ui.validators
  */
 sealed interface ValidationRule {
     val message: String
+
     fun validate(value: String): ValidationResult
 }

@@ -10,13 +10,16 @@ import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
  *
  * @param invokableRegistry A map where keys are string identifiers and values are the corresponding [Invokable] implementations.
  */
-class InvokableDefinitionMapper(private val invokableRegistry: Map<String, Invokable>) {
+class InvokableDefinitionMapper(
+    private val invokableRegistry: Map<String, Invokable>,
+) {
     /**
      * Performs the mapping from DTO to domain object.
      */
     fun map(dto: InvokableDefinitionDto): InvokableDefinition {
-        val invokable = invokableRegistry[dto.src]
-            ?: throw StateMachineException("Invokable source '${dto.src}' not found in registry.")
+        val invokable =
+            invokableRegistry[dto.src]
+                ?: throw StateMachineException("Invokable source '${dto.src}' not found in registry.")
 
         val inputMap = dto.input.mapValues { (_, valueDto) -> valueDto.toDomain() }
 

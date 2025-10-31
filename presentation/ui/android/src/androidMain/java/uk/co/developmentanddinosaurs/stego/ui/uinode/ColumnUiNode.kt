@@ -12,12 +12,12 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 @Composable
 fun RenderColumnUiNode(
     columnUiNode: ColumnUiNode,
-    renderChild: @Composable (UiNode) -> Unit
+    renderChild: @Composable (UiNode) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         columnUiNode.children.forEach {
             renderChild(it)

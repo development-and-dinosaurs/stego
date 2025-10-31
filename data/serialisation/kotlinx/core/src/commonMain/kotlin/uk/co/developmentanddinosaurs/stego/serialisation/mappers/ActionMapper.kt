@@ -65,7 +65,9 @@ class ActionMapper(
     override fun map(dto: ActionDto): Action {
         val mapper =
             mappers[dto::class]
-                ?: throw StateMachineException("Action DTO type '${dto::class.simpleName}' not found in mapper registry.")
+                ?: throw StateMachineException(
+                    "Action DTO type '${dto::class.simpleName}' not found in mapper registry.",
+                )
         return mapper.map(dto)
     }
 }

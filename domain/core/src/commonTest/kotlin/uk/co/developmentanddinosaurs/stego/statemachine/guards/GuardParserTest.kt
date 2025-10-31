@@ -176,7 +176,8 @@ class GuardParserTest :
                         shouldThrow<IllegalArgumentException> {
                             GuardParser.parse(expression)
                         }
-                    exception.message shouldBe "All expressions must be enclosed in parentheses or be a NOT expression: 'a == b'"
+                    exception.message shouldBe
+                        "All expressions must be enclosed in parentheses or be a NOT expression: 'a == b'"
                 }
             }
         }
@@ -190,7 +191,8 @@ class GuardParserTest :
                         shouldThrow<IllegalArgumentException> {
                             GuardParser.parse(expression)
                         }
-                    exception.message shouldBe "All expressions must be enclosed in parentheses or be a NOT expression: 'c < d'"
+                    exception.message shouldBe
+                        "All expressions must be enclosed in parentheses or be a NOT expression: 'c < d'"
                 }
             }
         }
@@ -204,7 +206,8 @@ class GuardParserTest :
                         GuardParser.parse(expression)
                     }
                 Then("it should throw an IllegalArgumentException") {
-                    exception.message shouldBe "All expressions must be enclosed in parentheses or be a NOT expression: '(a) == (b)'"
+                    exception.message shouldBe
+                        "All expressions must be enclosed in parentheses or be a NOT expression: '(a) == (b)'"
                 }
             }
         }

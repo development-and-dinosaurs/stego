@@ -10,5 +10,5 @@ package uk.co.developmentanddinosaurs.stego.ui.node
 data class ImageUiNode(
     override val id: String,
     val url: String,
-    val contentDescription: String
+    val contentDescription: String,
 ) : UiNode

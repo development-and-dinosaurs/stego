@@ -6,7 +6,11 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
-import uk.co.developmentanddinosaurs.stego.statemachine.*
+import uk.co.developmentanddinosaurs.stego.statemachine.AssignAction
+import uk.co.developmentanddinosaurs.stego.statemachine.Event
+import uk.co.developmentanddinosaurs.stego.statemachine.LogicState
+import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
+import uk.co.developmentanddinosaurs.stego.statemachine.Transition
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
 @ExperimentalCoroutinesApi

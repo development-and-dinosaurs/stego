@@ -37,8 +37,8 @@ fun interface ValueProvider {
                 return when {
                     value.toIntOrNull() != null -> LiteralValue(value.toInt())
                     value.toDoubleOrNull() != null -> LiteralValue(value.toDouble())
-                    value.equals("true", ignoreCase = true) -> LiteralValue(true)
-                    value.equals("false", ignoreCase = true) -> LiteralValue(false)
+                    value.lowercase() == "true" -> LiteralValue(true)
+                    value.lowercase() == "false" -> LiteralValue(false)
                     value.startsWith("\"") && value.endsWith("\"") -> LiteralValue(value.substring(1, value.length - 1))
                     else -> LiteralValue(value)
                 }

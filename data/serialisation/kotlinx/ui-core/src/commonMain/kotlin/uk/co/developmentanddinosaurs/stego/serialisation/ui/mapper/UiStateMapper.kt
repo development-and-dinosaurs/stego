@@ -23,9 +23,7 @@ class UiStateMapper(
     private val uiNodeMapper: UiNodeMapper,
 ) : StateDtoMapper {
     override fun map(dto: StateDto): State {
-        if (dto !is UiStateDto) {
-            throw IllegalArgumentException("Invalid dto of type ${dto::class}!")
-        }
+        require(dto is UiStateDto) { "Invalid dto of type ${dto::class}!" }
         return UiState(
             id = dto.id,
             onEntry = dto.onEntry.map { actionMapper.map(it) },

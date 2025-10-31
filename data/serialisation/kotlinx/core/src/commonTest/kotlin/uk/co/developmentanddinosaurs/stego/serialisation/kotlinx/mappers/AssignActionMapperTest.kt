@@ -5,8 +5,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.AssignActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.OtherActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.StringDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.kotlinx.OtherActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.AssignActionMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.AssignAction
 

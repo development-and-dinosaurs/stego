@@ -13,12 +13,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.*
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
-import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.BooleanDataValueDto
-import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.DataValueDto
-import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.DataValueDtoSerializer
-import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.NullDataValueDto
-import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.NumberDataValueDto
-import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.StringDataValueDto
+import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.*
 
 // A dummy encoder that is not a JsonEncoder, for testing failure paths.
 @ExperimentalSerializationApi

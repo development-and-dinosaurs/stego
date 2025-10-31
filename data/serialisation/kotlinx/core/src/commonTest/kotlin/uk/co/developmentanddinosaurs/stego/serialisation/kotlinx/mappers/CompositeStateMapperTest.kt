@@ -5,11 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.InvokableDefinitionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.StateMachineDefinitionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.TransitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.*
 import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.NullDataValueDto
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.CompositeStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.StateDtoMapper

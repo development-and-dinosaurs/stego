@@ -8,11 +8,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
-import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.LogActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.LogicStateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.StateMachineDefinitionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.*
 import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.BooleanDataValueDto
 import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.NullDataValueDto
 import uk.co.developmentanddinosaurs.stego.serialisation.datavalue.NumberDataValueDto

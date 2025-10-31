@@ -9,7 +9,6 @@ import uk.co.developmentanddinosaurs.stego.serialisation.LogicStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.CompositeStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.LogicStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.*
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.stegoUiSerializersModule
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.*

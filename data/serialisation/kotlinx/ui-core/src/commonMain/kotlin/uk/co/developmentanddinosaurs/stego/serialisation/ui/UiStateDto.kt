@@ -17,6 +17,6 @@ data class UiStateDto(
     override val on: Map<String, List<TransitionDto>> = emptyMap(),
     override val onEntry: List<ActionDto> = emptyList(),
     override val onExit: List<ActionDto> = emptyList(),
-    override val states: Map<String, UiStateDto> = emptyMap(),
+    override val states: Map<String, StateDto> = emptyMap(),
     val uiNode: UiNodeDto,
 ) : StateDto

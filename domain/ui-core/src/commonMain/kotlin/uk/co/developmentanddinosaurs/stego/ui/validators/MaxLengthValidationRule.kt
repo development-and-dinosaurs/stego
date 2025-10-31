@@ -5,9 +5,7 @@ data class MaxLengthValidationRule(
     val length: Int,
 ) : ValidationRule {
     override fun validate(value: String): ValidationResult =
-        if (value.length >
-            length
-        ) {
+        if (value.length > length) {
             ValidationResult.Failure(message)
         } else {
             ValidationResult.Success

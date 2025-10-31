@@ -4,15 +4,11 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.BypassValidationButtonActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 import uk.co.developmentanddinosaurs.stego.ui.node.ButtonUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.BypassValidationButtonAction
-
-private object OtherUiNodeDto : UiNodeDto {
-    override val id: String = "other"
-}
 
 class ButtonUiNodeMapperTest : BehaviorSpec({
     Given("a ButtonUiNodeMapper") {

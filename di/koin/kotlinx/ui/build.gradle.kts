@@ -19,14 +19,12 @@ kotlin {
     jvm()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api(project(":di:koin:kotlinx:core"))
-                api(project(":data:serialisation:kotlinx:core"))
-                api(project(":data:serialisation:kotlinx:ui-core"))
-                api(libs.kotlinx.serialization.json)
-                api(libs.koin.core)
-            }
+        commonMain.dependencies {
+            api(project(":di:koin:kotlinx:core"))
+            api(project(":data:serialisation:kotlinx:core"))
+            api(project(":data:serialisation:kotlinx:ui-core"))
+            api(libs.kotlinx.serialization.json)
+            api(libs.koin.core)
         }
     }
 }

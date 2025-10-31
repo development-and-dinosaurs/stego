@@ -17,3 +17,7 @@ internal object OtherUiNode : UiNode {
 internal object OtherUiNodeDto : UiNodeDto {
     override val id: String = "other"
 }
+
+internal object UnknownUiNodeDto: UiNodeDto {
+    override val id: String = "unknown"
+}

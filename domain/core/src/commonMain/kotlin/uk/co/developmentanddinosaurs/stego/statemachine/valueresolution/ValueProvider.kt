@@ -6,7 +6,7 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 /**
  * An interface for providing a value, either from the context or as a literal.
  */
-interface ValueProvider {
+fun interface ValueProvider {
     fun get(
         context: Context,
         event: Event?,

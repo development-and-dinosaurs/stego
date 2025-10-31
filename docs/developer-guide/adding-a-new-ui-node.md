@@ -47,7 +47,7 @@ private fun RenderInternal(
 ) {
     when (uiNode) {
         // Other nodes
-        is MyNewUiNode -> RenderMyNewUiNode(uiNode, context)
+        is MyNewUiNode -> RenderMyNew(uiNode, context)
     }
 }
 ```
@@ -89,7 +89,7 @@ We use [Kotest](https://kotest.io/), specifically using the [BehaviourSpec](http
 ``` kotlin title="MyNewUiNodeMapperTest.kt"
 class MyNewUiNodeMapperTest : BehaviorSpec({
     Given("a MyNewUiNodeMapper") {
-        val mapper = UiNodeMapper()
+        val mapper = MyNewUiNodeMapper()
 
         And("a MyNewUiNodeDto") {
             val dto = MyNewUiNodeDto(

@@ -7,7 +7,7 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 /**
  * Defines a contract for mapping a [UiNodeDto] to a domain [UiNode].
  */
-interface UiNodeMapper {
+fun interface UiNodeMapper {
     /**
      * Maps a [UiNodeDto] to a [UiNode].
      */

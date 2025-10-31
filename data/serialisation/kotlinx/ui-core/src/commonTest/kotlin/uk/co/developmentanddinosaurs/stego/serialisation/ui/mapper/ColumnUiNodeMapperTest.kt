@@ -9,18 +9,15 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNode
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ColumnUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 import uk.co.developmentanddinosaurs.stego.ui.node.ColumnUiNode
-import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 
 class ColumnUiNodeMapperTest : BehaviorSpec({
     Given("a ColumnUiNodeMapper") {
-        val compositeUiNodeMapper = object : UiNodeMapper {
-            override fun map(dto: UiNodeDto): UiNode =
-                when (dto) {
-                    is OtherUiNodeDto -> OtherUiNode
-                    else -> throw IllegalArgumentException("Test DTO not recognised")
-                }
+        val compositeUiNodeMapper = UiNodeMapper { dto ->
+            when (dto) {
+                is OtherUiNodeDto -> OtherUiNode
+                else -> throw IllegalArgumentException("Test DTO not recognised")
+            }
         }
         val mapper = ColumnUiNodeMapper(compositeUiNodeMapper)
 
@@ -42,9 +39,8 @@ class ColumnUiNodeMapperTest : BehaviorSpec({
                 }
 
                 Then("it should have correctly mapped children") {
-                    val columnNode = uiNode as ColumnUiNode
-                    columnNode.children shouldHaveSize 1
-                    columnNode.children[0] shouldBe OtherUiNode
+                    uiNode.children shouldHaveSize 1
+                    uiNode.children[0] shouldBe OtherUiNode
                 }
             }
         }
@@ -53,7 +49,7 @@ class ColumnUiNodeMapperTest : BehaviorSpec({
             val dto = ColumnUiNodeDto(id = "empty-column", children = emptyList())
 
             When("the dto is mapped") {
-                val uiNode = mapper.map(dto) as ColumnUiNode
+                val uiNode = mapper.map(dto)
 
                 Then("it should have no children") {
                     uiNode.children.shouldBeEmpty()

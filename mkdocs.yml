@@ -1,0 +1,5 @@
+site_name: Stego Documentation
+theme:
+    name: material
+nav:
+    - Home: index.md

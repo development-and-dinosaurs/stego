@@ -54,10 +54,8 @@ internal object GuardParser {
             return NotGuard(parse(trimmed.substring(1)))
         }
 
-        if (!isEnclosedByParentheses(trimmed)) {
-            throw IllegalArgumentException(
-                "All expressions must be enclosed in parentheses or be a NOT expression: '$expression'",
-            )
+        require(isEnclosedByParentheses(trimmed)) {
+            "All expressions must be enclosed in parentheses or be a NOT expression: '$expression'"
         }
 
         // The content inside the parentheses is a new sub-expression to be parsed.

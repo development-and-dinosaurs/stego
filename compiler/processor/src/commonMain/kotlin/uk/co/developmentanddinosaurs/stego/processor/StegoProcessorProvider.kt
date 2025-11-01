@@ -5,5 +5,5 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
 class StegoProcessorProvider : SymbolProcessorProvider {
-    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor = StegoProcessor()
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor = StegoProcessor(environment.logger)
 }

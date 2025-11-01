@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlinx.kover) apply false
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.vanniktech.mavenPublish) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 sonarqube {

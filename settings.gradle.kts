@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 rootProject.name = "stego"
 include(
     "compiler:annotations",
+    "compiler:processor",
     "data:serialisation:kotlinx:core",
     "data:serialisation:kotlinx:ui-core",
     "di:koin:kotlinx:core",

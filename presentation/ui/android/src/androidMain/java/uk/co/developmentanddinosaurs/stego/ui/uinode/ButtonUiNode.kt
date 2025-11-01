@@ -6,10 +6,7 @@ import androidx.compose.runtime.Composable
 import uk.co.developmentanddinosaurs.stego.ui.node.ButtonUiNode
 
 @Composable
-fun RenderButtonUiNode(
-    buttonUiNode: ButtonUiNode,
-    onClick: () -> Unit,
-) {
+fun RenderButtonUiNode(buttonUiNode: ButtonUiNode, onClick: () -> Unit) {
     Button(
         onClick = onClick,
     ) {

@@ -11,8 +11,6 @@ class LessThanGuard(
     private val left: ValueProvider,
     private val right: ValueProvider,
 ) : Guard {
-    override fun evaluate(
-        context: Context,
-        event: Event,
-    ): Boolean = performComparison(left, right, context, event) { l, r -> l < r }
+    override fun evaluate(context: Context, event: Event): Boolean =
+        performComparison(left, right, context, event) { l, r -> l < r }
 }

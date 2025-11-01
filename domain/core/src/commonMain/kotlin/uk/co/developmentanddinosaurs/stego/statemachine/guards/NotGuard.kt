@@ -9,8 +9,5 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 class NotGuard(
     private val guard: Guard,
 ) : Guard {
-    override fun evaluate(
-        context: Context,
-        event: Event,
-    ): Boolean = !guard.evaluate(context, event)
+    override fun evaluate(context: Context, event: Event): Boolean = !guard.evaluate(context, event)
 }

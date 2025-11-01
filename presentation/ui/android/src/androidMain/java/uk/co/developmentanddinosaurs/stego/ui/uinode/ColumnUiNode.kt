@@ -10,10 +10,7 @@ import uk.co.developmentanddinosaurs.stego.ui.node.ColumnUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 
 @Composable
-fun RenderColumnUiNode(
-    columnUiNode: ColumnUiNode,
-    renderChild: @Composable (UiNode) -> Unit,
-) {
+fun RenderColumnUiNode(columnUiNode: ColumnUiNode, renderChild: @Composable (UiNode) -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

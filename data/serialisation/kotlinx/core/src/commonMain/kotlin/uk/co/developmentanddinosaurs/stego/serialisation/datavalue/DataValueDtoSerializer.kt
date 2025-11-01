@@ -15,10 +15,7 @@ import kotlinx.serialization.json.longOrNull
 object DataValueDtoSerializer : KSerializer<DataValueDto> {
     override val descriptor: SerialDescriptor = JsonPrimitive.serializer().descriptor
 
-    override fun serialize(
-        encoder: Encoder,
-        value: DataValueDto,
-    ) {
+    override fun serialize(encoder: Encoder, value: DataValueDto) {
         val jsonEncoder = encoder as? JsonEncoder ?: error("This serializer can only be used with JSON")
         val jsonElement =
             when (value) {

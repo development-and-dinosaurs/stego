@@ -3,6 +3,7 @@ package uk.co.developmentanddinosaurs.stego.serialisation.mappers
 import uk.co.developmentanddinosaurs.stego.serialisation.ActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.AssignActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.LogActionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.mappers.ActionMapper.Companion.defaultMappers
 import uk.co.developmentanddinosaurs.stego.statemachine.Action
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineException
 import kotlin.reflect.KClass

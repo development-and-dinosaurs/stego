@@ -10,8 +10,5 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 class LiteralValue(
     private val value: Any?,
 ) : ValueProvider {
-    override fun get(
-        context: Context,
-        event: Event?,
-    ): Any? = value
+    override fun get(context: Context, event: Event?): Any? = value
 }

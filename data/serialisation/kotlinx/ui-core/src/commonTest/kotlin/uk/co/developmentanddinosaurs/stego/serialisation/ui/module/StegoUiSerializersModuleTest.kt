@@ -22,20 +22,19 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLength
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
 
-class StegoUiSerializersModuleTest :
-    BehaviorSpec({
-        val json =
-            Json {
-                serializersModule = stegoUiSerializersModule
-                classDiscriminator = "type"
-                ignoreUnknownKeys = true
-            }
+class StegoUiSerializersModuleTest : BehaviorSpec({
+    val json =
+        Json {
+            serializersModule = stegoUiSerializersModule
+            classDiscriminator = "type"
+            ignoreUnknownKeys = true
+        }
 
-        Given("a Json instance with stegoUiSerializersModule") {
-            context("for StateDto polymorphism") {
-                When("deserializing a UiStateDto") {
-                    val stateJson =
-                        """
+    Given("a Json instance with stegoUiSerializersModule") {
+        context("for StateDto polymorphism") {
+            When("deserializing a UiStateDto") {
+                val stateJson =
+                    """
                         {
                           "id": "state",
                           "type": "ui",
@@ -45,34 +44,34 @@ class StegoUiSerializersModuleTest :
                             "text": "b"
                           }
                         }
-                        """.trimIndent()
-                    val stateDto = json.decodeFromString<StateDto>(stateJson)
+                    """.trimIndent()
+                val stateDto = json.decodeFromString<StateDto>(stateJson)
 
-                    Then("it should deserialize correctly") {
-                        stateDto.shouldBeInstanceOf<UiStateDto>()
-                    }
+                Then("it should deserialize correctly") {
+                    stateDto.shouldBeInstanceOf<UiStateDto>()
                 }
             }
+        }
 
-            context("for UiNodeDto polymorphism") {
-                When("deserializing a ColumnUiNodeDto") {
-                    val nodeJson =
-                        """
+        context("for UiNodeDto polymorphism") {
+            When("deserializing a ColumnUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "column",
                           "id": "a",
                           "children": []
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<ColumnUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<ColumnUiNodeDto>()
                 }
+            }
 
-                When("deserializing a TextFieldUiNodeDto") {
-                    val nodeJson =
-                        """
+            When("deserializing a TextFieldUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "text_field",
                           "id": "a",
@@ -83,16 +82,16 @@ class StegoUiSerializersModuleTest :
                           },
                           "validators": []
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<TextFieldUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<TextFieldUiNodeDto>()
                 }
+            }
 
-                When("deserializing a ButtonUiNodeDto") {
-                    val nodeJson =
-                        """
+            When("deserializing a ButtonUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "button",
                           "id": "a",
@@ -102,165 +101,165 @@ class StegoUiSerializersModuleTest :
                             "trigger": "c"
                           }
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<ButtonUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<ButtonUiNodeDto>()
                 }
+            }
 
-                When("deserializing a ProgressIndicatorUiNodeDto") {
-                    val nodeJson =
-                        """
+            When("deserializing a ProgressIndicatorUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "progress_indicator",
                           "id": "a"
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<ProgressIndicatorUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<ProgressIndicatorUiNodeDto>()
                 }
+            }
 
-                When("deserializing a LabelUiNodeDto") {
-                    val nodeJson =
-                        """
+            When("deserializing a LabelUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "label",
                           "id": "a",
                           "text": "b"
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<LabelUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<LabelUiNodeDto>()
                 }
+            }
 
-                When("deserializing an ImageUiNodeDto") {
-                    val nodeJson =
-                        """
+            When("deserializing an ImageUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "image",
                           "id": "a",
                           "url": "b",
                           "contentDescription": "c"
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<ImageUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<ImageUiNodeDto>()
                 }
+            }
 
-                When("deserializing a GridUiNodeDto") {
-                    val nodeJson =
-                        """
+            When("deserializing a GridUiNodeDto") {
+                val nodeJson =
+                    """
                         {
                           "type": "grid",
                           "id": "a",
                           "columns": 1,
                           "children": []
                         }
-                        """.trimIndent()
-                    val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
-                    Then("it should deserialize correctly") {
-                        nodeDto.shouldBeInstanceOf<GridUiNodeDto>()
-                    }
+                    """.trimIndent()
+                val nodeDto = json.decodeFromString<UiNodeDto>(nodeJson)
+                Then("it should deserialize correctly") {
+                    nodeDto.shouldBeInstanceOf<GridUiNodeDto>()
                 }
             }
+        }
 
-            context("for ButtonActionDto polymorphism") {
-                When("deserializing a SubmitButtonActionDto") {
-                    val actionJson =
-                        """
+        context("for ButtonActionDto polymorphism") {
+            When("deserializing a SubmitButtonActionDto") {
+                val actionJson =
+                    """
                         {
                           "type": "submit",
                           "trigger": "a",
                           "validationScope": ["b"],
                           "onValidationFail": "c"
                         }
-                        """.trimIndent()
-                    val actionDto = json.decodeFromString<ButtonActionDto>(actionJson)
+                    """.trimIndent()
+                val actionDto = json.decodeFromString<ButtonActionDto>(actionJson)
 
-                    Then("it should deserialize correctly") {
-                        actionDto.shouldBeInstanceOf<SubmitButtonActionDto>()
-                        actionDto.trigger shouldBe "a"
-                        actionDto.validationScope shouldBe listOf("b")
-                        actionDto.onValidationFail shouldBe "c"
-                    }
+                Then("it should deserialize correctly") {
+                    actionDto.shouldBeInstanceOf<SubmitButtonActionDto>()
+                    actionDto.trigger shouldBe "a"
+                    actionDto.validationScope shouldBe listOf("b")
+                    actionDto.onValidationFail shouldBe "c"
                 }
+            }
 
-                When("deserializing a BypassValidationButtonActionDto") {
-                    val actionJson =
-                        """
+            When("deserializing a BypassValidationButtonActionDto") {
+                val actionJson =
+                    """
                         {
                           "type": "bypassValidation",
                           "trigger": "a"
                         }
-                        """.trimIndent()
-                    val actionDto = json.decodeFromString<ButtonActionDto>(actionJson)
+                    """.trimIndent()
+                val actionDto = json.decodeFromString<ButtonActionDto>(actionJson)
 
-                    Then("it should deserialize correctly") {
-                        actionDto.shouldBeInstanceOf<BypassValidationButtonActionDto>()
-                        actionDto.trigger shouldBe "a"
-                    }
+                Then("it should deserialize correctly") {
+                    actionDto.shouldBeInstanceOf<BypassValidationButtonActionDto>()
+                    actionDto.trigger shouldBe "a"
                 }
             }
+        }
 
-            context("for ValidationRuleDto polymorphism") {
-                When("deserializing a RequiredValidationRuleDto") {
-                    val validationJson =
-                        """
+        context("for ValidationRuleDto polymorphism") {
+            When("deserializing a RequiredValidationRuleDto") {
+                val validationJson =
+                    """
                         {
                           "type": "required",
                           "message": "a"
                         }
-                        """.trimIndent()
-                    val validationDto = json.decodeFromString<ValidationRuleDto>(validationJson)
+                    """.trimIndent()
+                val validationDto = json.decodeFromString<ValidationRuleDto>(validationJson)
 
-                    Then("it should deserialize correctly") {
-                        validationDto.shouldBeInstanceOf<RequiredValidationRuleDto>()
-                        validationDto.message shouldBe "a"
-                    }
+                Then("it should deserialize correctly") {
+                    validationDto.shouldBeInstanceOf<RequiredValidationRuleDto>()
+                    validationDto.message shouldBe "a"
                 }
+            }
 
-                When("deserializing a MinLengthValidationRuleDto") {
-                    val validationJson =
-                        """
+            When("deserializing a MinLengthValidationRuleDto") {
+                val validationJson =
+                    """
                         {
                           "type": "minLength",
                           "message": "a",
                           "length": 1
                         }
-                        """.trimIndent()
-                    val validationDto = json.decodeFromString<ValidationRuleDto>(validationJson)
+                    """.trimIndent()
+                val validationDto = json.decodeFromString<ValidationRuleDto>(validationJson)
 
-                    Then("it should deserialize correctly") {
-                        validationDto.shouldBeInstanceOf<MinLengthValidationRuleDto>()
-                        validationDto.message shouldBe "a"
-                        validationDto.length shouldBe 1
-                    }
+                Then("it should deserialize correctly") {
+                    validationDto.shouldBeInstanceOf<MinLengthValidationRuleDto>()
+                    validationDto.message shouldBe "a"
+                    validationDto.length shouldBe 1
                 }
+            }
 
-                When("deserializing a MaxLengthValidationRuleDto") {
-                    val validationJson =
-                        """
+            When("deserializing a MaxLengthValidationRuleDto") {
+                val validationJson =
+                    """
                         {
                           "type": "maxLength",
                           "message": "a",
                           "length": 1
                         }
-                        """.trimIndent()
-                    val validationDto = json.decodeFromString<ValidationRuleDto>(validationJson)
+                    """.trimIndent()
+                val validationDto = json.decodeFromString<ValidationRuleDto>(validationJson)
 
-                    Then("it should deserialize correctly") {
-                        validationDto.shouldBeInstanceOf<MaxLengthValidationRuleDto>()
-                        validationDto.message shouldBe "a"
-                        validationDto.length shouldBe 1
-                    }
+                Then("it should deserialize correctly") {
+                    validationDto.shouldBeInstanceOf<MaxLengthValidationRuleDto>()
+                    validationDto.message shouldBe "a"
+                    validationDto.length shouldBe 1
                 }
             }
         }
-    })
+    }
+})

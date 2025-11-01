@@ -29,10 +29,7 @@ class Context(
      * @param value The data to store.
      * @return A new, updated Context instance.
      */
-    fun put(
-        key: String,
-        value: Any?,
-    ): Context = Context(values + (key to value))
+    fun put(key: String, value: Any?): Context = Context(values + (key to value))
 
     fun asMap(): Map<String, Any?> = values
 }

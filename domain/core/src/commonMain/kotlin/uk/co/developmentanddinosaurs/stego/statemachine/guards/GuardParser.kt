@@ -86,10 +86,7 @@ internal object GuardParser {
      * Finds the index of a binary operator (like '&&' or '||') at the top level of an expression,
      * ignoring operators inside parentheses. It searches from right to left.
      */
-    private fun findSplitPoint(
-        expression: String,
-        operator: String,
-    ): Int? {
+    private fun findSplitPoint(expression: String, operator: String): Int? {
         var parenDepth = 0
         for (i in expression.indices.reversed()) {
             if (parenDepth == 0 && expression.substring(i).startsWith(operator)) {

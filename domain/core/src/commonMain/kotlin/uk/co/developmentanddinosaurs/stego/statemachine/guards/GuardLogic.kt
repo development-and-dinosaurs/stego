@@ -51,12 +51,7 @@ internal fun performComparison(
  * @param event The triggering event.
  * @return The boolean result of the equality check.
  */
-internal fun performEqualityCheck(
-    left: ValueProvider,
-    right: ValueProvider,
-    context: Context,
-    event: Event,
-): Boolean {
+internal fun performEqualityCheck(left: ValueProvider, right: ValueProvider, context: Context, event: Event): Boolean {
     val leftValue = left.get(context, event)
     val rightValue = right.get(context, event)
 

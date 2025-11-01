@@ -7,11 +7,7 @@ private val regex = "\\{([^{}]+)\\}".toRegex()
 /**
  * Resolves a string containing placeholders (e.g., "{username}") against a state machine Context.
  */
-fun resolve(
-    value: String,
-    context: Context,
-): String =
-    regex.replace(value) { result ->
-        val key = result.groupValues[1]
-        context.get(key)?.toString() ?: ""
-    }
+fun resolve(value: String, context: Context): String = regex.replace(value) { result ->
+    val key = result.groupValues[1]
+    context.get(key)?.toString() ?: ""
+}

@@ -8,36 +8,35 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ProgressIndicatorUiNodeDto
 import uk.co.developmentanddinosaurs.stego.ui.node.ProgressIndicatorUiNode
 
-class ProgressIndicatorUiNodeMapperTest :
-    BehaviorSpec({
-        Given("a ProgressIndicatorUiNodeMapper") {
-            val mapper = ProgressIndicatorUiNodeMapper()
+class ProgressIndicatorUiNodeMapperTest : BehaviorSpec({
+    Given("a ProgressIndicatorUiNodeMapper") {
+        val mapper = ProgressIndicatorUiNodeMapper()
 
-            and("a ProgressIndicatorUiNodeDto") {
-                val dto = ProgressIndicatorUiNodeDto(id = "progress-id")
+        and("a ProgressIndicatorUiNodeDto") {
+            val dto = ProgressIndicatorUiNodeDto(id = "progress-id")
 
-                When("the dto is mapped") {
-                    val uiNode = mapper.map(dto)
+            When("the dto is mapped") {
+                val uiNode = mapper.map(dto)
 
-                    Then("it should map all properties correctly") {
-                        uiNode.shouldBeInstanceOf<ProgressIndicatorUiNode>()
-                        uiNode.id shouldBe "progress-id"
-                    }
-                }
-            }
-
-            and("a non-ProgressIndicatorUiNodeDto") {
-                val dto = OtherUiNodeDto
-
-                When("the dto is mapped") {
-                    Then("it should throw an IllegalArgumentException") {
-                        val exception =
-                            shouldThrow<IllegalArgumentException> {
-                                mapper.map(dto)
-                            }
-                        exception.message shouldBe "Failed requirement."
-                    }
+                Then("it should map all properties correctly") {
+                    uiNode.shouldBeInstanceOf<ProgressIndicatorUiNode>()
+                    uiNode.id shouldBe "progress-id"
                 }
             }
         }
-    })
+
+        and("a non-ProgressIndicatorUiNodeDto") {
+            val dto = OtherUiNodeDto
+
+            When("the dto is mapped") {
+                Then("it should throw an IllegalArgumentException") {
+                    val exception =
+                        shouldThrow<IllegalArgumentException> {
+                            mapper.map(dto)
+                        }
+                    exception.message shouldBe "Failed requirement."
+                }
+            }
+        }
+    }
+})

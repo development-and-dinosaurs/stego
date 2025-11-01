@@ -23,10 +23,7 @@ class LogAction(
      * @param event The triggering event (unused).
      * @return The original, unmodified context.
      */
-    override fun execute(
-        context: Context,
-        event: Event,
-    ): Context {
+    override fun execute(context: Context, event: Event): Context {
         logger("LogAction: $message")
         return context
     }

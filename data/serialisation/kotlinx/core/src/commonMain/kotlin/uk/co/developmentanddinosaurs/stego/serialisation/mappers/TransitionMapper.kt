@@ -10,10 +10,9 @@ import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 class TransitionMapper(
     private val actionMapper: ActionDtoMapper,
 ) {
-    fun map(dto: TransitionDto): Transition =
-        Transition(
-            target = dto.target,
-            actions = dto.actions.map { actionMapper.map(it) },
-            guard = dto.guard?.let { Guard.create(it) },
-        )
+    fun map(dto: TransitionDto): Transition = Transition(
+        target = dto.target,
+        actions = dto.actions.map { actionMapper.map(it) },
+        guard = dto.guard?.let { Guard.create(it) },
+    )
 }

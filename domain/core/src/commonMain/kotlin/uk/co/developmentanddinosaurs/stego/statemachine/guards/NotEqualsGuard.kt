@@ -11,8 +11,5 @@ class NotEqualsGuard(
     private val left: ValueProvider,
     private val right: ValueProvider,
 ) : Guard {
-    override fun evaluate(
-        context: Context,
-        event: Event,
-    ): Boolean = !performEqualityCheck(left, right, context, event)
+    override fun evaluate(context: Context, event: Event): Boolean = !performEqualityCheck(left, right, context, event)
 }

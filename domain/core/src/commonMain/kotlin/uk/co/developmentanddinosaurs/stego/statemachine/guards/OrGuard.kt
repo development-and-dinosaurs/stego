@@ -10,8 +10,5 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 class OrGuard(
     private vararg val guards: Guard,
 ) : Guard {
-    override fun evaluate(
-        context: Context,
-        event: Event,
-    ): Boolean = guards.any { it.evaluate(context, event) }
+    override fun evaluate(context: Context, event: Event): Boolean = guards.any { it.evaluate(context, event) }
 }

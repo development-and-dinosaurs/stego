@@ -10,8 +10,5 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 data class EventValue(
     private val key: String,
 ) : ValueProvider {
-    override fun get(
-        context: Context,
-        event: Event?,
-    ): Any? = event?.data[key]
+    override fun get(context: Context, event: Event?): Any? = event?.data[key]
 }

@@ -68,90 +68,89 @@ private class HierarchicalStateMapper(
     }
 }
 
-class CompositeStateMapperTest :
-    BehaviorSpec({
-        val mapperFactories =
-            mapOf<KClass<out StateDto>, (StateDtoMapper) -> StateDtoMapper>(
-                SimpleStateDto::class to { _ -> SimpleStateMapper() },
-                HierarchicalStateDto::class to { compositeMapper -> HierarchicalStateMapper(compositeMapper) },
-            )
+class CompositeStateMapperTest : BehaviorSpec({
+    val mapperFactories =
+        mapOf<KClass<out StateDto>, (StateDtoMapper) -> StateDtoMapper>(
+            SimpleStateDto::class to { _ -> SimpleStateMapper() },
+            HierarchicalStateDto::class to { compositeMapper -> HierarchicalStateMapper(compositeMapper) },
+        )
 
-        Given("a CompositeStateMapper with registered mappers") {
-            val mapper = CompositeStateMapper(mapperFactories)
+    Given("a CompositeStateMapper with registered mappers") {
+        val mapper = CompositeStateMapper(mapperFactories)
 
-            and("a simple state machine definition") {
-                val dto =
-                    StateMachineDefinitionDto(
-                        initial = "Initial",
-                        states = mapOf("Initial" to SimpleStateDto("Initial")),
-                    )
+        and("a simple state machine definition") {
+            val dto =
+                StateMachineDefinitionDto(
+                    initial = "Initial",
+                    states = mapOf("Initial" to SimpleStateDto("Initial")),
+                )
 
-                When("the definition is mapped") {
-                    val definition = mapper.map(dto)
+            When("the definition is mapped") {
+                val definition = mapper.map(dto)
 
-                    Then("it should produce a valid StateMachineDefinition") {
-                        definition.initial shouldBe "Initial"
-                        definition.states.shouldHaveSize(1)
-                        definition.states["Initial"].shouldBeInstanceOf<LogicState>()
-                    }
-                }
-            }
-
-            and("a hierarchical state machine definition") {
-                val dto =
-                    StateMachineDefinitionDto(
-                        initial = "Parent",
-                        states =
-                            mapOf(
-                                "Parent" to
-                                    HierarchicalStateDto(
-                                        id = "Parent",
-                                        states = mapOf("Child" to SimpleStateDto("Child")),
-                                    ),
-                            ),
-                    )
-
-                When("the definition is mapped") {
-                    val definition = mapper.map(dto)
-
-                    Then("it should correctly map parent and child states") {
-                        val parent = definition.states["Parent"] as LogicState
-                        parent.states.shouldHaveSize(1)
-                        parent.states["Child"].shouldBeInstanceOf<LogicState>()
-                    }
-                }
-            }
-
-            and("a definition with an unknown state type") {
-                val dto =
-                    StateMachineDefinitionDto(
-                        initial = "Initial",
-                        states = mapOf("Initial" to UnknownStateDto("Initial")),
-                    )
-
-                When("the definition is mapped") {
-                    Then("it should throw a StateMachineException") {
-                        val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
-                        exception.message shouldBe "Unsupported StateDto type: UnknownStateDto"
-                    }
-                }
-            }
-
-            and("a definition with a null initial context value") {
-                val dto =
-                    StateMachineDefinitionDto(
-                        initial = "Initial",
-                        states = mapOf("Initial" to SimpleStateDto("Initial")),
-                        initialContext = mapOf("badValue" to NullDataValueDto),
-                    )
-
-                When("the definition is mapped") {
-                    Then("it should throw a StateMachineException") {
-                        val exception =
-                            shouldThrow<StateMachineException> { mapper.map(dto) }
-                        exception.message shouldBe "Failed to map initial context value: NullDataValueDto"
-                    }
+                Then("it should produce a valid StateMachineDefinition") {
+                    definition.initial shouldBe "Initial"
+                    definition.states.shouldHaveSize(1)
+                    definition.states["Initial"].shouldBeInstanceOf<LogicState>()
                 }
             }
         }
-    })
+
+        and("a hierarchical state machine definition") {
+            val dto =
+                StateMachineDefinitionDto(
+                    initial = "Parent",
+                    states =
+                    mapOf(
+                        "Parent" to
+                            HierarchicalStateDto(
+                                id = "Parent",
+                                states = mapOf("Child" to SimpleStateDto("Child")),
+                            ),
+                    ),
+                )
+
+            When("the definition is mapped") {
+                val definition = mapper.map(dto)
+
+                Then("it should correctly map parent and child states") {
+                    val parent = definition.states["Parent"] as LogicState
+                    parent.states.shouldHaveSize(1)
+                    parent.states["Child"].shouldBeInstanceOf<LogicState>()
+                }
+            }
+        }
+
+        and("a definition with an unknown state type") {
+            val dto =
+                StateMachineDefinitionDto(
+                    initial = "Initial",
+                    states = mapOf("Initial" to UnknownStateDto("Initial")),
+                )
+
+            When("the definition is mapped") {
+                Then("it should throw a StateMachineException") {
+                    val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
+                    exception.message shouldBe "Unsupported StateDto type: UnknownStateDto"
+                }
+            }
+        }
+
+        and("a definition with a null initial context value") {
+            val dto =
+                StateMachineDefinitionDto(
+                    initial = "Initial",
+                    states = mapOf("Initial" to SimpleStateDto("Initial")),
+                    initialContext = mapOf("badValue" to NullDataValueDto),
+                )
+
+            When("the definition is mapped") {
+                Then("it should throw a StateMachineException") {
+                    val exception =
+                        shouldThrow<StateMachineException> { mapper.map(dto) }
+                    exception.message shouldBe "Failed to map initial context value: NullDataValueDto"
+                }
+            }
+        }
+    }
+})

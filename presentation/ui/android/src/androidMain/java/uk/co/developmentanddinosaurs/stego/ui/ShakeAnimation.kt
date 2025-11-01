@@ -12,10 +12,7 @@ private const val SHAKE_DISTANCE = 10f
 private const val SHAKE_DURATION_MS = 50
 private const val SHAKE_REPETITIONS = 2
 
-fun Modifier.shake(
-    shakeTrigger: Int,
-    onAnimationFinished: () -> Unit = {},
-) = composed {
+fun Modifier.shake(shakeTrigger: Int, onAnimationFinished: () -> Unit = {}) = composed {
     val shake = remember { Animatable(0f) }
     LaunchedEffect(shakeTrigger) {
         if (shakeTrigger > 0) {

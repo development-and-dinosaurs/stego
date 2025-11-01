@@ -33,10 +33,7 @@ fun RenderTextFieldUiNode(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var hasBeenFocused by remember { mutableStateOf(false) }
 
-    fun validateAndReport(
-        value: String,
-        isFocused: Boolean = hasBeenFocused,
-    ) {
+    fun validateAndReport(value: String, isFocused: Boolean = hasBeenFocused) {
         val firstError =
             textFieldUiNode.validation
                 .asSequence()
@@ -98,19 +95,19 @@ fun RenderTextFieldUiNode(
         isError = errorMessage != null,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions =
-            KeyboardActions(onDone = {
-                commitChange()
-                focusManager.clearFocus()
-            }),
+        KeyboardActions(onDone = {
+            commitChange()
+            focusManager.clearFocus()
+        }),
         modifier =
-            Modifier
-                .shake(if (errorMessage != null) shakeTrigger else 0)
-                .onFocusChanged { focusState ->
-                    if (focusState.isFocused) hasBeenFocused = true
-                    if (!focusState.isFocused) {
-                        validateAndReport(text, true)
-                        commitChange()
-                    }
-                },
+        Modifier
+            .shake(if (errorMessage != null) shakeTrigger else 0)
+            .onFocusChanged { focusState ->
+                if (focusState.isFocused) hasBeenFocused = true
+                if (!focusState.isFocused) {
+                    validateAndReport(text, true)
+                    commitChange()
+                }
+            },
     )
 }

@@ -25,8 +25,5 @@ internal data class OtherActionDto(
 internal data class TestAction(
     val data: String,
 ) : Action {
-    override fun execute(
-        context: Context,
-        event: Event,
-    ): Context = context
+    override fun execute(context: Context, event: Event): Context = context
 }

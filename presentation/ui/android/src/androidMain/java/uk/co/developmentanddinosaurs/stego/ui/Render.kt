@@ -32,11 +32,7 @@ import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderProgressIndicatorUiNo
 import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderTextFieldUiNode
 
 @Composable
-fun Render(
-    uiNode: UiNode,
-    context: Context,
-    onEvent: (Event) -> Unit,
-) {
+fun Render(uiNode: UiNode, context: Context, onEvent: (Event) -> Unit) {
     val formFields = remember { mutableStateMapOf<String, FieldState>() }
     var shakeTrigger by remember { mutableIntStateOf(0) }
 
@@ -134,10 +130,7 @@ private fun RenderColumn(
 }
 
 @Composable
-private fun RenderLabel(
-    uiNode: LabelUiNode,
-    context: Context,
-) {
+private fun RenderLabel(uiNode: LabelUiNode, context: Context) {
     val resolvedNode = uiNode.copy(text = resolve(uiNode.text, context))
     RenderLabelUiNode(resolvedNode)
 }

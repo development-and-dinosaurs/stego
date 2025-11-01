@@ -165,11 +165,7 @@ class StateMachineEngine(
         enterState(targetState, event, statesToEnter)
     }
 
-    private fun enterState(
-        targetState: State,
-        event: Event,
-        statesToEnter: List<State>? = null,
-    ) {
+    private fun enterState(targetState: State, event: Event, statesToEnter: List<State>? = null) {
         val path = statesToEnter ?: getPathToState(targetState.id)
 
         var tempContext = output.value.context

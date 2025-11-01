@@ -45,31 +45,31 @@ class StegoUiKoinModule {
             single {
                 CompositeUiNodeMapper(
                     simpleMappers =
-                        mapOf(
-                            LabelUiNodeDto::class to LabelUiNodeMapper(),
-                            ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
-                            TextFieldUiNodeDto::class to TextFieldUiNodeMapper(get(), get()),
-                            ButtonUiNodeDto::class to ButtonUiNodeMapper(get()),
-                            ImageUiNodeDto::class to ImageUiNodeDtoMapper(),
-                        ),
+                    mapOf(
+                        LabelUiNodeDto::class to LabelUiNodeMapper(),
+                        ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
+                        TextFieldUiNodeDto::class to TextFieldUiNodeMapper(get(), get()),
+                        ButtonUiNodeDto::class to ButtonUiNodeMapper(get()),
+                        ImageUiNodeDto::class to ImageUiNodeDtoMapper(),
+                    ),
                     compositeAwareFactories =
-                        mapOf(
-                            ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) },
-                            GridUiNodeDto::class to { mapper -> GridUiNodeMapper(mapper) },
-                        ),
+                    mapOf(
+                        ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) },
+                        GridUiNodeDto::class to { mapper -> GridUiNodeMapper(mapper) },
+                    ),
                 )
             } bind UiNodeMapper::class
             single {
                 CompositeStateMapper(
                     mapperFactories =
-                        mapOf(
-                            LogicStateDto::class to { stateMapper ->
-                                LogicStateMapper(get(), get(), get(), stateMapper)
-                            },
-                            UiStateDto::class to { stateMapper ->
-                                UiStateMapper(stateMapper, get(), get(), get(), get())
-                            },
-                        ),
+                    mapOf(
+                        LogicStateDto::class to { stateMapper ->
+                            LogicStateMapper(get(), get(), get(), stateMapper)
+                        },
+                        UiStateDto::class to { stateMapper ->
+                            UiStateMapper(stateMapper, get(), get(), get(), get())
+                        },
+                    ),
                 )
             }
         }

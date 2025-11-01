@@ -10,10 +10,7 @@ import uk.co.developmentanddinosaurs.stego.ui.node.GridUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 
 @Composable
-fun RenderGridUiNode(
-    gridUiNode: GridUiNode,
-    renderChild: @Composable (UiNode) -> Unit,
-) {
+fun RenderGridUiNode(gridUiNode: GridUiNode, renderChild: @Composable (UiNode) -> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(gridUiNode.columns),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -8,13 +8,18 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import kotlinx.serialization.json.Json
 import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
+import uk.co.developmentanddinosaurs.stego.processor.metadata.NodeInfo
+import uk.co.developmentanddinosaurs.stego.processor.metadata.PropertyInfo
 
 @OptIn(KspExperimental::class)
 class StegoProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
 ) : SymbolProcessor {
+    private val json = Json
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         logger.info("Stego processor started")
         val nodeSymbols =
@@ -27,12 +32,15 @@ class StegoProcessor(
             return emptyList()
         }
 
-        writeNodeList(nodeSymbols)
+        writeMetadata(nodeSymbols)
 
         return emptyList()
     }
 
-    private fun writeNodeList(nodeSymbols: Sequence<KSClassDeclaration>) {
+    private fun writeMetadata(nodeSymbols: Sequence<KSClassDeclaration>) {
+        val nodes = nodeSymbols.map(::toNodeInfo).toList()
+        val nodesJson = json.encodeToString(nodes)
+
         val outputFile =
             codeGenerator.createNewFile(
                 dependencies =
@@ -40,15 +48,39 @@ class StegoProcessor(
                         aggregating = true,
                         sources = nodeSymbols.mapNotNull { it.containingFile }.toList().toTypedArray(),
                     ),
-                packageName = "",
-                fileName = "stego_annotated_classes",
-                extensionName = "txt",
+                packageName = "META-INF/stego",
+                fileName = "nodes",
+                extensionName = "json",
             )
-        outputFile.bufferedWriter().use { writer ->
-            nodeSymbols.forEach { node ->
-                writer.write(node.qualifiedName!!.asString())
-                writer.newLine()
-            }
-        }
+
+        outputFile.write(nodesJson.toByteArray())
+    }
+
+    private fun toNodeInfo(classDeclaration: KSClassDeclaration): NodeInfo {
+        val stegoAnnotation =
+            classDeclaration.annotations.first { it.shortName.asString() == StegoNode::class.simpleName }
+        val typeArgument =
+            stegoAnnotation.arguments.first { it.name?.asString() == "type" }
+
+        val properties =
+            classDeclaration
+                .getAllProperties()
+                .map { property ->
+                    PropertyInfo(
+                        name = property.simpleName.asString(),
+                        typeQualifiedName =
+                            property.type
+                                .resolve()
+                                .declaration.qualifiedName!!
+                                .asString(),
+                    )
+                }.toList()
+
+        return NodeInfo(
+            qualifiedName = classDeclaration.qualifiedName!!.asString(),
+            simpleName = classDeclaration.simpleName.asString(),
+            type = typeArgument.value as String,
+            properties = properties,
+        )
     }
 }

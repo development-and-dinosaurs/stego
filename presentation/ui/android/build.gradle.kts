@@ -1,64 +1,68 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     `spotless-convention`
-    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.android.kotlin.multiplatform.library)
 }
 
-kotlin {
-    android {
-        withJava()
-        namespace = "uk.co.developmentanddinosaurs.stego.ui"
-        compileSdk =
-            libs.versions.android.compileSdk
-                .get()
-                .toInt()
+android {
+    namespace = "uk.co.developmentanddinosaurs.stego.ui"
+    compileSdk =
+        libs.versions.android.compileSdk
+            .get()
+            .toInt()
+
+    defaultConfig {
         minSdk =
             libs.versions.android.minSdk
                 .get()
                 .toInt()
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions.jvmTarget = JvmTarget.JVM_17
-            }
-        }
     }
-    jvm()
 
-    sourceSets {
-        androidMain.dependencies {
-            implementation(project(":domain:core"))
-            implementation(project(":domain:ui-core"))
-            implementation(project.dependencies.platform(libs.compose.bom))
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.appcompat)
-            implementation(libs.androidx.core.ktx)
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network.okhttp)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.ui)
-            implementation(libs.google.material)
-        }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
-        commonTest.dependencies {
-            implementation(libs.kotest.assertions.core)
-            implementation(libs.kotest.framework.engine)
-        }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 
-        jvmTest.dependencies {
-            implementation(libs.kotest.runner.junit5)
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion =
+            libs.versions.compose.compiler
+                .get()
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-    filter {
-        isFailOnNoMatchingTests = false
-    }
+dependencies {
+    implementation(project(":compiler:annotations"))
+    implementation(project(":domain:core"))
+    implementation(project(":domain:ui-core"))
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.ui)
+    implementation(libs.google.material)
+
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.framework.engine)
+    testImplementation(libs.kotest.runner.junit5)
 }

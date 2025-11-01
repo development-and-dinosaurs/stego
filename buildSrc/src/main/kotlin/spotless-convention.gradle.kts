@@ -5,7 +5,11 @@ plugins {
 spotless {
     kotlin {
         target("src/**/*.kt")
-        ktlint()
+        ktlint().editorConfigOverride(
+            mapOf(
+                "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+            ),
+        )
     }
     kotlinGradle {
         target("*.gradle.kts")

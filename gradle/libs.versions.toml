@@ -11,6 +11,7 @@ coilCompose = "3.3.0"
 compose-bom = "2025.10.00"
 compose-compiler = "1.5.15"
 google-material = "1.13.0"
+kctFork = "0.11.0"
 koin = "4.1.1"
 kotest = "6.0.3"
 kotlin = "2.2.20"
@@ -39,6 +40,7 @@ compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
+kctfork-ksp = { module = "dev.zacsweers.kctfork:ksp", version.ref = "kctFork" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }

@@ -1,5 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.ui.node
 
+import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
+
 /**
  * UI model for an image.
  *
@@ -7,6 +9,7 @@ package uk.co.developmentanddinosaurs.stego.ui.node
  * @property url The URL of the image to display.
  * @property contentDescription Text used by screen readers to describe what is in the image.
  */
+@StegoNode(type = "stego.image")
 data class ImageUiNode(
     override val id: String,
     val url: String,

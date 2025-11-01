@@ -2,8 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `spotless-convention`
-    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -29,6 +30,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":domain:core"))
+            implementation(project(":compiler:annotations"))
         }
         commonTest.dependencies {
             implementation(libs.kotest.assertions.core)
@@ -39,6 +41,10 @@ kotlin {
             implementation(libs.kotest.runner.junit5)
         }
     }
+}
+
+dependencies {
+    "kspJvm"(project(":compiler:processor"))
 }
 
 tasks.withType<Test> {

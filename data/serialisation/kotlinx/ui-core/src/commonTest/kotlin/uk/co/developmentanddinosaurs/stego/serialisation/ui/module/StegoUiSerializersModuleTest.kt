@@ -74,7 +74,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "text_field",
+                          "type": "stego.text_field",
                           "id": "a",
                           "text": "b",
                           "label": "c",

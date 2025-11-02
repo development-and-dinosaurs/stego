@@ -15,7 +15,7 @@ class TextFieldUiNodeMapper(
             text = dto.text,
             label = dto.label,
             onTextChanged = interactionMapper.map(dto.onTextChanged),
-            validation = validationRuleMapper.map(dto.validators),
+            validators = validationRuleMapper.map(dto.validators),
         )
     }
 }

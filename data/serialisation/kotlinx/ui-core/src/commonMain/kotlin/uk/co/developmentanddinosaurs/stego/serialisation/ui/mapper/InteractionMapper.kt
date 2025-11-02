@@ -1,11 +1,11 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper
 
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.InteractionDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UserInteractionDto
 import uk.co.developmentanddinosaurs.stego.ui.node.UserInteraction
 
 /**
- * Maps an [InteractionDto] to a [UserInteraction] domain model.
+ * Maps a [UserInteractionDto] to a [UserInteraction] domain model.
  */
 class InteractionMapper {
-    fun map(dto: InteractionDto): UserInteraction = UserInteraction(trigger = dto.trigger)
+    fun map(dto: UserInteractionDto): UserInteraction = UserInteraction(trigger = dto.trigger)
 }

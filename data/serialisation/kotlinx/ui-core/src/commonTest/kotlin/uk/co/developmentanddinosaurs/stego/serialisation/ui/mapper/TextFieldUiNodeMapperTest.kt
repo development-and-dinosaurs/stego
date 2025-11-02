@@ -6,8 +6,8 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.InteractionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.TextFieldUiNodeDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UserInteractionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLengthValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.ui.node.TextFieldUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.UserInteraction
@@ -26,7 +26,7 @@ class TextFieldUiNodeMapperTest :
                         id = "text-field-id",
                         text = "Initial text",
                         label = "Enter text",
-                        onTextChanged = InteractionDto(trigger = "text-changed-event"),
+                        onTextChanged = UserInteractionDto(trigger = "text-changed-event"),
                         validators = listOf(MinLengthValidationRuleDto(message = "Too short", length = 5)),
                     )
 
@@ -42,8 +42,8 @@ class TextFieldUiNodeMapperTest :
                         uiNode.onTextChanged.shouldBeInstanceOf<UserInteraction>()
                         uiNode.onTextChanged.trigger shouldBe "text-changed-event"
 
-                        uiNode.validation shouldHaveSize 1
-                        uiNode.validation[0] shouldBe MinLengthValidationRule("Too short", 5)
+                        uiNode.validators shouldHaveSize 1
+                        uiNode.validators[0] shouldBe MinLengthValidationRule("Too short", 5)
                     }
                 }
             }

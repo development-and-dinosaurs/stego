@@ -31,7 +31,7 @@
                         ]
                     },
                     {
-                        "type": "text_field",
+                        "type": "stego.text_field",
                         "id": "username_field",
                         "label": "Username",
                         "text": "{username}",

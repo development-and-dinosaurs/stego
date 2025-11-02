@@ -38,7 +38,7 @@ fun RenderTextFieldUiNode(
         isFocused: Boolean = hasBeenFocused,
     ) {
         val firstError =
-            textFieldUiNode.validation
+            textFieldUiNode.validators
                 .asSequence()
                 .map { it.validate(value) }
                 .filterIsInstance<ValidationResult.Failure>()
@@ -52,7 +52,7 @@ fun RenderTextFieldUiNode(
                 isValid = firstError == null,
                 triggerValidation = {
                     validateAndReport(text, true)
-                    return@FieldState textFieldUiNode.validation.all { it.validate(text) is ValidationResult.Success }
+                    return@FieldState textFieldUiNode.validators.all { it.validate(text) is ValidationResult.Success }
                 },
             ),
         )
@@ -71,7 +71,7 @@ fun RenderTextFieldUiNode(
     }
 
     fun commitChange() {
-        val hasFailed = textFieldUiNode.validation.any { it.validate(text) is ValidationResult.Failure }
+        val hasFailed = textFieldUiNode.validators.any { it.validate(text) is ValidationResult.Failure }
         if (!hasFailed) {
             userInteractionHandler(
                 textFieldUiNode.onTextChanged.trigger,

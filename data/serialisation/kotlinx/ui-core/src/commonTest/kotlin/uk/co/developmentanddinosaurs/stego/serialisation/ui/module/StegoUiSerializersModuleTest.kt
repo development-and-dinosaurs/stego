@@ -142,7 +142,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "image",
+                          "type": "stego.image",
                           "id": "a",
                           "url": "b",
                           "contentDescription": "c"

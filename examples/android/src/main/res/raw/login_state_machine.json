@@ -12,7 +12,7 @@
         "id": "idle_column",
         "children": [
           {
-            "type": "image",
+            "type": "stego.image",
             "id": "image_field",
             "url": "https://agilekatas.co.uk/img/katas/kata_berlinclock.png",
             "contentDescription": "Berlin Clock"

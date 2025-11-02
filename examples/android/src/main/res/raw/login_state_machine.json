@@ -38,7 +38,7 @@
             ]
           },
           {
-            "type": "button",
+            "type": "stego.button",
             "id": "login_button",
             "text": "Log In",
             "onClick": {
@@ -145,7 +145,7 @@
             "text": "Error for {username}: {error}"
           },
           {
-            "type": "button",
+            "type": "stego.button",
             "id": "retry_button",
             "text": "Retry",
             "onClick": {

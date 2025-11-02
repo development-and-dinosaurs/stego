@@ -124,9 +124,10 @@ abstract class GenerateDtosTask : DefaultTask() {
 
     private fun mapToDto(typeString: String): String {
         val typeMappings = mapOf(
-            "uk.co.developmentanddinosaurs.stego.ui.node.UiNode" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto"
+            "uk.co.developmentanddinosaurs.stego.ui.node.UiNode" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto",
+            "uk.co.developmentanddinosaurs.stego.ui.node.ButtonAction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonActionDto"
         )
-
+        println("Mapping $typeString to ${typeMappings[typeString]}")
         return typeMappings[typeString] ?: typeString
     }
 }

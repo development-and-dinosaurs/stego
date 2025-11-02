@@ -8,7 +8,7 @@
       "id": "Idle",
       "type": "ui",
       "uiNode": {
-        "type": "column",
+        "type": "stego.column",
         "id": "idle_column",
         "children": [
           {
@@ -76,7 +76,7 @@
       "id": "Loading",
       "type": "ui",
       "uiNode": {
-        "type": "column",
+        "type": "stego.column",
         "id": "loading_column",
         "children": [
           {
@@ -121,7 +121,7 @@
       "id": "Success",
       "type": "ui",
       "uiNode": {
-        "type": "column",
+        "type": "stego.column",
         "id": "success_column",
         "children": [
           {
@@ -136,7 +136,7 @@
       "id": "Error",
       "type": "ui",
       "uiNode": {
-        "type": "column",
+        "type": "stego.column",
         "id": "error_column",
         "children": [
           {

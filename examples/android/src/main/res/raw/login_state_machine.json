@@ -84,7 +84,7 @@
             "id": "loading_spinner"
           },
           {
-            "type": "label",
+            "type": "stego.label",
             "id": "loading_label",
             "text": "Reticulating splines..."
           }
@@ -125,7 +125,7 @@
         "id": "success_column",
         "children": [
           {
-            "type": "label",
+            "type": "stego.label",
             "id": "success_label",
             "text": "Welcome, {username}!"
           }
@@ -140,7 +140,7 @@
         "id": "error_column",
         "children": [
           {
-            "type": "label",
+            "type": "stego.label",
             "id": "error_label",
             "text": "Error for {username}: {error}"
           },

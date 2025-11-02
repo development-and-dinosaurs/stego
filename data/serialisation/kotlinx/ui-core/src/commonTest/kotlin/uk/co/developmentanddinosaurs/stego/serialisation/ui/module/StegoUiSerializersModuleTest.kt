@@ -40,7 +40,7 @@ class StegoUiSerializersModuleTest :
                           "id": "state",
                           "type": "ui",
                           "uiNode": {
-                            "type": "label",
+                            "type": "stego.label",
                             "id": "a",
                             "text": "b"
                           }
@@ -127,7 +127,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "label",
+                          "type": "stego.label",
                           "id": "a",
                           "text": "b"
                         }

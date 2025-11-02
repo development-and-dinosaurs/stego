@@ -59,7 +59,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "column",
+                          "type": "stego.column",
                           "id": "a",
                           "children": []
                         }
@@ -94,7 +94,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "button",
+                          "type": "stego.button",
                           "id": "a",
                           "text": "b",
                           "onClick": {
@@ -113,7 +113,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "progress_indicator",
+                          "type": "stego.progress_indicator",
                           "id": "a"
                         }
                         """.trimIndent()
@@ -158,7 +158,7 @@ class StegoUiSerializersModuleTest :
                     val nodeJson =
                         """
                         {
-                          "type": "grid",
+                          "type": "stego.grid",
                           "id": "a",
                           "columns": 1,
                           "children": []

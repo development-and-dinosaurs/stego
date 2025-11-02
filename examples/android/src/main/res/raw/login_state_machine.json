@@ -80,7 +80,7 @@
         "id": "loading_column",
         "children": [
           {
-            "type": "progress_indicator",
+            "type": "stego.progress_indicator",
             "id": "loading_spinner"
           },
           {

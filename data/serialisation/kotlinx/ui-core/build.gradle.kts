@@ -1,12 +1,34 @@
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `spotless-convention`
+    `generate-dtos`
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlinx.kover)
 }
+
+val generateDtos =
+    tasks.register<Generate_dtos_gradle.GenerateDtosTask>("generateDtos") {
+        group = "generation"
+        description = "Generate DTO classes from metadata"
+        dependsOn(
+            rootProject
+                .project(":domain:ui-core")
+                .tasks
+                .named("kspKotlinJvm"),
+        )
+
+        inputFile.set(
+            rootProject
+                .project(":domain:ui-core")
+                .layout.buildDirectory
+                .file("generated/ksp/jvm/jvmMain/resources/stego/nodes.json"),
+        )
+        outputDir.set(layout.buildDirectory.dir("generated/sources/dtos/kotlin"))
+    }
 
 kotlin {
     android {
@@ -29,6 +51,9 @@ kotlin {
     jvm()
 
     sourceSets {
+        commonMain {
+            kotlin.srcDir(generateDtos.map { it.outputDir })
+        }
         commonMain.dependencies {
             implementation(project(":domain:core"))
             implementation(project(":domain:ui-core"))

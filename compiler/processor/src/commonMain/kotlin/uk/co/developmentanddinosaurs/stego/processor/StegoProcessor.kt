@@ -48,7 +48,7 @@ class StegoProcessor(
                         aggregating = true,
                         sources = nodeSymbols.mapNotNull { it.containingFile }.toList().toTypedArray(),
                     ),
-                packageName = "META-INF/stego",
+                packageName = "stego",
                 fileName = "nodes",
                 extensionName = "json",
             )

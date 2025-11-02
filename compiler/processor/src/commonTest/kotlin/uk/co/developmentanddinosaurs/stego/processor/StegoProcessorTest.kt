@@ -45,12 +45,12 @@ class StegoProcessorTest :
                 }
 
                 And("it should generate a metadata JSON file") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/META-INF/stego/nodes.json")
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
                     generatedFile.exists() shouldBe true
                 }
 
                 And("the generated JSON should contain the correct metadata") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/META-INF/stego/nodes.json")
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
                     val nodes = Json.decodeFromString<List<NodeInfo>>(generatedFile.readText())
 
                     nodes.size shouldBe 1
@@ -108,7 +108,7 @@ class StegoProcessorTest :
                 }
 
                 And("the generated JSON should contain metadata for both classes") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/META-INF/stego/nodes.json")
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
                     val nodes = Json.decodeFromString<List<NodeInfo>>(generatedFile.readText())
 
                     nodes.size shouldBe 2
@@ -146,7 +146,7 @@ class StegoProcessorTest :
                 }
 
                 And("it should not generate a metadata file") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/META-INF/stego/nodes.json")
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
                     generatedFile.exists() shouldBe false
                 }
             }

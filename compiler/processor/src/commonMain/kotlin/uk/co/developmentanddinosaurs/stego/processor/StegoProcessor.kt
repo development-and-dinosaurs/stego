@@ -8,6 +8,8 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.Variance
 import kotlinx.serialization.json.Json
 import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
 import uk.co.developmentanddinosaurs.stego.processor.metadata.NodeInfo
@@ -68,11 +70,7 @@ class StegoProcessor(
                 .map { property ->
                     PropertyInfo(
                         name = property.simpleName.asString(),
-                        typeQualifiedName =
-                            property.type
-                                .resolve()
-                                .declaration.qualifiedName!!
-                                .asString(),
+                        typeQualifiedName = property.type.resolve().toTypeName(),
                     )
                 }.toList()
 
@@ -82,5 +80,25 @@ class StegoProcessor(
             type = typeArgument.value as String,
             properties = properties,
         )
+    }
+
+    private fun KSType.toTypeName(): String {
+        val baseType = this.declaration.qualifiedName?.asString() ?: return ""
+        if (this.arguments.isEmpty()) {
+            return baseType
+        }
+        val genericArgs =
+            this.arguments.joinToString(separator = ", ") { argument ->
+                val type = argument.type?.resolve()
+                val variance =
+                    when (argument.variance) {
+                        Variance.CONTRAVARIANT -> "in "
+                        Variance.COVARIANT -> "out "
+                        else -> ""
+                    }
+                variance + (type?.toTypeName() ?: "*")
+            }
+
+        return "$baseType<$genericArgs>"
     }
 }

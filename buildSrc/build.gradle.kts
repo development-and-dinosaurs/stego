@@ -3,13 +3,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.kotlin.serialization)
 }
 
 repositories {
+    mavenCentral()
     gradlePluginPortal()
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinpoet)
     implementation(libs.spotless.gradle.plugin)
 }
 

@@ -14,13 +14,13 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ButtonUiNodeM
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ColumnUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.CompositeUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.GridUiNodeMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ImageUiNodeDtoMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.InteractionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ImageUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.LabelUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ProgressIndicatorUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.TextFieldUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiStateMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UserInteractionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.stegoUiSerializersModule
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonUiNodeDto
@@ -39,7 +39,7 @@ class StegoUiKoinModule {
         module {
             includes(StegoCoreKoinModule().module)
             single(named("stegoUiSerializersModule")) { stegoUiSerializersModule }
-            single { InteractionMapper() }
+            single { UserInteractionMapper() }
             single { ButtonActionMapper() }
             single { ValidationRuleMapper() }
             single {
@@ -50,7 +50,7 @@ class StegoUiKoinModule {
                             ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
                             TextFieldUiNodeDto::class to TextFieldUiNodeMapper(get(), get()),
                             ButtonUiNodeDto::class to ButtonUiNodeMapper(get()),
-                            ImageUiNodeDto::class to ImageUiNodeDtoMapper(),
+                            ImageUiNodeDto::class to ImageUiNodeMapper(),
                         ),
                     compositeAwareFactories =
                         mapOf(

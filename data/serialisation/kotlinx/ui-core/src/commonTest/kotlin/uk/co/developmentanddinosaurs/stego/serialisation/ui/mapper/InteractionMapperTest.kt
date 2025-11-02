@@ -7,7 +7,7 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UserInteraction
 class InteractionMapperTest :
     BehaviorSpec({
         Given("an InteractionMapper") {
-            val mapper = InteractionMapper()
+            val mapper = UserInteractionMapper()
 
             and("a UserInteractionDto") {
                 val dto = UserInteractionDto(trigger = "some-event")

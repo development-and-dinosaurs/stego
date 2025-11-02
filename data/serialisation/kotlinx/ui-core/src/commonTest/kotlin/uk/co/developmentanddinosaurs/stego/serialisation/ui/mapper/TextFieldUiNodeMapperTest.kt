@@ -16,9 +16,9 @@ import uk.co.developmentanddinosaurs.stego.ui.validators.MinLengthValidationRule
 class TextFieldUiNodeMapperTest :
     BehaviorSpec({
         Given("a TextFieldUiNodeMapper") {
-            val interactionMapper = InteractionMapper()
+            val userInteractionMapper = UserInteractionMapper()
             val validationRuleMapper = ValidationRuleMapper()
-            val mapper = TextFieldUiNodeMapper(interactionMapper, validationRuleMapper)
+            val mapper = TextFieldUiNodeMapper(userInteractionMapper, validationRuleMapper)
 
             and("a TextFieldUiNodeDto") {
                 val dto =

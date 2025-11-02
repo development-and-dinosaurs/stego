@@ -6,6 +6,6 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UserInteraction
 /**
  * Maps a [UserInteractionDto] to a [UserInteraction] domain model.
  */
-class InteractionMapper {
+class UserInteractionMapper {
     fun map(dto: UserInteractionDto): UserInteraction = UserInteraction(trigger = dto.trigger)
 }

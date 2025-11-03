@@ -1,9 +1,10 @@
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import uk.co.developmentanddinosaurs.stego.gradle.GenerateDtosTask
+import uk.co.developmentanddinosaurs.stego.gradle.GenerateMappersTask
 
 plugins {
     `spotless-convention`
-    `generate-dtos`
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
@@ -11,7 +12,7 @@ plugins {
 }
 
 val generateDtos =
-    tasks.register<Generate_dtos_gradle.GenerateDtosTask>("generateDtos") {
+    tasks.register<GenerateDtosTask>("generateDtos") {
         group = "generation"
         description = "Generate DTO classes from metadata"
         dependsOn(
@@ -31,7 +32,7 @@ val generateDtos =
     }
 
 val generateMappers =
-    tasks.register<Generate_dtos_gradle.GenerateMappersTask>("generateMappers") {
+    tasks.register<GenerateMappersTask>("generateMappers") {
         group = "generation"
         description = "Generate Mapper classes from metadata"
         dependsOn(

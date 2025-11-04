@@ -95,7 +95,7 @@ class StegoUiSerializersModuleTest :
                       "id": "a",
                       "text": "b",
                       "onClick": {
-                        "type": "bypassValidation",
+                        "type": "bypass_validation",
                         "trigger": "c"
                       }
                     }
@@ -191,7 +191,7 @@ class StegoUiSerializersModuleTest :
                 val actionJson =
                     """
                     {
-                      "type": "bypassValidation",
+                      "type": "bypass_validation",
                       "trigger": "a"
                     }
                     """.trimIndent()

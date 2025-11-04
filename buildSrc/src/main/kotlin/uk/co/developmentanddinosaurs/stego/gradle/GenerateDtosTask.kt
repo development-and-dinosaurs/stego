@@ -22,6 +22,9 @@ abstract class GenerateDtosTask : DefaultTask() {
     @get:InputFile
     abstract val inputFile: RegularFileProperty
 
+    @get:InputFile
+    abstract val baseDtosFile: RegularFileProperty
+
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
@@ -35,6 +38,19 @@ abstract class GenerateDtosTask : DefaultTask() {
         val json = Json { ignoreUnknownKeys = true }
         val nodes = json.decodeFromString<List<NodeMetadata>>(input.readText())
 
+        val externalSuperTypeProperties =
+            baseDtosFile.get().asFile.let {
+                if (it.exists()) {
+                    json.decodeFromString<Map<String, List<String>>>(it.readText())
+                } else {
+                    emptyMap()
+                }
+            }
+
+        val nodesByQualifiedName = nodes.associateBy { it.qualifiedName }
+        val superTypeProperties =
+            nodes.associate { node -> node.qualifiedName to (nodesByQualifiedName[node.superType]?.properties?.map { p -> p.name }?.toSet() ?: externalSuperTypeProperties[node.superType]?.toSet() ?: emptySet()) }
+
         nodes.forEach { node ->
             val dtoName = "${node.simpleName}Dto"
             val packageName = getDtoPackage(node.qualifiedName)
@@ -44,16 +60,17 @@ abstract class GenerateDtosTask : DefaultTask() {
             val constructorBuilder = FunSpec.constructorBuilder()
             val propertySpecs = node.properties.map { property ->
                 val typeName = parseTypeName(property.typeQualifiedName)
-                constructorBuilder.addParameter(property.name, typeName)
+
+                val parameterSpec = com.squareup.kotlinpoet.ParameterSpec.builder(property.name, typeName)
+                if (typeName.isNullable) {
+                    parameterSpec.defaultValue("null")
+                }
+                constructorBuilder.addParameter(parameterSpec.build())
+
                 val propertySpec = PropertySpec.builder(property.name, typeName)
                     .initializer(property.name)
 
-                // A simple heuristic to check if a property is likely inherited.
-                val isInherited =
-                    node.superType != null &&
-                        (property.name == "id" || property.name == "message" || property.name == "trigger")
-
-                if (isInherited) {
+                if (superTypeProperties[node.qualifiedName]?.contains(property.name) == true) {
                     propertySpec.addModifiers(KModifier.OVERRIDE)
                 }
 
@@ -73,7 +90,12 @@ abstract class GenerateDtosTask : DefaultTask() {
                 dtoClass.addAnnotation(serialNameAnnotation)
             }
 
-            node.superType?.let { dtoClass.addSuperinterface(ClassName.bestGuess(mapToDto(it))) }
+            node.superType?.let {
+                println("Super type: $it")
+                if (it != "kotlin.Any") {
+                    dtoClass.addSuperinterface(ClassName.bestGuess(mapToDto(it)))
+                }
+            }
 
             val fileSpec = FileSpec.builder(packageName, dtoName)
                 .addType(dtoClass.build())
@@ -85,18 +107,23 @@ abstract class GenerateDtosTask : DefaultTask() {
 
     private fun parseTypeName(typeString: String): TypeName {
         val trimmed = typeString.trim()
+        val isNullable = trimmed.endsWith('?')
+        val nonNullableTypeString = if (isNullable) trimmed.removeSuffix("?") else trimmed
+
         if (trimmed == "*") return STAR
 
-        val genericStartIndex = trimmed.indexOf('<')
-        if (genericStartIndex == -1) return ClassName.bestGuess(mapToDto(trimmed))
+        val genericStartIndex = nonNullableTypeString.indexOf('<')
+        if (genericStartIndex == -1) {
+            return ClassName.bestGuess(mapToDto(nonNullableTypeString)).copy(nullable = isNullable)
+        }
 
-        val genericEndIndex = trimmed.lastIndexOf('>')
-        if (genericEndIndex == -1) return ClassName.bestGuess(trimmed)
+        val genericEndIndex = nonNullableTypeString.lastIndexOf('>')
+        if (genericEndIndex == -1) return ClassName.bestGuess(nonNullableTypeString)
 
-        val rawTypeString = trimmed.take(genericStartIndex)
+        val rawTypeString = nonNullableTypeString.take(genericStartIndex)
         val rawClassName = ClassName.bestGuess(mapToDto(rawTypeString))
 
-        val argsString = trimmed.substring(genericStartIndex + 1, genericEndIndex)
+        val argsString = nonNullableTypeString.substring(genericStartIndex + 1, genericEndIndex)
 
         val typeArgs = mutableListOf<TypeName>()
         var nestLevel = 0
@@ -112,6 +139,6 @@ abstract class GenerateDtosTask : DefaultTask() {
         }
         typeArgs.add(parseTypeName(argsString.substring(lastSplit)))
 
-        return rawClassName.parameterizedBy(typeArgs)
+        return rawClassName.parameterizedBy(typeArgs).copy(nullable = isNullable)
     }
 }

@@ -1,5 +1,8 @@
 package uk.co.developmentanddinosaurs.stego.ui.validators
 
+import uk.co.developmentanddinosaurs.stego.annotations.StegoComponent
+
+@StegoComponent("minLength")
 data class MinLengthValidationRule(
     override val message: String,
     val length: Int,

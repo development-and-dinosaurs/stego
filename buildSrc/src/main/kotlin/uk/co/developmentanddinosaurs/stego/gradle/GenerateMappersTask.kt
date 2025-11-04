@@ -25,6 +25,7 @@ abstract class GenerateMappersTask : DefaultTask() {
     private val componentRootToMapperInterface = mapOf(
         "uk.co.developmentanddinosaurs.stego.ui.node.UiNode" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapper",
         "uk.co.developmentanddinosaurs.stego.ui.node.ButtonAction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ButtonActionMapper",
+        "uk.co.developmentanddinosaurs.stego.ui.node.UserInteraction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UserInteractionMapper",
         "uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ValidationRuleMapper",
     )
 
@@ -55,11 +56,6 @@ abstract class GenerateMappersTask : DefaultTask() {
             val nodeClassName = ClassName.bestGuess(node.qualifiedName)
             val dtoPackage = getDtoPackage(node.qualifiedName)
             val dtoClassName = ClassName(dtoPackage, "${node.simpleName}Dto")
-
-            val mapperInterfaceName = componentRootToMapperInterface[node.superType] ?: return@forEach
-            val mapperInterface = ClassName.bestGuess(mapperInterfaceName)
-            val dtoInterface = ClassName.bestGuess(mapToDto(node.superType!!))
-            val domainInterface = ClassName.bestGuess(node.superType!!)
 
             val constructorBuilder = FunSpec.constructorBuilder()
             val constructorMappers = mutableMapOf<String, String>()
@@ -98,24 +94,37 @@ abstract class GenerateMappersTask : DefaultTask() {
 
             val primaryConstructor = constructorBuilder.build()
 
-            val mapFunction =
-                FunSpec.builder("map")
+            val mapperClass = TypeSpec.classBuilder(mapperName)
+                .primaryConstructor(primaryConstructor)
+                .addProperties(propertySpecs)
+
+            // A mapper only needs to implement an interface if it's part of a polymorphic group.
+            if (node.superType != null && componentRootToMapperInterface.containsKey(node.superType)) {
+                val mapperInterfaceName = componentRootToMapperInterface.getValue(node.superType!!)
+                val mapperInterface = ClassName.bestGuess(mapperInterfaceName)
+                val dtoInterface = ClassName.bestGuess(mapToDto(node.superType!!))
+                val domainInterface = ClassName.bestGuess(node.superType!!)
+
+                val mapFunction = FunSpec.builder("map")
                     .addModifiers(KModifier.OVERRIDE)
                     .addParameter("dto", dtoInterface)
                     .returns(domainInterface)
                     .addStatement("require(dto is %T)", dtoClassName)
                     .addStatement("return %T(\n%L\n)", nodeClassName, mappingStatements)
                     .build()
-
-            val mapperClass =
-                TypeSpec.classBuilder(mapperName)
-                    .addSuperinterface(mapperInterface)
-                    .primaryConstructor(primaryConstructor)
-                    .addProperties(propertySpecs)
-                    .addFunction(mapFunction)
+                mapperClass.addSuperinterface(mapperInterface)
+                mapperClass.addFunction(mapFunction)
+            } else {
+                // For standalone mappers, create a simple map function with concrete types.
+                val mapFunction = FunSpec.builder("map")
+                    .addParameter("dto", dtoClassName)
+                    .returns(nodeClassName)
+                    .addStatement("return %T(\n%L\n)", nodeClassName, mappingStatements)
                     .build()
+                mapperClass.addFunction(mapFunction)
+            }
 
-            val fileSpec = FileSpec.builder(packageName, mapperName).addType(mapperClass).build()
+            val fileSpec = FileSpec.builder(packageName, mapperName).addType(mapperClass.build()).build()
             fileSpec.writeTo(output)
         }
     }

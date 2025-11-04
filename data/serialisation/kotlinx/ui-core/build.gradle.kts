@@ -28,6 +28,12 @@ val generateDtos =
                 .layout.buildDirectory
                 .file("generated/ksp/jvm/jvmMain/resources/stego/nodes.json"),
         )
+        baseDtosFile.set(
+            rootProject
+                .project(":domain:ui-core")
+                .layout.buildDirectory
+                .file("generated/ksp/jvm/jvmMain/resources/stego/base-dtos.json"),
+        )
         outputDir.set(layout.buildDirectory.dir("generated/sources/dtos/kotlin"))
     }
 

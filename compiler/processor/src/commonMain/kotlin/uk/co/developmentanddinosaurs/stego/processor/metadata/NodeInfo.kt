@@ -12,6 +12,7 @@ data class NodeInfo(
     val simpleName: String,
     val type: String,
     val properties: List<PropertyInfo>,
+    val superType: String?,
 )
 
 @Serializable

@@ -1,5 +1,8 @@
 package uk.co.developmentanddinosaurs.stego.ui.validators
 
+import uk.co.developmentanddinosaurs.stego.annotations.StegoComponent
+
+@StegoComponent("required")
 data class RequiredValidationRule(
     override val message: String,
 ) : ValidationRule {

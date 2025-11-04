@@ -12,12 +12,8 @@ class CompositeUiNodeMapper(
     simpleMappers: Map<KClass<out UiNodeDto>, UiNodeMapper>,
     compositeAwareFactories: Map<KClass<out UiNodeDto>, (UiNodeMapper) -> UiNodeMapper>,
 ) : UiNodeMapper {
-    private val mapperMap: Map<KClass<out UiNodeDto>, UiNodeMapper>
-
-    init {
-        val compositeAwareMappers = compositeAwareFactories.mapValues { it.value(this) }
-        this.mapperMap = simpleMappers + compositeAwareMappers
-    }
+    private val mapperMap: Map<KClass<out UiNodeDto>, UiNodeMapper> =
+        simpleMappers + compositeAwareFactories.mapValues { it.value(this) }
 
     override fun map(dto: UiNodeDto): UiNode {
         val mapper =

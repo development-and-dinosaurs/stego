@@ -151,4 +151,86 @@ class StegoProcessorTest :
                 }
             }
         }
+
+        Given("a source file with a class annotated with @StegoNode and generic type arguments") {
+            val source =
+                SourceFile.kotlin(
+                    "GenericNode.kt",
+                    """
+                package stego.tests
+
+                import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
+
+                @StegoNode("generic.node")
+                data class GenericNode(val id: String, val data: List<String>)
+                """,
+                )
+
+            val compilation =
+                KotlinCompilation().apply {
+                    sources = listOf(source)
+                    configureKsp {
+                        symbolProcessorProviders += mutableListOf(StegoProcessorProvider())
+                    }
+                    inheritClassPath = true
+                }
+
+            When("the processor is run") {
+                val result = compilation.compile()
+
+                Then("the compilation should succeed") {
+                    result.exitCode shouldBe KotlinCompilation.ExitCode.OK
+                }
+
+                And("the generated JSON should contain the correct generic type metadata") {
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
+                    val nodes = Json.decodeFromString<List<NodeInfo>>(generatedFile.readText())
+
+                    nodes.size shouldBe 1
+                    nodes.first().properties.any { it.name == "data" && it.typeQualifiedName == "kotlin.collections.List<kotlin.String>" } shouldBe true
+                }
+            }
+        }
+
+        Given("a source file with a StegoNode that inherits from a base DTO") {
+            val source =
+                SourceFile.kotlin(
+                    "InheritingNode.kt",
+                    """
+                package stego.tests
+
+                import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
+
+                open class BaseDto(val baseProperty: String)
+
+                @StegoNode("inheriting.node")
+                data class InheritingNode(val ownProperty: String) : BaseDto("test")
+                """,
+                )
+
+            val compilation =
+                KotlinCompilation().apply {
+                    sources = listOf(source)
+                    configureKsp {
+                        symbolProcessorProviders += mutableListOf(StegoProcessorProvider())
+                    }
+                    inheritClassPath = true
+                }
+
+            When("the processor is run") {
+                val result = compilation.compile()
+
+                Then("the compilation should succeed") {
+                    result.exitCode shouldBe KotlinCompilation.ExitCode.OK
+                }
+
+                And("it should generate a base-dtos.json file") {
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/base-dtos.json")
+                    generatedFile.exists() shouldBe true
+
+                    val baseDtos = Json.decodeFromString<Map<String, List<String>>>(generatedFile.readText())
+                    baseDtos["stego.tests.BaseDto"] shouldBe listOf("baseProperty")
+                }
+            }
+        }
     })

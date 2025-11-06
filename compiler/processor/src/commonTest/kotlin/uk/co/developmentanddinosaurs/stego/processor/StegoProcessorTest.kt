@@ -8,7 +8,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
-import uk.co.developmentanddinosaurs.stego.processor.metadata.NodeInfo
+import uk.co.developmentanddinosaurs.stego.processor.metadata.BaseComponentMetadata
+import uk.co.developmentanddinosaurs.stego.processor.metadata.ComponentMetadata
 import uk.co.developmentanddinosaurs.stego.processor.metadata.PropertyInfo
 import java.io.File
 
@@ -45,20 +46,20 @@ class StegoProcessorTest :
                 }
 
                 And("it should generate a metadata JSON file") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/components.json")
                     generatedFile.exists() shouldBe true
                 }
 
                 And("the generated JSON should contain the correct metadata") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
-                    val nodes = Json.decodeFromString<List<NodeInfo>>(generatedFile.readText())
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/components.json")
+                    val components = Json.decodeFromString<List<ComponentMetadata>>(generatedFile.readText())
 
-                    nodes.size shouldBe 1
-                    val nodeInfo = nodes.first()
+                    components.size shouldBe 1
+                    val nodeInfo = components.first()
 
                     nodeInfo.qualifiedName shouldBe "stego.tests.MyTestNode"
                     nodeInfo.simpleName shouldBe "MyTestNode"
-                    nodeInfo.type shouldBe "test.node"
+                    nodeInfo.stegoType shouldBe "test.node"
                     nodeInfo.properties shouldBe
                         listOf(
                             PropertyInfo(
@@ -77,7 +78,7 @@ class StegoProcessorTest :
         Given("a source file with multiple classes annotated with @StegoNode") {
             val source =
                 SourceFile.kotlin(
-                    "MultipleNodes.kt",
+                    "MultipleComponents.kt",
                     """
                 package stego.tests
 
@@ -108,12 +109,12 @@ class StegoProcessorTest :
                 }
 
                 And("the generated JSON should contain metadata for both classes") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
-                    val nodes = Json.decodeFromString<List<NodeInfo>>(generatedFile.readText())
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/components.json")
+                    val components = Json.decodeFromString<List<ComponentMetadata>>(generatedFile.readText())
 
-                    nodes.size shouldBe 2
-                    nodes.any { it.simpleName == "NodeOne" && it.type == "node.one" } shouldBe true
-                    nodes.any { it.simpleName == "NodeTwo" && it.type == "node.two" } shouldBe true
+                    components.size shouldBe 2
+                    components.any { it.simpleName == "NodeOne" && it.stegoType == "node.one" } shouldBe true
+                    components.any { it.simpleName == "NodeTwo" && it.stegoType == "node.two" } shouldBe true
                 }
             }
         }
@@ -146,7 +147,7 @@ class StegoProcessorTest :
                 }
 
                 And("it should not generate a metadata file") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/components.json")
                     generatedFile.exists() shouldBe false
                 }
             }
@@ -183,16 +184,20 @@ class StegoProcessorTest :
                 }
 
                 And("the generated JSON should contain the correct generic type metadata") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/nodes.json")
-                    val nodes = Json.decodeFromString<List<NodeInfo>>(generatedFile.readText())
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/components.json")
+                    val components = Json.decodeFromString<List<ComponentMetadata>>(generatedFile.readText())
 
-                    nodes.size shouldBe 1
-                    nodes.first().properties.any { it.name == "data" && it.typeQualifiedName == "kotlin.collections.List<kotlin.String>" } shouldBe true
+                    components.size shouldBe 1
+                    components.first().properties.any {
+                        it.name == "data" &&
+                            it.typeQualifiedName == "kotlin.collections.List<kotlin.String>"
+                    } shouldBe
+                        true
                 }
             }
         }
 
-        Given("a source file with a StegoNode that inherits from a base DTO") {
+        Given("a source file with a StegoNode that inherits from a base component") {
             val source =
                 SourceFile.kotlin(
                     "InheritingNode.kt",
@@ -201,10 +206,10 @@ class StegoProcessorTest :
 
                 import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
 
-                open class BaseDto(val baseProperty: String)
+                open class BaseComponent(val baseProperty: String)
 
                 @StegoNode("inheriting.node")
-                data class InheritingNode(val ownProperty: String) : BaseDto("test")
+                data class InheritingNode(val ownProperty: String) : BaseComponent("test")
                 """,
                 )
 
@@ -224,12 +229,13 @@ class StegoProcessorTest :
                     result.exitCode shouldBe KotlinCompilation.ExitCode.OK
                 }
 
-                And("it should generate a base-dtos.json file") {
-                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/base-dtos.json")
+                And("it should generate a base-components.json file") {
+                    val generatedFile = File(compilation.kspSourcesDir, "resources/stego/base-components.json")
                     generatedFile.exists() shouldBe true
 
-                    val baseDtos = Json.decodeFromString<Map<String, List<String>>>(generatedFile.readText())
-                    baseDtos["stego.tests.BaseDto"] shouldBe listOf("baseProperty")
+                    val baseComponents = Json.decodeFromString<List<BaseComponentMetadata>>(generatedFile.readText())
+                    baseComponents shouldBe
+                        listOf(BaseComponentMetadata("stego.tests.BaseComponent", listOf("baseProperty")))
                 }
             }
         }

@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
  * This is designed to be serialized to JSON for consumption by another processor.
  */
 @Serializable
-data class NodeInfo(
+data class ComponentMetadata(
     val qualifiedName: String,
-    val simpleName: String,
-    val type: String,
+    val simpleName: String = qualifiedName.substringAfterLast('.'),
+    val stegoType: String?,
     val properties: List<PropertyInfo>,
     val superType: String?,
 )
@@ -19,4 +19,10 @@ data class NodeInfo(
 data class PropertyInfo(
     val name: String,
     val typeQualifiedName: String,
+)
+
+@Serializable
+data class BaseComponentMetadata(
+    val qualifiedName: String,
+    val properties: List<String>,
 )

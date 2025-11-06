@@ -5,7 +5,6 @@ package uk.co.developmentanddinosaurs.stego.annotations
  * Mapper, and register it.
  * @param type The string identifier for JSON (e.g., "my-new").
  */
-@StegoComponent
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class StegoNode(

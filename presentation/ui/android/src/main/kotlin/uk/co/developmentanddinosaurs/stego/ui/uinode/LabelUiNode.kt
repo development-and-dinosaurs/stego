@@ -6,5 +6,5 @@ import uk.co.developmentanddinosaurs.stego.ui.node.LabelUiNode
 
 @Composable
 fun RenderLabelUiNode(labelUiNode: LabelUiNode) {
-    Text(text = labelUiNode.text)
+  Text(text = labelUiNode.text)
 }

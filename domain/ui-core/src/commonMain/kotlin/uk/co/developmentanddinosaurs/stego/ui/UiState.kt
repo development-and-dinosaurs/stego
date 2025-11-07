@@ -11,7 +11,8 @@ import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
  * A state that contains UI information.
  *
  * @property id A unique identifier for the state within its parent's scope.
- * @property initial The ID of the initial substate. Required if this is a hierarchical parent state.
+ * @property initial The ID of the initial substate. Required if this is a hierarchical parent
+ *   state.
  * @property invoke An optional [Invokable] service to be executed upon entering this state.
  * @property on A map where keys are event types and values are a list of possible [Transition]s.
  * @property onEntry A list of [Action]s to be executed when the state machine enters this state.

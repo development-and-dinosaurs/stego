@@ -10,9 +10,9 @@ fun RenderButtonUiNode(
     buttonUiNode: ButtonUiNode,
     onClick: () -> Unit,
 ) {
-    Button(
-        onClick = onClick,
-    ) {
-        Text(text = buttonUiNode.text)
-    }
+  Button(
+      onClick = onClick,
+  ) {
+    Text(text = buttonUiNode.text)
+  }
 }

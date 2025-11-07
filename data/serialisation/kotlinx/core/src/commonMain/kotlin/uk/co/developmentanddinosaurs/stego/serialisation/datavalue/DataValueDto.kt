@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable(with = DataValueDtoSerializer::class)
 sealed interface DataValueDto {
-    fun toDomain(): Any?
+  fun toDomain(): Any?
 }

@@ -16,22 +16,20 @@ fun Modifier.shake(
     shakeTrigger: Int,
     onAnimationFinished: () -> Unit = {},
 ) = composed {
-    val shake = remember { Animatable(0f) }
-    LaunchedEffect(shakeTrigger) {
-        if (shakeTrigger > 0) {
-            shake.animateTo(
-                targetValue = SHAKE_DISTANCE,
-                animationSpec = tween(durationMillis = SHAKE_DURATION_MS, delayMillis = 0),
-            )
-            repeat(SHAKE_REPETITIONS) {
-                shake.animateTo(-SHAKE_DISTANCE, animationSpec = tween(durationMillis = SHAKE_DURATION_MS))
-                shake.animateTo(SHAKE_DISTANCE, animationSpec = tween(durationMillis = SHAKE_DURATION_MS))
-            }
-            shake.animateTo(0f, animationSpec = tween(durationMillis = SHAKE_DURATION_MS))
-            onAnimationFinished()
-        }
+  val shake = remember { Animatable(0f) }
+  LaunchedEffect(shakeTrigger) {
+    if (shakeTrigger > 0) {
+      shake.animateTo(
+          targetValue = SHAKE_DISTANCE,
+          animationSpec = tween(durationMillis = SHAKE_DURATION_MS, delayMillis = 0),
+      )
+      repeat(SHAKE_REPETITIONS) {
+        shake.animateTo(-SHAKE_DISTANCE, animationSpec = tween(durationMillis = SHAKE_DURATION_MS))
+        shake.animateTo(SHAKE_DISTANCE, animationSpec = tween(durationMillis = SHAKE_DURATION_MS))
+      }
+      shake.animateTo(0f, animationSpec = tween(durationMillis = SHAKE_DURATION_MS))
+      onAnimationFinished()
     }
-    this.graphicsLayer {
-        translationX = shake.value
-    }
+  }
+  this.graphicsLayer { translationX = shake.value }
 }

@@ -21,27 +21,24 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLength
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
 
-val stegoUiSerializersModule =
-    SerializersModule {
-        polymorphic(StateDto::class) {
-            subclass(UiStateDto::class)
-        }
-        polymorphic(UiNodeDto::class) {
-            subclass(ColumnUiNodeDto::class)
-            subclass(TextFieldUiNodeDto::class)
-            subclass(ButtonUiNodeDto::class)
-            subclass(ProgressIndicatorUiNodeDto::class)
-            subclass(LabelUiNodeDto::class)
-            subclass(ImageUiNodeDto::class)
-            subclass(GridUiNodeDto::class)
-        }
-        polymorphic(ButtonActionDto::class) {
-            subclass(SubmitButtonActionDto::class)
-            subclass(BypassValidationButtonActionDto::class)
-        }
-        polymorphic(ValidationRuleDto::class) {
-            subclass(RequiredValidationRuleDto::class)
-            subclass(MinLengthValidationRuleDto::class)
-            subclass(MaxLengthValidationRuleDto::class)
-        }
-    }
+val stegoUiSerializersModule = SerializersModule {
+  polymorphic(StateDto::class) { subclass(UiStateDto::class) }
+  polymorphic(UiNodeDto::class) {
+    subclass(ColumnUiNodeDto::class)
+    subclass(TextFieldUiNodeDto::class)
+    subclass(ButtonUiNodeDto::class)
+    subclass(ProgressIndicatorUiNodeDto::class)
+    subclass(LabelUiNodeDto::class)
+    subclass(ImageUiNodeDto::class)
+    subclass(GridUiNodeDto::class)
+  }
+  polymorphic(ButtonActionDto::class) {
+    subclass(SubmitButtonActionDto::class)
+    subclass(BypassValidationButtonActionDto::class)
+  }
+  polymorphic(ValidationRuleDto::class) {
+    subclass(RequiredValidationRuleDto::class)
+    subclass(MinLengthValidationRuleDto::class)
+    subclass(MaxLengthValidationRuleDto::class)
+  }
+}

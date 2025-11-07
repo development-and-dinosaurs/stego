@@ -12,6 +12,6 @@ fun resolve(
     context: Context,
 ): String =
     regex.replace(value) { result ->
-        val key = result.groupValues[1]
-        context.get(key)?.toString() ?: ""
+      val key = result.groupValues[1]
+      context.get(key)?.toString() ?: ""
     }

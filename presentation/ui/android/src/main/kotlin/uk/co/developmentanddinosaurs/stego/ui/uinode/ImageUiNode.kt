@@ -6,8 +6,8 @@ import uk.co.developmentanddinosaurs.stego.ui.node.ImageUiNode
 
 @Composable
 fun RenderImageUiNode(imageUiNode: ImageUiNode) {
-    AsyncImage(
-        model = imageUiNode.url,
-        contentDescription = imageUiNode.contentDescription,
-    )
+  AsyncImage(
+      model = imageUiNode.url,
+      contentDescription = imageUiNode.contentDescription,
+  )
 }

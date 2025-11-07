@@ -14,13 +14,11 @@ fun RenderGridUiNode(
     gridUiNode: GridUiNode,
     renderChild: @Composable (UiNode) -> Unit,
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(gridUiNode.columns),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(gridUiNode.children) {
-            renderChild(it)
-        }
-    }
+  LazyVerticalGrid(
+      columns = GridCells.Fixed(gridUiNode.columns),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    items(gridUiNode.children) { renderChild(it) }
+  }
 }

@@ -5,10 +5,10 @@ plugins {
 spotless {
     kotlin {
         target("src/**/*.kt")
-        ktlint()
+        ktfmt()
     }
     kotlinGradle {
         target("*.gradle.kts")
-        ktlint()
+        ktfmt()
     }
 }

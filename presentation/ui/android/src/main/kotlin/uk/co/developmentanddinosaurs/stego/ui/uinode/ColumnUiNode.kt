@@ -14,13 +14,11 @@ fun RenderColumnUiNode(
     columnUiNode: ColumnUiNode,
     renderChild: @Composable (UiNode) -> Unit,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        columnUiNode.children.forEach {
-            renderChild(it)
-        }
-    }
+  Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    columnUiNode.children.forEach { renderChild(it) }
+  }
 }

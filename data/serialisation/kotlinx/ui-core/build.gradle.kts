@@ -46,7 +46,7 @@ kotlin {
     commonMain {
       kotlin.srcDir(tasks.named<GenerateDtosTask>("generateDtos").map { it.outputDir })
       kotlin.srcDir(tasks.named<GenerateMappersTask>("generateMappers").map { it.outputDir })
-      kotlin.srcDir(tasks.named<GenerateModuleTask>("generateModule").map { it.outputDir})
+      kotlin.srcDir(tasks.named<GenerateModuleTask>("generateModule").map { it.outputDir })
     }
     commonMain.dependencies {
       implementation(project(":domain:core"))

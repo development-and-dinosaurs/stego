@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import uk.co.developmentanddinosaurs.stego.gradle.GenerateDtosTask
 import uk.co.developmentanddinosaurs.stego.gradle.GenerateMappersTask
+import uk.co.developmentanddinosaurs.stego.gradle.GenerateModuleTask
 
 plugins {
   `spotless-convention`
@@ -26,8 +27,7 @@ stegoCodegen {
           .buildDirectory
           .file("generated/ksp/jvm/jvmMain/resources/stego/base-components.json"),
   )
-  dtoOutputDir.set(layout.buildDirectory.dir("generated/sources/kotlin"))
-  mapperOutputDir.set(layout.buildDirectory.dir("generated/sources/kotlin"))
+  outputDir.set(layout.buildDirectory.dir("generated/sources/kotlin"))
 }
 
 kotlin {
@@ -45,9 +45,8 @@ kotlin {
   sourceSets {
     commonMain {
       kotlin.srcDir(tasks.named<GenerateDtosTask>("generateDtos").map { it.outputDir })
-      kotlin.srcDir(
-          tasks.named<GenerateMappersTask>("generateMappers").map { it.outputDirectoryProperty }
-      )
+      kotlin.srcDir(tasks.named<GenerateMappersTask>("generateMappers").map { it.outputDir })
+      kotlin.srcDir(tasks.named<GenerateModuleTask>("generateModule").map { it.outputDir})
     }
     commonMain.dependencies {
       implementation(project(":domain:core"))

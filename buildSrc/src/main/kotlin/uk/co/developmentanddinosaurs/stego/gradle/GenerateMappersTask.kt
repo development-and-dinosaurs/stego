@@ -24,7 +24,7 @@ abstract class GenerateMappersTask : DefaultTask() {
     abstract val baseComponentsFileProperty: RegularFileProperty
 
     @get:OutputDirectory
-    abstract val outputDirectoryProperty: DirectoryProperty
+    abstract val outputDir: DirectoryProperty
 
     private lateinit var rootTypeToMapperInterface: Map<String, ClassName>
 
@@ -32,7 +32,7 @@ abstract class GenerateMappersTask : DefaultTask() {
     fun generate() {
         val componentsFile = componentsFileProperty.get().asFile
         val baseComponentsFile = baseComponentsFileProperty.get().asFile
-        val outputDirectory = outputDirectoryProperty.get().asFile
+        val outputDirectory = outputDir.get().asFile
         outputDirectory.mkdirs()
 
         rootTypeToMapperInterface = createMapperInterfaces(baseComponentsFile)

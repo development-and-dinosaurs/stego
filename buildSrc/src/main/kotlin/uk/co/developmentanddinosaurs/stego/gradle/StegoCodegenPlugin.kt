@@ -10,23 +10,28 @@ class StegoCodegenPlugin : Plugin<Project> {
         val extension = project.extensions.create<StegoCodegenExtension>("stegoCodegen")
 
         project.tasks.register<GenerateDtosTask>("generateDtos") {
-            dependsOn(project.rootProject
-                .project(":domain:ui-core")
-                .tasks
-                .named("kspKotlinJvm"))
+            dependsOn(kspTask(project))
             componentsFile.set(extension.componentsFile)
             baseComponentsFile.set(extension.baseComponentsFile)
-            outputDir.set(extension.dtoOutputDir)
+            outputDir.set(extension.outputDir)
         }
 
         project.tasks.register<GenerateMappersTask>("generateMappers") {
-            dependsOn(project.rootProject
-                .project(":domain:ui-core")
-                .tasks
-                .named("kspKotlinJvm"))
+            dependsOn(kspTask(project))
             componentsFileProperty.set(extension.componentsFile)
             baseComponentsFileProperty.set(extension.baseComponentsFile)
-            outputDirectoryProperty.set(extension.mapperOutputDir)
+            outputDir.set(extension.outputDir)
+        }
+
+        project.tasks.register<GenerateModuleTask>("generateModule") {
+            dependsOn(kspTask(project))
+            componentsFile.set(extension.componentsFile)
+            outputDir.set(extension.outputDir)
         }
     }
+
+    private fun kspTask(project: Project) = project.rootProject
+        .project(":domain:ui-core")
+        .tasks
+        .named("kspKotlinJvm")
 }

@@ -34,7 +34,7 @@ data class BaseComponentMetadata(
 private val json = Json { ignoreUnknownKeys = true }
 
 internal fun mapToDto(typeString: String): String {
-    return if (typeString.contains("stego")) typeString.replace("ui", "serialisation.ui") + "Dto" else typeString
+    return if (typeString.contains("stego")) typeString.replace(".ui", ".serialisation.ui") + "Dto" else typeString
 }
 
 internal fun getComponentMetadata(input: File): List<ComponentMetadata> {

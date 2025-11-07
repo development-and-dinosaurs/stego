@@ -10,7 +10,7 @@ import uk.co.developmentanddinosaurs.stego.serialisation.mappers.CompositeStateM
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.LogicStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiStateMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.stegoUiSerializersModule
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.uiSerializersModule
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ColumnUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.GridUiNodeDto
@@ -45,7 +45,7 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.Va
 class StegoUiKoinModule {
   val module: Module = module {
     includes(StegoCoreKoinModule().module)
-    single(named("stegoUiSerializersModule")) { stegoUiSerializersModule }
+    single(named("stegoUiSerializersModule")) { uiSerializersModule() }
     single { UserInteractionMapper() }
     single {
       CompositeButtonActionMapper(

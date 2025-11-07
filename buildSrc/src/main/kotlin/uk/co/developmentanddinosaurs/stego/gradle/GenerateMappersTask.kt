@@ -4,128 +4,148 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
 abstract class GenerateMappersTask : DefaultTask() {
     @get:InputFile
-    abstract val inputFile: RegularFileProperty
+    abstract val componentsFileProperty: RegularFileProperty
+
+    @get:InputFile
+    abstract val baseComponentsFileProperty: RegularFileProperty
 
     @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
+    abstract val outputDirectoryProperty: DirectoryProperty
 
-    private val componentRootToMapperInterface = mapOf(
-        "uk.co.developmentanddinosaurs.stego.ui.node.UiNode" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapper",
-        "uk.co.developmentanddinosaurs.stego.ui.node.ButtonAction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ButtonActionMapper",
-        "uk.co.developmentanddinosaurs.stego.ui.node.UserInteraction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UserInteractionMapper",
-        "uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ValidationRuleMapper",
-    )
-
-    @get:Input
-    val mapperTypeMappings =
-        mapOf(
-            "uk.co.developmentanddinosaurs.stego.ui.node.ButtonAction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ButtonActionMapper",
-            "uk.co.developmentanddinosaurs.stego.ui.node.UserInteraction" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UserInteractionMapper",
-            "uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ValidationRuleMapper",
-            "uk.co.developmentanddinosaurs.stego.ui.node.UiNode" to "uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapper",
-        )
+    private lateinit var rootTypeToMapperInterface: Map<String, ClassName>
 
     @TaskAction
     fun generate() {
-        val input = inputFile.get().asFile
-        val output = outputDir.get().asFile
-        output.deleteRecursively()
-        output.mkdirs()
+        val componentsFile = componentsFileProperty.get().asFile
+        val baseComponentsFile = baseComponentsFileProperty.get().asFile
+        val outputDirectory = outputDirectoryProperty.get().asFile
+        outputDirectory.mkdirs()
 
-        val json = Json { ignoreUnknownKeys = true }
-        val nodes = json.decodeFromString<List<NodeMetadata>>(input.readText())
+        rootTypeToMapperInterface = createMapperInterfaces(baseComponentsFile)
 
-        nodes.forEach { node ->
-            val mapperName = "${node.simpleName}Mapper"
-            val basePackage = node.qualifiedName.substringBeforeLast('.').replace(".ui.", ".serialisation.ui.")
-            val packageName = basePackage.replace(".node", ".mapper").replace(".validators", ".mapper")
+        val components = getComponentMetadata(componentsFile)
+        components.forEach { node ->
+            val mapperSpec = generateMapper(node)
+            mapperSpec.writeTo(outputDirectory)
+        }
+    }
 
-            val nodeClassName = ClassName.bestGuess(node.qualifiedName)
-            val dtoPackage = getDtoPackage(node.qualifiedName)
-            val dtoClassName = ClassName(dtoPackage, "${node.simpleName}Dto")
+    private fun createMapperInterfaces(baseComponentsFile: File): Map<String, ClassName> {
+        val baseComponents = getBaseComponentMetadata(baseComponentsFile)
+        return baseComponents.associate {
+            val mapperPackage = it.packageName.replaceFirst(".ui", ".serialisation.ui") + ".mapper"
+            val mapperInterfaceName = "${it.simpleName}Mapper"
+            it.qualifiedName to ClassName(mapperPackage, mapperInterfaceName)
+        }
+    }
 
-            val constructorBuilder = FunSpec.constructorBuilder()
-            val constructorMappers = mutableMapOf<String, String>()
-            val propertySpecs = mutableListOf<PropertySpec>()
+    private fun generateMapper(node: ComponentMetadata): FileSpec {
+        val mapperName = "${node.simpleName}Mapper"
+        val mapperPackageName = node.qualifiedName.replaceFirst(".ui", ".serialisation.ui")
+            .substringBeforeLast('.')
+            .plus(".mapper")
 
-            val mappingStatements =
-                node.properties.joinToString(",\n") { property ->
-                    val propertyAssignment =
-                        if (mapperTypeMappings.containsKey(property.typeQualifiedName.substringBefore('<')) ||
-                            (property.typeQualifiedName.contains("<") && mapperTypeMappings.containsKey(property.typeQualifiedName.substringAfter('<').substringBefore('>')))
-                        ) {
-                            val typeToMap = if (property.typeQualifiedName.contains("<")) property.typeQualifiedName.substringAfter('<').substringBefore('>') else property.typeQualifiedName.substringBefore('<')
-                            val mapperFqName = mapperTypeMappings.getValue(typeToMap)
-                            val mapperClassName = ClassName.bestGuess(mapperFqName)
-                            val mapperFieldName = mapperClassName.simpleName.replaceFirstChar { it.lowercase() }
-                            if (!constructorMappers.containsKey(mapperFqName)) {
-                                constructorBuilder.addParameter(mapperFieldName, mapperClassName)
-                                propertySpecs.add(
-                                    PropertySpec.builder(mapperFieldName, mapperClassName, KModifier.PRIVATE)
-                                        .initializer(mapperFieldName)
-                                        .build()
-                                )
-                                constructorMappers[mapperFqName] = mapperFieldName
-                            }
-                            val isCollection = property.typeQualifiedName.startsWith("kotlin.collections.List<")
-                            if (isCollection) {
-                                "${property.name} = dto.${property.name}.map { ${constructorMappers[mapperFqName]!!}.map(it) }"
-                            } else {
-                                "${property.name} = ${constructorMappers[mapperFqName]!!}.map(dto.${property.name})"
-                            }
-                        } else {
-                            "${property.name} = dto.${property.name}"
-                        }
-                    "    $propertyAssignment"
-                }
+        val componentClassName = ClassName.bestGuess(node.qualifiedName)
+        val dtoPackageName = node.qualifiedName.replaceFirst(".ui", ".serialisation.ui").substringBeforeLast('.')
+        val dtoClassName = ClassName(dtoPackageName, "${node.simpleName}Dto")
 
-            val primaryConstructor = constructorBuilder.build()
+        val constructorBuilder = FunSpec.constructorBuilder()
+        val propertySpecs = mutableListOf<PropertySpec>()
 
-            val mapperClass = TypeSpec.classBuilder(mapperName)
-                .primaryConstructor(primaryConstructor)
-                .addProperties(propertySpecs)
+        val mappingStatements = node.properties.joinToString(",\n") { property ->
+            val rhs = buildPropertyMapping(
+                property = property,
+                constructorBuilder = constructorBuilder,
+                propertySpecs = propertySpecs
+            )
+            "${property.name} = $rhs"
+        }
 
-            // A mapper only needs to implement an interface if it's part of a polymorphic group.
-            if (node.superType != null && componentRootToMapperInterface.containsKey(node.superType)) {
-                val mapperInterfaceName = componentRootToMapperInterface.getValue(node.superType!!)
-                val mapperInterface = ClassName.bestGuess(mapperInterfaceName)
-                val dtoInterface = ClassName.bestGuess(mapToDto(node.superType!!))
-                val domainInterface = ClassName.bestGuess(node.superType!!)
+        val primaryConstructor = constructorBuilder.build()
+        val mapperClass = TypeSpec.classBuilder(mapperName)
+            .primaryConstructor(primaryConstructor)
+            .addProperties(propertySpecs)
 
-                val mapFunction = FunSpec.builder("map")
-                    .addModifiers(KModifier.OVERRIDE)
-                    .addParameter("dto", dtoInterface)
-                    .returns(domainInterface)
-                    .addStatement("require(dto is %T)", dtoClassName)
-                    .addStatement("return %T(\n%L\n)", nodeClassName, mappingStatements)
-                    .build()
-                mapperClass.addSuperinterface(mapperInterface)
-                mapperClass.addFunction(mapFunction)
-            } else {
-                // For standalone mappers, create a simple map function with concrete types.
-                val mapFunction = FunSpec.builder("map")
-                    .addParameter("dto", dtoClassName)
-                    .returns(nodeClassName)
-                    .addStatement("return %T(\n%L\n)", nodeClassName, mappingStatements)
-                    .build()
-                mapperClass.addFunction(mapFunction)
-            }
+        val superType = node.superType
+        if (superType != null) {
+            val mapperInterface = rootTypeToMapperInterface.getValue(superType)
+            val dtoInterface = ClassName.bestGuess(mapToDto(superType))
+            val domainInterface = ClassName.bestGuess(superType)
 
-            val fileSpec = FileSpec.builder(packageName, mapperName).addType(mapperClass.build()).build()
-            fileSpec.writeTo(output)
+            val mapFunction = FunSpec.builder("map")
+                .addModifiers(KModifier.OVERRIDE)
+                .addParameter("dto", dtoInterface)
+                .returns(domainInterface)
+                .addStatement("require(dto is %T)", dtoClassName)
+                .addStatement("return %T(\n%L\n)", componentClassName, mappingStatements)
+                .build()
+
+            mapperClass.addSuperinterface(mapperInterface)
+            mapperClass.addFunction(mapFunction)
+        } else {
+            val mapFunction = FunSpec.builder("map")
+                .addParameter("dto", dtoClassName)
+                .returns(componentClassName)
+                .addStatement("return %T(\n%L\n)", componentClassName, mappingStatements)
+                .build()
+            mapperClass.addFunction(mapFunction)
+        }
+
+        return FileSpec.builder(mapperPackageName, mapperName)
+            .addType(mapperClass.build())
+            .build()
+    }
+
+    private fun buildPropertyMapping(
+        property: PropertyMetadata,
+        constructorBuilder: FunSpec.Builder,
+        propertySpecs: MutableList<PropertySpec>
+    ): String {
+        val propertyName = property.name
+        val typeName = parseTypeName(property.typeQualifiedName)
+
+        var typeToInspect = typeName.copy(nullable = false)
+        var isCollection = false
+
+        if (typeName is ParameterizedTypeName && typeName.rawType == LIST) {
+            typeToInspect = typeName.typeArguments.first()
+            isCollection = true
+        }
+
+        require(typeToInspect is ClassName)
+
+        if (!typeToInspect.packageName.contains("stego")) {
+            return "dto.$propertyName"
+        }
+
+        val mapperType = typeToInspect.packageName + ".mapper." + typeToInspect.simpleName.replace("Dto", "Mapper")
+        val mapperClassName = ClassName.bestGuess(mapperType)
+        val mapperFieldName = mapperClassName.simpleName.replaceFirstChar { it.lowercase() }
+        constructorBuilder.addParameter(mapperFieldName, mapperClassName)
+        propertySpecs.add(
+            PropertySpec.builder(mapperFieldName, mapperClassName, KModifier.PRIVATE)
+                .initializer(mapperFieldName)
+                .build()
+        )
+
+        return if (isCollection) {
+            "dto.$propertyName.map { $mapperFieldName.map(it) }"
+        } else {
+            "$mapperFieldName.map(dto.$propertyName)"
         }
     }
 }

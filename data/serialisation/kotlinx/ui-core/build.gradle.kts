@@ -5,56 +5,29 @@ import uk.co.developmentanddinosaurs.stego.gradle.GenerateMappersTask
 
 plugins {
     `spotless-convention`
+    id("uk.co.developmentanddinosaurs.stego.codegen")
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlinx.kover)
 }
 
-val generateDtos =
-    tasks.register<GenerateDtosTask>("generateDtos") {
-        group = "generation"
-        description = "Generate DTO classes from metadata"
-        dependsOn(
-            rootProject
-                .project(":domain:ui-core")
-                .tasks
-                .named("kspKotlinJvm"),
-        )
-
-        inputFile.set(
-            rootProject
-                .project(":domain:ui-core")
-                .layout.buildDirectory
-                .file("generated/ksp/jvm/jvmMain/resources/stego/nodes.json"),
-        )
-        baseDtosFile.set(
-            rootProject
-                .project(":domain:ui-core")
-                .layout.buildDirectory
-                .file("generated/ksp/jvm/jvmMain/resources/stego/base-dtos.json"),
-        )
-        outputDir.set(layout.buildDirectory.dir("generated/sources/dtos/kotlin"))
-    }
-
-val generateMappers =
-    tasks.register<GenerateMappersTask>("generateMappers") {
-        group = "generation"
-        description = "Generate Mapper classes from metadata"
-        dependsOn(
-            rootProject
-                .project(":domain:ui-core")
-                .tasks
-                .named("kspKotlinJvm"),
-        )
-        inputFile.set(
-            rootProject
-                .project(":domain:ui-core")
-                .layout.buildDirectory
-                .file("generated/ksp/jvm/jvmMain/resources/stego/nodes.json"),
-        )
-        outputDir.set(layout.buildDirectory.dir("generated/sources/mappers/kotlin"))
-    }
+stegoCodegen {
+    componentsFile.set(
+        rootProject
+            .project(":domain:ui-core")
+            .layout.buildDirectory
+            .file("generated/ksp/jvm/jvmMain/resources/stego/components.json"),
+    )
+    baseComponentsFile.set(
+        rootProject
+            .project(":domain:ui-core")
+            .layout.buildDirectory
+            .file("generated/ksp/jvm/jvmMain/resources/stego/base-components.json"),
+    )
+    dtoOutputDir.set(layout.buildDirectory.dir("generated/sources/kotlin"))
+    mapperOutputDir.set(layout.buildDirectory.dir("generated/sources/kotlin"))
+}
 
 kotlin {
     android {
@@ -78,8 +51,8 @@ kotlin {
 
     sourceSets {
         commonMain {
-            kotlin.srcDir(generateDtos.map { it.outputDir })
-            kotlin.srcDir(generateMappers.map { it.outputDir })
+            kotlin.srcDir(tasks.named<GenerateDtosTask>("generateDtos").map { it.outputDir })
+            kotlin.srcDir(tasks.named<GenerateMappersTask>("generateMappers").map { it.outputDirectoryProperty })
         }
         commonMain.dependencies {
             implementation(project(":domain:core"))

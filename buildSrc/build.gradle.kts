@@ -25,3 +25,12 @@ java {
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget = JvmTarget.JVM_17
 }
+
+gradlePlugin {
+    plugins {
+        create("stegoCodegen") {
+            id = "uk.co.developmentanddinosaurs.stego.codegen"
+            implementationClass = "uk.co.developmentanddinosaurs.stego.gradle.StegoCodegenPlugin"
+        }
+    }
+}

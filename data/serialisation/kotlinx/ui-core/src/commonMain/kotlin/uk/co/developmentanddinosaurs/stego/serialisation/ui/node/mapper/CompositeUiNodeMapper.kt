@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper
+package uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper
 
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
 import uk.co.developmentanddinosaurs.stego.ui.node.UiNode

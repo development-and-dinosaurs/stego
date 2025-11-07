@@ -1,6 +1,7 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper
+package uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper
 
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.ValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule
 import kotlin.reflect.KClass
 

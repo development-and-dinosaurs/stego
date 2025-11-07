@@ -1,5 +1,6 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper
+package uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper
 
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.ButtonActionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonActionDto
 import uk.co.developmentanddinosaurs.stego.ui.node.ButtonAction
 import kotlin.reflect.KClass

@@ -9,6 +9,8 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNode
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.OtherUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UnknownUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.UiNodeDto
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.CompositeUiNodeMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.UiNodeMapper
 import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
 import kotlin.reflect.KClass
 

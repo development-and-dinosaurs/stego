@@ -35,86 +35,87 @@ private class OverridingAssignActionMapper : ActionDtoMapper {
   override fun map(dto: ActionDto): Action = CustomAction("overridden")
 }
 
-class ActionMapperTest :
-    BehaviorSpec({
-      Given("an ActionMapper with default mappers") {
-        val mapper = ActionMapper()
+class ActionMapperTest : BehaviorSpec() {
+  init {
+    Given("an ActionMapper with default mappers") {
+      val mapper = ActionMapper()
 
-        and("a built-in AssignActionDto") {
-          val dto =
-              AssignActionDto(
-                  "key",
-                  StringDataValueDto("value"),
-              )
-
-          When("the dto is mapped") {
-            val action = mapper.map(dto)
-
-            Then("it should return an AssignAction") { action.shouldBeInstanceOf<AssignAction>() }
-          }
-        }
-
-        and("a built-in LogActionDto") {
-          val dto = LogActionDto("message")
-
-          When("the dto is mapped") {
-            val action = mapper.map(dto)
-
-            Then("it should return a LogAction") { action.shouldBeInstanceOf<LogAction>() }
-          }
-        }
-
-        and("an unknown ActionDto") {
-          val dto = CustomActionDto("some data")
-
-          When("the dto is mapped") {
-            Then("it should throw a StateMachineException") {
-              val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
-              exception.message shouldBe
-                  "Action DTO type 'CustomActionDto' not found in mapper registry."
-            }
-          }
-        }
-      }
-
-      Given("an ActionMapper with a custom action mapper provided via a lambda") {
-        val customMappers =
-            mapOf<KClass<out ActionDto>, ActionDtoMapper>(
-                CustomActionDto::class to
-                    ActionDtoMapper { dto -> CustomAction((dto as CustomActionDto).data) },
-            )
-        val mapper = ActionMapper(customMappers)
-        val dto = CustomActionDto("custom data")
-
-        When("the custom dto is mapped") {
-          val action = mapper.map(dto)
-
-          Then("it should return the correct custom action from the registry") {
-            action.shouldBeInstanceOf<CustomAction>()
-            action.data shouldBe "custom data"
-          }
-        }
-      }
-
-      Given("an ActionMapper that overrides a default mapper") {
-        val customMappers =
-            mapOf<KClass<out ActionDto>, ActionDtoMapper>(
-                AssignActionDto::class to OverridingAssignActionMapper(),
-            )
-        val mapper = ActionMapper(customMappers)
+      and("a built-in AssignActionDto") {
         val dto =
             AssignActionDto(
                 "key",
                 StringDataValueDto("value"),
             )
 
-        When("the built-in dto is mapped") {
+        When("the dto is mapped") {
           val action = mapper.map(dto)
 
-          Then("it should return the overridden action") {
-            action.shouldBeInstanceOf<CustomAction>()
-            action.data shouldBe "overridden"
+          Then("it should return an AssignAction") { action.shouldBeInstanceOf<AssignAction>() }
+        }
+      }
+
+      and("a built-in LogActionDto") {
+        val dto = LogActionDto("message")
+
+        When("the dto is mapped") {
+          val action = mapper.map(dto)
+
+          Then("it should return a LogAction") { action.shouldBeInstanceOf<LogAction>() }
+        }
+      }
+
+      and("an unknown ActionDto") {
+        val dto = CustomActionDto("some data")
+
+        When("the dto is mapped") {
+          Then("it should throw a StateMachineException") {
+            val exception = shouldThrow<StateMachineException> { mapper.map(dto) }
+            exception.message shouldBe
+                "Action DTO type 'CustomActionDto' not found in mapper registry."
           }
         }
       }
-    })
+    }
+
+    Given("an ActionMapper with a custom action mapper provided via a lambda") {
+      val customMappers =
+          mapOf<KClass<out ActionDto>, ActionDtoMapper>(
+              CustomActionDto::class to
+                  ActionDtoMapper { dto -> CustomAction((dto as CustomActionDto).data) },
+          )
+      val mapper = ActionMapper(customMappers)
+      val dto = CustomActionDto("custom data")
+
+      When("the custom dto is mapped") {
+        val action = mapper.map(dto)
+
+        Then("it should return the correct custom action from the registry") {
+          action.shouldBeInstanceOf<CustomAction>()
+          action.data shouldBe "custom data"
+        }
+      }
+    }
+
+    Given("an ActionMapper that overrides a default mapper") {
+      val customMappers =
+          mapOf<KClass<out ActionDto>, ActionDtoMapper>(
+              AssignActionDto::class to OverridingAssignActionMapper(),
+          )
+      val mapper = ActionMapper(customMappers)
+      val dto =
+          AssignActionDto(
+              "key",
+              StringDataValueDto("value"),
+          )
+
+      When("the built-in dto is mapped") {
+        val action = mapper.map(dto)
+
+        Then("it should return the overridden action") {
+          action.shouldBeInstanceOf<CustomAction>()
+          action.data shouldBe "overridden"
+        }
+      }
+    }
+  }
+}

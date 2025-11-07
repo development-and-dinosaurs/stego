@@ -35,47 +35,48 @@ private data class AnotherTestValidationRule(
   override fun validate(value: String): ValidationResult = ValidationResult.Success
 }
 
-class CompositeValidationRuleMapperTest :
-    BehaviorSpec({
-      Given("a CompositeValidationRuleMapper") {
-        val mappers =
-            mapOf(
-                TestValidationRuleDto::class to
-                    ValidationRuleMapper { dto ->
-                      val testDto = dto as TestValidationRuleDto
-                      TestValidationRule(testDto.message)
-                    },
-                AnotherTestValidationRuleDto::class to
-                    ValidationRuleMapper { dto ->
-                      val anotherDto = dto as AnotherTestValidationRuleDto
-                      AnotherTestValidationRule(anotherDto.message)
-                    },
-            )
-        val mapper = CompositeValidationRuleMapper(mappers)
+class CompositeValidationRuleMapperTest : BehaviorSpec() {
+  init {
+    Given("a CompositeValidationRuleMapper") {
+      val mappers =
+          mapOf(
+              TestValidationRuleDto::class to
+                  ValidationRuleMapper { dto ->
+                    val testDto = dto as TestValidationRuleDto
+                    TestValidationRule(testDto.message)
+                  },
+              AnotherTestValidationRuleDto::class to
+                  ValidationRuleMapper { dto ->
+                    val anotherDto = dto as AnotherTestValidationRuleDto
+                    AnotherTestValidationRule(anotherDto.message)
+                  },
+          )
+      val mapper = CompositeValidationRuleMapper(mappers)
 
-        and("a known validation rule DTO") {
-          val dto = TestValidationRuleDto("This is a test")
+      and("a known validation rule DTO") {
+        val dto = TestValidationRuleDto("This is a test")
 
-          When("the dto is mapped") {
-            val rule = mapper.map(dto)
+        When("the dto is mapped") {
+          val rule = mapper.map(dto)
 
-            Then("it should be mapped correctly") {
-              rule.shouldBeInstanceOf<TestValidationRule>()
-              rule.message shouldBe "This is a test"
-            }
-          }
-        }
-
-        and("an unknown validation rule DTO") {
-          val dto = UnknownValidationRuleDto("I am unknown")
-
-          When("the dto is mapped") {
-            Then("it should throw an IllegalArgumentException") {
-              val exception = shouldThrow<IllegalArgumentException> { mapper.map(dto) }
-              exception.message shouldContain
-                  "Unsupported ValidationRuleDto type: UnknownValidationRuleDto"
-            }
+          Then("it should be mapped correctly") {
+            rule.shouldBeInstanceOf<TestValidationRule>()
+            rule.message shouldBe "This is a test"
           }
         }
       }
-    })
+
+      and("an unknown validation rule DTO") {
+        val dto = UnknownValidationRuleDto("I am unknown")
+
+        When("the dto is mapped") {
+          Then("it should throw an IllegalArgumentException") {
+            val exception = shouldThrow<IllegalArgumentException> { mapper.map(dto) }
+            exception.message shouldContain
+                "Unsupported ValidationRuleDto type: UnknownValidationRuleDto"
+          }
+        }
+      }
+    }
+  }
+}

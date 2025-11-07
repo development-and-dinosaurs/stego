@@ -45,94 +45,94 @@ private class SimpleStateMapper : StateDtoMapper {
   override fun map(dto: StateDto): State = LogicState(dto.id)
 }
 
-class UiStateMapperTest :
-    BehaviorSpec({
-      Given("a UiStateMapper") {
-        val stateMapper = SimpleStateMapper()
-        val actionMapper = ActionMapper()
-        val invokableMapper =
-            InvokableDefinitionMapper(mapOf("invoke" to Invokable { InvokableResult.Success() }))
-        val transitionMapper = TransitionMapper(actionMapper)
-        val uiNodeMapper =
-            CompositeUiNodeMapper(
-                simpleMappers =
-                    mapOf<KClass<out UiNodeDto>, UiNodeMapper>(
-                        LabelUiNodeDto::class to LabelUiNodeMapper(),
+class UiStateMapperTest : BehaviorSpec() {
+  init {
+    Given("a UiStateMapper") {
+      val stateMapper = SimpleStateMapper()
+      val actionMapper = ActionMapper()
+      val invokableMapper =
+          InvokableDefinitionMapper(mapOf("invoke" to Invokable { InvokableResult.Success() }))
+      val transitionMapper = TransitionMapper(actionMapper)
+      val uiNodeMapper =
+          CompositeUiNodeMapper(
+              simpleMappers =
+                  mapOf<KClass<out UiNodeDto>, UiNodeMapper>(
+                      LabelUiNodeDto::class to LabelUiNodeMapper(),
+                  ),
+              compositeAwareFactories = emptyMap(),
+          )
+
+      val mapper =
+          UiStateMapper(
+              stateMapper,
+              actionMapper,
+              invokableMapper,
+              transitionMapper,
+              uiNodeMapper,
+          )
+
+      and("a complete UiStateDto") {
+        val dto =
+            UiStateDto(
+                id = "ui-state",
+                onEntry = listOf(AssignActionDto("onEntryKey", StringDataValueDto("onEntryValue"))),
+                onExit = listOf(AssignActionDto("onExitKey", StringDataValueDto("onExitValue"))),
+                on =
+                    mapOf(
+                        "EVENT" to
+                            listOf(
+                                TransitionDto(
+                                    target = "some-target",
+                                ),
+                            ),
                     ),
-                compositeAwareFactories = emptyMap(),
+                invoke = InvokableDefinitionDto("invoke-id", "invoke"),
+                initial = "start",
+                states = mapOf("child" to SimpleStateDto("child")),
+                uiNode = LabelUiNodeDto("label-id", "label-text"),
             )
 
-        val mapper =
-            UiStateMapper(
-                stateMapper,
-                actionMapper,
-                invokableMapper,
-                transitionMapper,
-                uiNodeMapper,
-            )
+        When("the dto is mapped") {
+          val state = mapper.map(dto)
 
-        and("a complete UiStateDto") {
-          val dto =
-              UiStateDto(
-                  id = "ui-state",
-                  onEntry =
-                      listOf(AssignActionDto("onEntryKey", StringDataValueDto("onEntryValue"))),
-                  onExit = listOf(AssignActionDto("onExitKey", StringDataValueDto("onExitValue"))),
-                  on =
-                      mapOf(
-                          "EVENT" to
-                              listOf(
-                                  TransitionDto(
-                                      target = "some-target",
-                                  ),
-                              ),
-                      ),
-                  invoke = InvokableDefinitionDto("invoke-id", "invoke"),
-                  initial = "start",
-                  states = mapOf("child" to SimpleStateDto("child")),
-                  uiNode = LabelUiNodeDto("label-id", "label-text"),
-              )
+          Then("it should map all properties correctly") {
+            state.shouldBeInstanceOf<UiState>()
+            state.id shouldBe "ui-state"
+            state.initial shouldBe "start"
+            state.onEntry[0].shouldBeInstanceOf<AssignAction>()
+            state.onExit[0].shouldBeInstanceOf<AssignAction>()
+            state.on["EVENT"]?.get(0).shouldBeInstanceOf<Transition>()
 
-          When("the dto is mapped") {
-            val state = mapper.map(dto)
-
-            Then("it should map all properties correctly") {
-              state.shouldBeInstanceOf<UiState>()
-              state.id shouldBe "ui-state"
-              state.initial shouldBe "start"
-              state.onEntry[0].shouldBeInstanceOf<AssignAction>()
-              state.onExit[0].shouldBeInstanceOf<AssignAction>()
-              state.on["EVENT"]?.get(0).shouldBeInstanceOf<Transition>()
-
-              state.states shouldHaveSize 1
-              state.states["child"] shouldBe LogicState("child")
-              state.uiNode.id shouldBe "label-id"
-            }
-          }
-        }
-
-        and("a minimal UiStateDto") {
-          val dto = UiStateDto(id = "minimal-state", uiNode = LabelUiNodeDto("a", "b"))
-
-          When("the dto is mapped") {
-            val state = mapper.map(dto)
-
-            Then("it should map correctly with default empty values") {
-              state.shouldBeInstanceOf<UiState>()
-              state.id shouldBe "minimal-state"
-              state.uiNode.id shouldBe "a"
-            }
-          }
-        }
-
-        and("a non-UiStateDto") {
-          val dto = LogicStateDto(id = "non-ui-state")
-
-          When("the dto is mapped") {
-            Then("it should throw an IllegalArgumentException") {
-              shouldThrow<IllegalArgumentException> { mapper.map(dto) }
-            }
+            state.states shouldHaveSize 1
+            state.states["child"] shouldBe LogicState("child")
+            state.uiNode.id shouldBe "label-id"
           }
         }
       }
-    })
+
+      and("a minimal UiStateDto") {
+        val dto = UiStateDto(id = "minimal-state", uiNode = LabelUiNodeDto("a", "b"))
+
+        When("the dto is mapped") {
+          val state = mapper.map(dto)
+
+          Then("it should map correctly with default empty values") {
+            state.shouldBeInstanceOf<UiState>()
+            state.id shouldBe "minimal-state"
+            state.uiNode.id shouldBe "a"
+          }
+        }
+      }
+
+      and("a non-UiStateDto") {
+        val dto = LogicStateDto(id = "non-ui-state")
+
+        When("the dto is mapped") {
+          Then("it should throw an IllegalArgumentException") {
+            shouldThrow<IllegalArgumentException> { mapper.map(dto) }
+          }
+        }
+      }
+    }
+  }
+}

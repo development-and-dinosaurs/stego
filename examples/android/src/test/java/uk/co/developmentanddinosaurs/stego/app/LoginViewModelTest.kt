@@ -14,54 +14,57 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Transition
 import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 
 @ExperimentalCoroutinesApi
-class LoginViewModelTest : BehaviorSpec({
-    coroutineTestScope = true
+class LoginViewModelTest : BehaviorSpec() {
 
-    val testLoginStateMachineDefinition = StateMachineDefinition(
-        initial = "Start",
-        states = mapOf(
-            "Start" to LogicState(
-                id = "Start",
-                on = mapOf(
-                    "SUBMIT" to listOf(
-                        Transition("Success", guard = Guard.create("({event.username} == stego)")),
-                        Transition("Error", actions = listOf(AssignAction("error", "Invalid username")))
+    init {
+        coroutineTestScope = true
+
+        val testLoginStateMachineDefinition = StateMachineDefinition(
+            initial = "Start",
+            states = mapOf(
+                "Start" to LogicState(
+                    id = "Start",
+                    on = mapOf(
+                        "SUBMIT" to listOf(
+                            Transition("Success", guard = Guard.create("({event.username} == stego)")),
+                            Transition("Error", actions = listOf(AssignAction("error", "Invalid username")))
+                        )
                     )
-                )
-            ),
-            "Success" to LogicState(id = "Success"),
-            "Error" to LogicState(id = "Error")
+                ),
+                "Success" to LogicState(id = "Success"),
+                "Error" to LogicState(id = "Error")
+            )
         )
-    )
 
-    Given("a LoginViewModel") {
-        val testDispatcher = StandardTestDispatcher(testCoroutineScheduler)
+        Given("a LoginViewModel") {
+            val testDispatcher = StandardTestDispatcher(testCoroutineScheduler)
 
-        When("a successful login event is sent") {
-            val viewModel = LoginViewModel(testLoginStateMachineDefinition, testDispatcher)
-            val event = Event("SUBMIT", mapOf("username" to "stego"))
-            viewModel.onEvent(event)
-            testCoroutineScheduler.advanceUntilIdle()
+            When("a successful login event is sent") {
+                val viewModel = LoginViewModel(testLoginStateMachineDefinition, testDispatcher)
+                val event = Event("SUBMIT", mapOf("username" to "stego"))
+                viewModel.onEvent(event)
+                testCoroutineScheduler.advanceUntilIdle()
 
-            Then("the final state should be Success") {
-                viewModel.uiState.first { it.state.id == "Success" }
-                viewModel.uiState.value.state.id shouldBe "Success"
-            }
-        }
-
-        When("a failed login event is sent") {
-            val viewModel = LoginViewModel(testLoginStateMachineDefinition, testDispatcher)
-            val event = Event("SUBMIT", mapOf("username" to "wrong"))
-            viewModel.onEvent(event)
-            testCoroutineScheduler.advanceUntilIdle()
-
-            Then("the final state should be Error") {
-                viewModel.uiState.value.state.id shouldBe "Error"
+                Then("the final state should be Success") {
+                    viewModel.uiState.first { it.state.id == "Success" }
+                    viewModel.uiState.value.state.id shouldBe "Success"
+                }
             }
 
-            And("the context should contain an error message") {
-                viewModel.uiState.value.context.get("error") shouldBe "Invalid username"
+            When("a failed login event is sent") {
+                val viewModel = LoginViewModel(testLoginStateMachineDefinition, testDispatcher)
+                val event = Event("SUBMIT", mapOf("username" to "wrong"))
+                viewModel.onEvent(event)
+                testCoroutineScheduler.advanceUntilIdle()
+
+                Then("the final state should be Error") {
+                    viewModel.uiState.value.state.id shouldBe "Error"
+                }
+
+                And("the context should contain an error message") {
+                    viewModel.uiState.value.context.get("error") shouldBe "Invalid username"
+                }
             }
         }
     }
-})
+}

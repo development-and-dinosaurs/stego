@@ -7,7 +7,7 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.CompositeValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.ValidationRuleMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.ui.validators.ValidationResult
 import uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule
 

@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper
+package uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper
 
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.ValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule

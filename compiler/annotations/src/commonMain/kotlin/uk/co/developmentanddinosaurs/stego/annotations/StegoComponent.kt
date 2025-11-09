@@ -10,5 +10,5 @@ package uk.co.developmentanddinosaurs.stego.annotations
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class StegoComponent(
-    val type: String = "",
+    val type: String,
 )

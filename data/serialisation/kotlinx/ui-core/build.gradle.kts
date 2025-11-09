@@ -27,6 +27,13 @@ stegoCodegen {
           .buildDirectory
           .file("generated/ksp/jvm/jvmMain/resources/stego/base-components.json"),
   )
+  nodesFile.set(
+      rootProject
+          .project(":domain:ui-core")
+          .layout
+          .buildDirectory
+          .file("generated/ksp/jvm/jvmMain/resources/stego/nodes.json"),
+  )
   outputDir.set(layout.buildDirectory.dir("generated/sources/kotlin"))
 }
 

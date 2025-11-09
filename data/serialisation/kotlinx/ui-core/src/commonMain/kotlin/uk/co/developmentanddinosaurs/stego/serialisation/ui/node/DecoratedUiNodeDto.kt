@@ -1,6 +1,3 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.ui.node
 
-interface UiNodeDto {
-  val id: String
-  val type: String
-}
+interface DecoratedUiNodeDto : UiNodeDto

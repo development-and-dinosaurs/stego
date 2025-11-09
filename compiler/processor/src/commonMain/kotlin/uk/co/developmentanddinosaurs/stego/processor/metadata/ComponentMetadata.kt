@@ -19,6 +19,7 @@ data class ComponentMetadata(
 data class PropertyInfo(
     val name: String,
     val typeQualifiedName: String,
+    val isDecoratedNode: Boolean
 )
 
 @Serializable

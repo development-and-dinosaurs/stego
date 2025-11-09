@@ -1,6 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.ui.node
 
 import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
+import uk.co.developmentanddinosaurs.stego.ui.UserInteraction
 import uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule
 
 /**
@@ -14,9 +15,9 @@ import uk.co.developmentanddinosaurs.stego.ui.validators.ValidationRule
  */
 @StegoNode(type = "stego.text_field")
 data class TextFieldUiNode(
-    override val id: String,
-    val label: String,
-    val text: String,
-    val onTextChanged: UserInteraction,
-    val validators: List<ValidationRule> = emptyList(),
+  override val id: String,
+  val label: String,
+  val text: String,
+  val onTextChanged: UserInteraction,
+  val validators: List<ValidationRule> = emptyList(),
 ) : UiNode

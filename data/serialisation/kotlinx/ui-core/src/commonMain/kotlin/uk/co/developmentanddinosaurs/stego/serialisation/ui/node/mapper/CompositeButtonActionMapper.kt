@@ -1,8 +1,9 @@
 package uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper
 
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ButtonActionMapper
 import kotlin.reflect.KClass
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonActionDto
-import uk.co.developmentanddinosaurs.stego.ui.node.ButtonAction
+import uk.co.developmentanddinosaurs.stego.ui.ButtonAction
 
 class CompositeButtonActionMapper(
     private val mappers: Map<KClass<out ButtonActionDto>, ButtonActionMapper>,

@@ -19,6 +19,7 @@ import uk.co.developmentanddinosaurs.stego.ui.node.ImageUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.InteractionDataKeys
 import uk.co.developmentanddinosaurs.stego.ui.node.LabelUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.ProgressIndicatorUiNode
+import uk.co.developmentanddinosaurs.stego.ui.node.RowUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.SubmitButtonAction
 import uk.co.developmentanddinosaurs.stego.ui.node.TextFieldUiNode
 import uk.co.developmentanddinosaurs.stego.ui.node.UiNode
@@ -29,6 +30,7 @@ import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderGridUiNode
 import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderImageUiNode
 import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderLabelUiNode
 import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderProgressIndicatorUiNode
+import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderRowUiNode
 import uk.co.developmentanddinosaurs.stego.ui.uinode.RenderTextFieldUiNode
 
 @Composable
@@ -96,6 +98,7 @@ private fun RenderInternal(
     is ImageUiNode -> RenderImageUiNode(uiNode)
     is LabelUiNode -> RenderLabel(uiNode, context)
     is ProgressIndicatorUiNode -> RenderProgressIndicatorUiNode()
+    is RowUiNode -> RenderRow(uiNode, context, onEvent, formFields, shakeTrigger, onShake)
     is TextFieldUiNode ->
         RenderTextField(uiNode, context, interactionHandler, onStateChange, shakeTrigger)
   }
@@ -113,6 +116,20 @@ private fun RenderGrid(
     onShake: () -> Unit,
 ) {
   RenderGridUiNode(uiNode) { childNode ->
+    RenderInternal(childNode, context, onEvent, formFields, shakeTrigger, onShake)
+  }
+}
+
+@Composable
+private fun RenderRow(
+    uiNode: RowUiNode,
+    context: Context,
+    onEvent: (Event) -> Unit,
+    formFields: SnapshotStateMap<String, FieldState>,
+    shakeTrigger: Int,
+    onShake: () -> Unit,
+) {
+  RenderRowUiNode(uiNode) { childNode ->
     RenderInternal(childNode, context, onEvent, formFields, shakeTrigger, onShake)
   }
 }

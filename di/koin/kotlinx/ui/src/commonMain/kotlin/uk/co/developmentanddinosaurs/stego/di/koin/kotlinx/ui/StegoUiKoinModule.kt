@@ -11,27 +11,20 @@ import uk.co.developmentanddinosaurs.stego.serialisation.mappers.LogicStateMappe
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.uiSerializersModule
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ButtonUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ColumnUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.GridUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ImageUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.LabelUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.ProgressIndicatorUiNodeDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.SubmitButtonActionDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.TextFieldUiNodeDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.ButtonActionMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ButtonActionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.ButtonUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.ColumnUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.CompositeButtonActionMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.CompositeUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.CompositeValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.GridUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.ImageUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.LabelUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.ProgressIndicatorUiNodeMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.RowUiNodeMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.SubmitButtonActionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.TextFieldUiNodeMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.UiNodeMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.UiNodeMapperRegistry
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.UserInteractionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MaxLengthValidationRuleDto
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.MinLengthValidationRuleDto
@@ -39,7 +32,7 @@ import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.RequiredV
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.MaxLengthValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.MinLengthValidationRuleMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.RequiredValidationRuleMapper
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.validators.mapper.ValidationRuleMapper
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.mapper.ValidationRuleMapper
 
 /** Provides the Koin module for UI dependencies. */
 class StegoUiKoinModule {
@@ -66,22 +59,19 @@ class StegoUiKoinModule {
       )
     } bind ValidationRuleMapper::class
     single {
-      CompositeUiNodeMapper(
-          simpleMappers =
-              mapOf(
-                  LabelUiNodeDto::class to LabelUiNodeMapper(),
-                  ProgressIndicatorUiNodeDto::class to ProgressIndicatorUiNodeMapper(),
-                  TextFieldUiNodeDto::class to TextFieldUiNodeMapper(get(), get()),
-                  ButtonUiNodeDto::class to ButtonUiNodeMapper(get()),
-                  ImageUiNodeDto::class to ImageUiNodeMapper(),
-              ),
-          compositeAwareFactories =
-              mapOf(
-                  ColumnUiNodeDto::class to { mapper -> ColumnUiNodeMapper(mapper) },
-                  GridUiNodeDto::class to { mapper -> GridUiNodeMapper(mapper) },
-              ),
+      UiNodeMapperRegistry(
+          setOf(
+              ButtonUiNodeMapper(get()),
+              ColumnUiNodeMapper(get()),
+              GridUiNodeMapper(get()),
+              ImageUiNodeMapper(),
+              LabelUiNodeMapper(),
+              ProgressIndicatorUiNodeMapper(),
+              RowUiNodeMapper(get()),
+              TextFieldUiNodeMapper(get(), get()),
+          )
       )
-    } bind UiNodeMapper::class
+    }
     single {
       CompositeStateMapper(
           mapperFactories =

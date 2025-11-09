@@ -1,6 +1,7 @@
 package uk.co.developmentanddinosaurs.stego.ui.node
 
 import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
+import uk.co.developmentanddinosaurs.stego.ui.ButtonAction
 
 /**
  * UI model for a button.
@@ -11,7 +12,7 @@ import uk.co.developmentanddinosaurs.stego.annotations.StegoNode
  */
 @StegoNode(type = "stego.button")
 data class ButtonUiNode(
-    override val id: String,
-    val text: String,
-    val onClick: ButtonAction,
+  override val id: String,
+  val text: String,
+  val onClick: ButtonAction,
 ) : UiNode

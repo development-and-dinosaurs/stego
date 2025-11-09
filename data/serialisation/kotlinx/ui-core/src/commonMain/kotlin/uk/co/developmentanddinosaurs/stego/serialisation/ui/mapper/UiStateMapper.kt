@@ -6,7 +6,6 @@ import uk.co.developmentanddinosaurs.stego.serialisation.mappers.InvokableDefini
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.StateDtoMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.TransitionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.ui.UiStateDto
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.node.mapper.UiNodeMapper
 import uk.co.developmentanddinosaurs.stego.statemachine.State
 import uk.co.developmentanddinosaurs.stego.ui.UiState
 

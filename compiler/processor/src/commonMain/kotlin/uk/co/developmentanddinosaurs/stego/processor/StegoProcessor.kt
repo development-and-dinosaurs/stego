@@ -21,8 +21,8 @@ import uk.co.developmentanddinosaurs.stego.processor.metadata.PropertyInfo
 
 @OptIn(KspExperimental::class)
 class StegoProcessor(
-    private val codeGenerator: CodeGenerator,
-    private val logger: KSPLogger,
+  private val codeGenerator: CodeGenerator,
+  private val logger: KSPLogger,
 ) : SymbolProcessor {
   private val json = Json
 
@@ -34,7 +34,20 @@ class StegoProcessor(
       return emptyList()
     }
 
-    writeComponentMetadata(symbols)
+    val stegoNodes =
+      resolver
+        .getSymbolsWithAnnotation(StegoNode::class.qualifiedName!!)
+        .filterIsInstance<KSClassDeclaration>()
+        .toSet()
+
+    val stegoComponents =
+      resolver
+        .getSymbolsWithAnnotation(StegoComponent::class.qualifiedName!!)
+        .filterIsInstance<KSClassDeclaration>()
+        .toSet()
+
+    writeStegoNodes(stegoNodes)
+    writeStegoComponents(stegoComponents)
     writeBaseComponentMetadata(symbols)
 
     logger.info("Stego processor finished")
@@ -42,28 +55,23 @@ class StegoProcessor(
   }
 
   private fun getSymbolsToProcess(resolver: Resolver): Set<KSClassDeclaration> =
-      (resolver.getSymbolsWithAnnotation(StegoComponent::class.qualifiedName!!) +
-              resolver.getSymbolsWithAnnotation(StegoNode::class.qualifiedName!!))
-          .filterIsInstance<KSClassDeclaration>()
-          .toSet()
+    (resolver.getSymbolsWithAnnotation(StegoComponent::class.qualifiedName!!) +
+      resolver.getSymbolsWithAnnotation(StegoNode::class.qualifiedName!!))
+      .filterIsInstance<KSClassDeclaration>()
+      .toSet()
 
-  private fun writeComponentMetadata(symbols: Set<KSClassDeclaration>) {
+  private fun writeStegoNodes(symbols: Set<KSClassDeclaration>) {
+    val stegoNodes = symbols.map(::toComponentMetadata)
+    val stegoNodesJson = json.encodeToString(stegoNodes)
+
+    writeJsonFile(symbols, stegoNodesJson, "nodes")
+  }
+
+  private fun writeStegoComponents(symbols: Set<KSClassDeclaration>) {
     val components = symbols.map(::toComponentMetadata)
     val componentsJson = json.encodeToString(components)
 
-    val outputFile =
-        codeGenerator.createNewFile(
-            dependencies =
-                Dependencies(
-                    aggregating = true,
-                    sources = symbols.mapNotNull { it.containingFile }.toList().toTypedArray(),
-                ),
-            packageName = "stego",
-            fileName = "components",
-            extensionName = "json",
-        )
-
-    outputFile.write(componentsJson.toByteArray())
+    writeJsonFile(symbols, componentsJson, "components")
   }
 
   private fun writeBaseComponentMetadata(symbols: Set<KSClassDeclaration>) {
@@ -71,83 +79,102 @@ class StegoProcessor(
     val baseComponents = externalSupertypes.map(::toBaseComponentMetadata)
     val baseComponentsJson = json.encodeToString(baseComponents.toList())
 
-    val outputFile =
-        codeGenerator.createNewFile(
-            dependencies = Dependencies(aggregating = true, sources = emptyArray()),
-            packageName = "stego",
-            fileName = "base-components",
-            extensionName = "json",
-        )
+    writeJsonFile(symbols, baseComponentsJson, "base-components")
+  }
 
-    outputFile.write(baseComponentsJson.toByteArray())
-    logger.info(
-        "Wrote base component metadata for: ${baseComponents.map { it.qualifiedName }.toList()}"
-    )
+  private fun writeJsonFile(
+    symbols: Set<KSClassDeclaration>,
+    stegoNodesJson: String,
+    fileName: String,
+  ) {
+    val outputFile =
+      codeGenerator.createNewFile(
+        dependencies =
+          Dependencies(
+            aggregating = true,
+            sources = symbols.mapNotNull { it.containingFile }.toList().toTypedArray(),
+          ),
+        packageName = "stego",
+        fileName = fileName,
+        extensionName = "json",
+      )
+
+    outputFile.write(stegoNodesJson.toByteArray())
   }
 
   private fun getExternalSupertypes(symbols: Set<KSClassDeclaration>): List<KSClassDeclaration> =
-      symbols
-          .flatMap { it.superTypes }
-          .map { it.resolve().declaration }
-          .filterIsInstance<KSClassDeclaration>()
-          .filterNot { it.qualifiedName!!.asString().startsWith("kotlin.") }
-          .distinctBy { it.qualifiedName }
+    symbols
+      .flatMap { it.superTypes }
+      .map { it.resolve().declaration }
+      .filterIsInstance<KSClassDeclaration>()
+      .filterNot { it.qualifiedName!!.asString().startsWith("kotlin.") }
+      .distinctBy { it.qualifiedName }
 
   private fun toBaseComponentMetadata(declaration: KSClassDeclaration): BaseComponentMetadata =
-      BaseComponentMetadata(
-          qualifiedName = declaration.qualifiedName!!.asString(),
-          properties =
-              declaration
-                  .getAllProperties()
-                  .map(KSPropertyDeclaration::simpleName)
-                  .map(KSName::asString)
-                  .toList(),
-      )
+    BaseComponentMetadata(
+      qualifiedName = declaration.qualifiedName!!.asString(),
+      properties =
+        declaration
+          .getAllProperties()
+          .map(KSPropertyDeclaration::simpleName)
+          .map(KSName::asString)
+          .toList(),
+    )
 
   private fun toComponentMetadata(classDeclaration: KSClassDeclaration): ComponentMetadata {
     val stegoAnnotation =
-        classDeclaration.annotations.first { it.shortName.asString().contains("Stego") }
+      classDeclaration.annotations.first { it.shortName.asString().contains("Stego") }
     val stegoType =
-        stegoAnnotation.arguments.first { it.name?.asString() == "type" }.value as String
+      stegoAnnotation.arguments.first { it.name?.asString() == "type" }.value as String
     val superType =
-        classDeclaration.superTypes
-            .map { it.resolve().declaration.qualifiedName?.asString() }
-            .filterNotNull()
-            .filterNot { it.startsWith("kotlin.") }
-            .firstOrNull()
-
+      classDeclaration.superTypes
+        .map { it.resolve().declaration.qualifiedName?.asString() }
+        .filterNotNull()
+        .filterNot { it.startsWith("kotlin.") }
+        .firstOrNull()
+    println()
+    println(stegoType)
+    classDeclaration.primaryConstructor?.parameters?.forEach {
+      it.type.resolve().arguments.forEach {
+        println((it.type?.resolve()?.declaration as KSClassDeclaration).superTypes.toList())
+      }
+    }
     val constructorParameters = classDeclaration.primaryConstructor?.parameters ?: emptyList()
     val properties =
-        constructorParameters.map { parameter ->
-          PropertyInfo(
-              name = parameter.name!!.asString(),
-              typeQualifiedName = parameter.type.resolve().toTypeName(),
-          )
+      constructorParameters.map { parameter ->
+        val isDecoratedNode = parameter.type.resolve().arguments.any { arg ->
+          (arg.type?.resolve()?.declaration as KSClassDeclaration).superTypes.toList().map { it.resolve().declaration.simpleName.asString() }.contains("DecoratedUiNode")
         }
+        PropertyInfo(
+          name = parameter.name!!.asString(),
+          typeQualifiedName = parameter.type.resolve().toTypeName(),
+          isDecoratedNode = isDecoratedNode,
+        )
+      }
     return ComponentMetadata(
-        qualifiedName = classDeclaration.qualifiedName!!.asString(),
-        stegoType = stegoType.ifBlank { null },
-        properties = properties,
-        superType = superType,
+      qualifiedName = classDeclaration.qualifiedName!!.asString(),
+      stegoType = stegoType.ifBlank { null },
+      properties = properties,
+      superType = superType,
     )
   }
 
   private fun KSType.toTypeName(): String {
     val baseType = this.declaration.qualifiedName!!.asString()
     val typeName =
-        if (this.arguments.isEmpty()) {
-          baseType
-        } else {
-          this.toGenericTypeName(baseType)
-        }
+      if (this.arguments.isEmpty()) {
+        baseType
+      } else {
+        this.toGenericTypeName(baseType)
+      }
     return if (this.nullability == Nullability.NULLABLE) "$typeName?" else typeName
   }
 
   private fun KSType.toGenericTypeName(baseType: String): String {
     val genericArgs =
-        this.arguments.joinToString(separator = ", ") { argument ->
-          argument.type!!.resolve().toTypeName()
-        }
+      this.arguments.joinToString(separator = ", ") { argument ->
+        argument.type!!.resolve().toTypeName()
+      }
     return "$baseType<$genericArgs>"
   }
 }

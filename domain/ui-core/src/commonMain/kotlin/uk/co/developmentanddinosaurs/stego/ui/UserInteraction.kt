@@ -1,4 +1,4 @@
-package uk.co.developmentanddinosaurs.stego.ui.node
+package uk.co.developmentanddinosaurs.stego.ui
 
 import uk.co.developmentanddinosaurs.stego.annotations.StegoComponent
 
@@ -7,7 +7,7 @@ import uk.co.developmentanddinosaurs.stego.annotations.StegoComponent
  *
  * @property trigger The unique identifier for the interaction.
  */
-@StegoComponent
+@StegoComponent(type = "user-interaction")
 data class UserInteraction(
     val trigger: String,
 )

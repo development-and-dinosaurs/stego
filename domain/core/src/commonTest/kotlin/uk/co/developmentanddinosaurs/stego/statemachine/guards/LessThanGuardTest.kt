@@ -6,45 +6,50 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Context
 import uk.co.developmentanddinosaurs.stego.statemachine.Event
 import uk.co.developmentanddinosaurs.stego.statemachine.valueresolution.ValueProvider
 
-class LessThanGuardTest : BehaviorSpec() {
-  init {
-    val context = Context()
-    val event = Event("TEST_EVENT")
+class LessThanGuardTest :
+    BehaviorSpec({
+        val context = Context()
+        val event = Event("TEST_EVENT")
 
-    Given("the left value is less than the right value") {
-      val leftProvider = ValueProvider.resolve(1)
-      val rightProvider = ValueProvider.resolve(5)
+        Given("the left value is less than the right value") {
+            val leftProvider = ValueProvider.resolve(1)
+            val rightProvider = ValueProvider.resolve(5)
 
-      When("the guard is evaluated") {
-        val guard = LessThanGuard(leftProvider, rightProvider)
-        val result = guard.evaluate(context, event)
+            When("the guard is evaluated") {
+                val guard = LessThanGuard(leftProvider, rightProvider)
+                val result = guard.evaluate(context, event)
 
-        Then("it should return true") { result shouldBe true }
-      }
-    }
+                Then("it should return true") {
+                    result shouldBe true
+                }
+            }
+        }
 
-    Given("the left value is equal to the right value") {
-      val leftProvider = ValueProvider.resolve(5)
-      val rightProvider = ValueProvider.resolve(5)
+        Given("the left value is equal to the right value") {
+            val leftProvider = ValueProvider.resolve(5)
+            val rightProvider = ValueProvider.resolve(5)
 
-      When("the guard is evaluated") {
-        val guard = LessThanGuard(leftProvider, rightProvider)
-        val result = guard.evaluate(context, event)
+            When("the guard is evaluated") {
+                val guard = LessThanGuard(leftProvider, rightProvider)
+                val result = guard.evaluate(context, event)
 
-        Then("it should return false") { result shouldBe false }
-      }
-    }
+                Then("it should return false") {
+                    result shouldBe false
+                }
+            }
+        }
 
-    Given("the left value is greater than the right value") {
-      val leftProvider = ValueProvider.resolve(10)
-      val rightProvider = ValueProvider.resolve(5)
+        Given("the left value is greater than the right value") {
+            val leftProvider = ValueProvider.resolve(10)
+            val rightProvider = ValueProvider.resolve(5)
 
-      When("the guard is evaluated") {
-        val guard = LessThanGuard(leftProvider, rightProvider)
-        val result = guard.evaluate(context, event)
+            When("the guard is evaluated") {
+                val guard = LessThanGuard(leftProvider, rightProvider)
+                val result = guard.evaluate(context, event)
 
-        Then("it should return false") { result shouldBe false }
-      }
-    }
-  }
-}
+                Then("it should return false") {
+                    result shouldBe false
+                }
+            }
+        }
+    })

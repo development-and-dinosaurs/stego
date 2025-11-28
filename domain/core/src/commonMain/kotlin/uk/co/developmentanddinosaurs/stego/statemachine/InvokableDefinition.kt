@@ -6,7 +6,7 @@ package uk.co.developmentanddinosaurs.stego.statemachine
  * @property id A unique identifier for this specific invocation.
  * @property src The [Invokable] logic to be executed.
  * @property input A map of parameters to be passed to the [Invokable] during execution. The values
- *   must conform to the [DataValue] model.
+ * must conform to the [DataValue] model.
  */
 data class InvokableDefinition(
     val id: String,

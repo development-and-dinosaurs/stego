@@ -9,10 +9,13 @@ import uk.co.developmentanddinosaurs.stego.serialisation.LogActionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.LogicStateDto
 import uk.co.developmentanddinosaurs.stego.serialisation.StateDto
 
-val stegoCoreSerializersModule = SerializersModule {
-  polymorphic(StateDto::class) { subclass(LogicStateDto::class) }
-  polymorphic(ActionDto::class) {
-    subclass(LogActionDto::class)
-    subclass(AssignActionDto::class)
-  }
-}
+val stegoCoreSerializersModule =
+    SerializersModule {
+        polymorphic(StateDto::class) {
+            subclass(LogicStateDto::class)
+        }
+        polymorphic(ActionDto::class) {
+            subclass(LogActionDto::class)
+            subclass(AssignActionDto::class)
+        }
+    }

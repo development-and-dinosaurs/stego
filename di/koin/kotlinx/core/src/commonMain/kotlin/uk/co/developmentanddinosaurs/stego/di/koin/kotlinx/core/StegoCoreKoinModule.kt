@@ -12,13 +12,16 @@ import uk.co.developmentanddinosaurs.stego.serialisation.mappers.LogActionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.TransitionMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.module.stegoCoreSerializersModule
 
-/** Provides the Koin module for core dependencies. */
+/**
+ * Provides the Koin module for core dependencies.
+ */
 class StegoCoreKoinModule {
-  val module: Module = module {
-    single(named("stegoCoreSerializersModule")) { stegoCoreSerializersModule }
-    single { ActionMapper() } bind ActionDtoMapper::class
-    singleOf(::AssignActionMapper)
-    single { LogActionMapper { message -> println(message) } }
-    singleOf(::TransitionMapper)
-  }
+    val module: Module =
+        module {
+            single(named("stegoCoreSerializersModule")) { stegoCoreSerializersModule }
+            single { ActionMapper() } bind ActionDtoMapper::class
+            singleOf(::AssignActionMapper)
+            single { LogActionMapper { message -> println(message) } }
+            singleOf(::TransitionMapper)
+        }
 }

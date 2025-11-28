@@ -6,7 +6,7 @@ import kotlinx.serialization.modules.plus
 import uk.co.developmentanddinosaurs.stego.serialisation.StateMachineDefinitionDto
 import uk.co.developmentanddinosaurs.stego.serialisation.mappers.CompositeStateMapper
 import uk.co.developmentanddinosaurs.stego.serialisation.module.stegoCoreSerializersModule
-import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.uiSerializersModule
+import uk.co.developmentanddinosaurs.stego.serialisation.ui.module.stegoUiSerializersModule
 import uk.co.developmentanddinosaurs.stego.statemachine.Invokable
 import uk.co.developmentanddinosaurs.stego.statemachine.InvokableResult
 import uk.co.developmentanddinosaurs.stego.statemachine.StateMachineDefinition
@@ -37,7 +37,7 @@ fun loadLoginStateMachineDefinitionJsonString(context: android.content.Context):
 }
 
 private val json = Json {
-    serializersModule = stegoCoreSerializersModule + uiSerializersModule()
+    serializersModule = stegoCoreSerializersModule + stegoUiSerializersModule
 }
 
 fun stateDefDto(context: android.content.Context): StateMachineDefinitionDto =

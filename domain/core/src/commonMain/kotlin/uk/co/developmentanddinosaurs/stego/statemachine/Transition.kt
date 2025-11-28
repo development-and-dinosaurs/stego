@@ -5,8 +5,8 @@ import uk.co.developmentanddinosaurs.stego.statemachine.guards.Guard
 /**
  * Represents a directed transition between two [State]s in the state machine.
  *
- * A transition is triggered by an [Event] and is only taken if its optional [guard] condition is
- * met. When taken, it will execute a list of [Action]s before entering the target state.
+ * A transition is triggered by an [Event] and is only taken if its optional [guard] condition is met.
+ * When taken, it will execute a list of [Action]s before entering the target state.
  *
  * @property target The ID of the target [State] to transition to.
  * @property actions A list of [Action]s to be executed when this transition is taken.

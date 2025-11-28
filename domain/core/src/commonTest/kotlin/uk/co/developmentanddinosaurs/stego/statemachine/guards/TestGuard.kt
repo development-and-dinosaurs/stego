@@ -5,16 +5,16 @@ import uk.co.developmentanddinosaurs.stego.statemachine.Event
 
 val TrueGuard =
     object : Guard {
-      override fun evaluate(
-          context: Context,
-          event: Event,
-      ) = true
+        override fun evaluate(
+            context: Context,
+            event: Event,
+        ) = true
     }
 
 val FalseGuard =
     object : Guard {
-      override fun evaluate(
-          context: Context,
-          event: Event,
-      ) = false
+        override fun evaluate(
+            context: Context,
+            event: Event,
+        ) = false
     }
